@@ -1,0 +1,9 @@
+[package]
+version = "0.1.0"
+category = "robotics"
+title = "OSRacer Lab Tasks"
+description = "IsaacLab task definitions for OSRacer."
+author = "osrbot"
+maintainer = "osrbot"
+repository = "https://github.com/osrbot/osracer_lab"
+keywords = ["isaaclab", "osracer", "rl", "ackermann"]
