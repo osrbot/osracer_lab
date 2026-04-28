@@ -1,0 +1,9 @@
+[package]
+version = "0.1.0"
+category = "robotics"
+title = "OSRacer Lab RL"
+description = "RL run configs and scripts for OSRacer IsaacLab tasks."
+author = "osrbot"
+maintainer = "osrbot"
+repository = "https://github.com/osrbot/osracer_lab"
+keywords = ["isaaclab", "osracer", "rsl-rl", "ppo"]
