@@ -6,15 +6,41 @@ Two configs are provided:
                         at scene level via TiledCameraCfg with camera_joint offset)
 """
 
+import os
+
 from isaaclab.actuators import DCMotorCfg, ImplicitActuatorCfg
 from isaaclab.assets import ArticulationCfg
 import isaaclab.sim as sim_utils
 
 from . import OSRACER_LAB_ASSETS_DATA_DIR
 
-OSRACER_URDF_PATH = (
-    "/home/osrbot/Desktop/osracer/osracer/osracer_description/urdf/osracer.urdf"
+_OSRACER_DESC_DIR = os.path.join(
+    os.path.dirname(__file__), "../../../../osracer/osracer_description"
 )
+_OSRACER_DESC_DIR = os.path.normpath(_OSRACER_DESC_DIR)
+
+_OSRACER_URDF_SRC = os.path.join(_OSRACER_DESC_DIR, "urdf", "osracer.urdf")
+
+
+def _make_patched_urdf() -> str:
+    """Return path to a URDF with package:// paths replaced by absolute file:// URIs.
+
+    IsaacSim's URDF importer cannot resolve package:// without ROS_PACKAGE_PATH.
+    We patch once and cache the result next to the source URDF.
+    """
+    patched_path = os.path.join(_OSRACER_DESC_DIR, "urdf", "osracer_patched.urdf")
+    if os.path.exists(patched_path):
+        return patched_path
+    with open(_OSRACER_URDF_SRC) as f:
+        content = f.read()
+    abs_desc = _OSRACER_DESC_DIR.rstrip("/")
+    patched = content.replace("package://osracer_description/", f"file://{abs_desc}/")
+    with open(patched_path, "w") as f:
+        f.write(patched)
+    return patched_path
+
+
+OSRACER_URDF_PATH = _make_patched_urdf()
 
 OSRACER_ACTUATOR_CFG = {
     "steering_joints": ImplicitActuatorCfg(
