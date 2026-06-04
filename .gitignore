@@ -9,3 +9,6 @@ logs/
 outputs/
 wandb/
 *.usd.tmp
+
+# IsaacLab URDF->USD conversion cache (runtime generated)
+source/osracer_lab_assets/data/Robots/OSRacer/usd/
