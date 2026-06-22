@@ -40,8 +40,8 @@ from isaaclab.utils import configclass
 from isaaclab.utils.math import euler_xyz_from_quat
 from isaaclab.utils.noise import UniformNoiseCfg as Unoise
 
-from wheeledlab_tasks.visual.mdp import reset_root_state
-from wheeledlab_tasks.visual.utils import (
+from osracer_lab_tasks.visual.mdp import reset_root_state
+from osracer_lab_tasks.visual.utils import (
     TraversabilityHashmapUtil,
     create_geometry,
     generate_random_poses,

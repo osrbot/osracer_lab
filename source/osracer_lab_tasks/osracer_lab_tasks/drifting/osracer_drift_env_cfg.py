@@ -22,12 +22,11 @@ from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils import configclass
 
-from wheeledlab.envs.mdp import increase_reward_weight_over_time
-from wheeledlab_tasks.common import BlindObsCfg
-from wheeledlab_tasks.drifting.mdp import reset_root_state_along_track
+from osracer_lab_tasks.mdp.curriculums import increase_reward_weight_over_time
+from osracer_lab_tasks.common import BlindObsCfg, OSRacerAckermannActionCfg
+from osracer_lab_tasks.drifting.mdp import reset_root_state_along_track
 
 from osracer_lab_assets import OSRACER_CFG
-from osracer_lab_tasks.common import OSRacerAckermannActionCfg
 
 ##############################
 ###### COMMON CONSTANTS ######
@@ -71,6 +70,8 @@ class OSRacerDriftSceneCfg(InteractiveSceneCfg):
     def __post_init__(self):
         super().__post_init__()
         self.robot.init_state = self.robot.init_state.replace(pos=(0.0, 0.0, 0.10))
+        # prestartup domain rand terms require replicate_physics=False
+        self.replicate_physics = False
 
 
 #####################
@@ -98,7 +99,7 @@ class DriftEventsCfg:
 class DriftEventsRandomCfg(DriftEventsCfg):
     change_wheel_friction = EventTerm(
         func=mdp.randomize_rigid_body_material,
-        mode="startup",
+        mode="prestartup",
         params={
             "static_friction_range": (0.3, 0.5),
             "dynamic_friction_range": (0.3, 0.5),
@@ -112,7 +113,7 @@ class DriftEventsRandomCfg(DriftEventsCfg):
 
     randomize_gains = EventTerm(
         func=mdp.randomize_actuator_gains,
-        mode="startup",
+        mode="prestartup",
         params={
             "asset_cfg": SceneEntityCfg("robot", joint_names=[".*rear.*wheel.*"]),
             "damping_distribution_params": (10.0, 50.0),
@@ -144,7 +145,7 @@ class DriftEventsRandomCfg(DriftEventsCfg):
 
     add_base_mass = EventTerm(
         func=mdp.randomize_rigid_body_mass,
-        mode="startup",
+        mode="prestartup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=["base_link"]),
             "mass_distribution_params": (0.3, 0.5),

@@ -16,7 +16,7 @@ setup(
     version=EXTENSION_TOML_DATA["package"]["version"],
     description=EXTENSION_TOML_DATA["package"]["description"],
     keywords=EXTENSION_TOML_DATA["package"]["keywords"],
-    install_requires=["toml", "gymnasium==1.0.0", "osracer_lab_assets"],
+    install_requires=["toml", "gymnasium==1.0.0", "osracer_lab_assets", "scipy"],
     license="MIT",
     include_package_data=True,
     python_requires=">=3.10",

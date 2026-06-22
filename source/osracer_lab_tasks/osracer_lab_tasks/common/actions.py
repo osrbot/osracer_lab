@@ -1,7 +1,7 @@
 """Action configuration for OSRacer tasks."""
 
 from isaaclab.utils import configclass
-from wheeledlab.envs.mdp import RCCarRWDActionCfg
+from osracer_lab_tasks.mdp.actions import RCCarRWDActionCfg
 
 
 @configclass
