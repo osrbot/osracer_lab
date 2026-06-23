@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 64]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 32]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 65]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 33]` |
 
 ## Implemented In `osracer_lab`
 
@@ -75,6 +75,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - `tools/jetson_runtime_summary.py`
 - Jetson deployment package verifier: `tools/verify_jetson_deployment.py`
   - Verifies packaged source authority snapshot when included.
+  - Requires CameraInfo-derived camera calibration for visual deployment packages.
 - Jetson performance profile helper: `tools/jetson_performance_profile.sh`
 - TensorRT engine build helper: `tools/build_tensorrt_engine.sh`
 - Policy inference benchmark and trtexec log parser: `tools/benchmark_policy_inference.py`

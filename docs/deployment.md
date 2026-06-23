@@ -109,6 +109,9 @@ manifest.json
 SHA256SUMS
 ```
 
+For `Isaac-OSRacerVisualRL-v0` packages, `measured_overlay.json` must include
+CameraInfo-derived `camera_calibration` at the deployed camera resolution.
+
 On Jetson, verify the package before launch:
 
 ```bash
