@@ -23,6 +23,20 @@ alignment procedure.
 
 Create the machine-readable measurement file before updating calibrated sim parameters:
 
+A combined Jetson evidence session can collect sensor topic rates and serial query latency in one directory:
+
+```bash
+cd /home/osrbot/Desktop/osracer/osracer
+tools/jetson_measurement_session.sh --output-dir /tmp/osracer_measurement_session
+cd /home/osrbot/Desktop/osracer/osracer_lab
+scripts/validate_osracer_lab.sh measurement-seed
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+MEASUREMENT_SESSION_FILE=/tmp/osracer_measurement_session/measurement_session.json \
+  scripts/validate_osracer_lab.sh import-measurement-session
+```
+
+Or run the individual import steps:
+
 ```bash
 scripts/validate_osracer_lab.sh measurement-seed
 # Fill every required value and source field with real measurements.

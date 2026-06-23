@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 39]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 20]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 40]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 21]` |
 
 ## Implemented In `osracer_lab`
 
@@ -33,6 +33,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Real-car measurement seed generator: `scripts/collect_real_measurement_seed.py`
 - Jetson sensor preflight measurement importer: `scripts/import_sensor_preflight_measurements.py`
 - Serial latency measurement importer: `scripts/import_serial_latency_measurement.py`
+- Combined measurement session importer: `scripts/import_measurement_session.py`
 - Real-car measurement template: `docs/real_car_measurements.template.json`
 - Sensor extrinsics measured-value checker/writer: `scripts/apply_sensor_extrinsics.py`
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
@@ -71,6 +72,7 @@ scripts/validate_osracer_lab.sh runtime-contract
 MEASUREMENT_SEED_OUTPUT=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh measurement-seed
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SENSOR_SUMMARY_FILE=/tmp/osracer_sensor_summary_valid.json scripts/validate_osracer_lab.sh import-sensor-preflight
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SERIAL_LATENCY_FILE=/tmp/osracer_serial_latency_valid.json scripts/validate_osracer_lab.sh import-serial-latency
+MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_SESSION_FILE=/tmp/osracer_measurement_session_valid/measurement_session.json scripts/validate_osracer_lab.sh import-measurement-session
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh sim2real-readiness
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
