@@ -10,7 +10,7 @@ The upper-computer repo currently exposes two different transform sets:
 | Frame | URDF `xyz rpy` | Static TF launch `xyz rpy` |
 |---|---|---|
 | `camera_link` | `0.12323 -0.017229 -0.053395 -1.5708 0 -1.5708` | `0.30 0 0.075 0 0 0` |
-| `laser` | `-0.082558 -0.017229 0.034095 -0.00028339 -0.031729 0.0057633` | `0.10 0 0.13 0 0 0` |
+| `laser` | `-0.082558 -0.017229 0.034095 0 0 0` | `0.10 0 0.13 0 0 0` |
 | `imu_link` | `0.0417958953212156 -0.0177578126845364 -0.063598843109235 0 0 0` | `0.22 0 0.03 0 0 0` |
 
 Do not tune visual, lidar, or IMU sim2real against both sets. Pick one measured

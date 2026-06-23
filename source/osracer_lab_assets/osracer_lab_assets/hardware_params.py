@@ -111,6 +111,14 @@ def lidar_25m_planar_scan_cfg(scan_rate_hz=10, angular_resolution_deg=0.25):
     }
 
 
+OSRACER_SOURCE_AUTHORITY = {
+    "firmware_repo": "https://github.com/osrbot/osrcore",
+    "firmware_expected_branch": "main",
+    "upper_computer_repo": "https://github.com/osrbot/osracer/tree/feat-demo",
+    "upper_computer_expected_branch": "feat-demo",
+    "firmware_protocol_doc": "docs/serial_protocol.md",
+}
+
 OSRACER_REAL_RUNTIME = {
     "chassis_launch": "osracer_bringup chassis_ackermann.launch.py",
     "serial_port": "/dev/osrbot_base",
@@ -132,7 +140,7 @@ OSRACER_SENSOR_EXTRINSICS = {
     "base_footprint_to_base_link_static_tf_xyz_rpy": (0.0, 0.0, 0.055, 0.0, 0.0, 0.0),
     "urdf_base_link_to_camera_link_xyz_rpy": (0.12323, -0.017229, -0.053395, -1.5708, 0.0, -1.5708),
     "static_tf_base_link_to_camera_link_xyz_rpy": (0.30, 0.0, 0.075, 0.0, 0.0, 0.0),
-    "urdf_base_link_to_laser_xyz_rpy": (-0.082558, -0.017229, 0.034095, -0.00028339, -0.031729, 0.0057633),
+    "urdf_base_link_to_laser_xyz_rpy": (-0.082558, -0.017229, 0.034095, 0.0, 0.0, 0.0),
     "static_tf_base_link_to_laser_xyz_rpy": (0.10, 0.0, 0.13, 0.0, 0.0, 0.0),
     "urdf_base_link_to_imu_link_xyz_rpy": (
         0.0417958953212156,
@@ -179,6 +187,7 @@ def hardware_summary():
         "lidar_25m": OSRACER_LIDAR_25M,
         "camera_pinhole_cfg": ar0234_pinhole_camera_cfg(),
         "lidar_planar_scan_cfg": lidar_25m_planar_scan_cfg(),
+        "source_authority": OSRACER_SOURCE_AUTHORITY,
         "real_runtime": OSRACER_REAL_RUNTIME,
         "sensor_extrinsics": OSRACER_SENSOR_EXTRINSICS,
         "required_real_car_measurements": REQUIRED_REAL_CAR_MEASUREMENTS,

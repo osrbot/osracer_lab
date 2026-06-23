@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 33]` |
-| `osracer` | `dev` | `dev...origin/dev [ahead 17]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 35]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 19]` |
 
 ## Implemented In `osracer_lab`
 
@@ -26,6 +26,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Simulation sensor contract check: `scripts/check_sim_sensor_contract.py`
 - MuJoCo kinematic sim2sim smoke: `scripts/mujoco_sim2sim_smoke.py`
 - Observation replay to MuJoCo pipeline: `scripts/run_sim2real_replay_pipeline.py`
+- Source authority check for `osrcore` and `osracer feat-demo`: `scripts/check_source_authority.py`
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
 - Real-car measurement value validator: `scripts/validate_real_measurements.py`
@@ -62,6 +63,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 Run from `osracer_lab`:
 
 ```bash
+scripts/validate_osracer_lab.sh source-authority
 scripts/validate_osracer_lab.sh runtime-contract
 scripts/validate_osracer_lab.sh sim2real-readiness
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements

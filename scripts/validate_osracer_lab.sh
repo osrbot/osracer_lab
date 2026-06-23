@@ -15,6 +15,8 @@ Targets:
   visual-smoke    Run a short camera/visual training check.
   visual-perf     Run the RTX 4080 SUPER visual throughput probe.
   export-smoke    Export the verified drift checkpoint to TorchScript.
+  source-authority
+                  Check source-of-truth repos: osrcore firmware and osracer feat-demo.
   runtime-contract
                   Check shared hardware/runtime parameters against osracer.
   sim-sensor-contract
@@ -42,6 +44,7 @@ Environment overrides:
   EXPORT_CHECKPOINT=logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
   EXPORT_OUTPUT_DIR=/tmp/osracer_policy_export_smoke
   OSRACER_ROOT=../osracer
+  OSRCORE_ROOT=/path/to/osrcore
   MEASUREMENTS_FILE=docs/real_car_measurements.json
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
@@ -89,6 +92,13 @@ case "$target" in
             --checkpoint "${EXPORT_CHECKPOINT:-logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt}" \
             --output_dir "${EXPORT_OUTPUT_DIR:-/tmp/osracer_policy_export_smoke}" \
             --format jit
+        ;;
+    source-authority)
+        args=(--osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}")
+        if [[ -n "${OSRCORE_ROOT:-}" ]]; then
+            args+=(--osrcore-root "$OSRCORE_ROOT")
+        fi
+        python3 "$ROOT_DIR/scripts/check_source_authority.py" "${args[@]}"
         ;;
     runtime-contract)
         python3 "$ROOT_DIR/scripts/check_runtime_contract.py" \

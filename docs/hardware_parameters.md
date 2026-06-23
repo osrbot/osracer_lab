@@ -4,6 +4,14 @@ This is the current real-vehicle parameter source for sim2sim, sim2real, and Jet
 Use `docs/real_car_measurement_checklist.md` to collect the missing measured values.
 Use `docs/extrinsics_alignment.md` to resolve the current camera, lidar, and IMU frame conflict.
 
+## Source Authority
+
+- Firmware source of truth: `https://github.com/osrbot/osrcore` on `main`.
+- ROS upper-computer source of truth: `https://github.com/osrbot/osracer/tree/feat-demo`.
+- Do not derive vehicle protocol or runtime parameters from `osracer dev` or another branch.
+- The current firmware serial contract is `v <vx_m/s> <steer_deg>`, `stream sync|legacy|off`, `s/m/r/b` telemetry, and `460800` baud on `/dev/osrbot_base` from the ROS side.
+
+
 ## Chassis Parameters
 
 Known simulation and bridge-aligned values:
@@ -81,7 +89,7 @@ way.
 
 ## Real Runtime Contract
 
-Values confirmed from the current `osracer` upper-computer code:
+Values confirmed from `osracer` `feat-demo` upper-computer code and `osrcore` firmware protocol:
 
 | Parameter | Value |
 |---|---|
@@ -110,7 +118,7 @@ calibrated sim2real:
 | Transform | URDF value `xyz rpy` | Static TF launch value `xyz rpy` |
 |---|---|---|
 | `base_link -> camera_link` | `0.12323 -0.017229 -0.053395 -1.5708 0 -1.5708` | `0.30 0 0.075 0 0 0` |
-| `base_link -> laser` | `-0.082558 -0.017229 0.034095 -0.00028339 -0.031729 0.0057633` | `0.10 0 0.13 0 0 0` |
+| `base_link -> laser` | `-0.082558 -0.017229 0.034095 0 0 0` | `0.10 0 0.13 0 0 0` |
 | `base_link -> imu_link` | `0.0417958953212156 -0.0177578126845364 -0.063598843109235 0 0 0` | `0.22 0 0.03 0 0 0` |
 
 Use measured physical mounting or a single generated robot description as the
