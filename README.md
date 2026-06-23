@@ -41,6 +41,12 @@ scripts/                        train_osracer_drift.py
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py \
     --task Isaac-OSRacerVisualRL-v0 --headless --num_envs 512
 
+# Reproducible validation wrapper
+scripts/validate_osracer_lab.sh static
+scripts/validate_osracer_lab.sh drift-smoke
+scripts/validate_osracer_lab.sh visual-smoke
+scripts/validate_osracer_lab.sh visual-perf
+
 # Resume from checkpoint
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py \
     --resume logs/rsl_rl/osracer_drift/model_1000.pt
