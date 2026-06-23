@@ -102,6 +102,7 @@ The package contains:
 ```text
 policy.pt
 hardware_params.json
+README.md
 manifest.json
 SHA256SUMS
 ```
@@ -111,6 +112,7 @@ On Jetson, verify the package before launch:
 ```bash
 cd /path/to/osracer_jetson_deployment
 sha256sum -c SHA256SUMS
+/path/to/osracer/tools/verify_jetson_deployment.py .
 /path/to/osracer/tools/jetson_preflight.sh --policy policy.pt --offline-smoke
 ```
 
