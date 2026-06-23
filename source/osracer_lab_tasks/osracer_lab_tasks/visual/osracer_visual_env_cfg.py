@@ -41,6 +41,7 @@ from isaaclab.utils.math import euler_xyz_from_quat
 from isaaclab.utils.noise import UniformNoiseCfg as Unoise
 
 from osracer_lab_tasks.visual.mdp import reset_root_state
+from osracer_lab_tasks.mdp import observations as osracer_obs
 from osracer_lab_tasks.visual.utils import (
     TraversabilityHashmapUtil,
     create_geometry,
@@ -64,8 +65,8 @@ class VisualObsCfg:
             func=mdp_sensors.camera_data_rgb_flattened_aug,
             params={"sensor_cfg": SceneEntityCfg("camera")},
         )
-        base_lin_vel = ObsTerm(func=mdp.base_lin_vel, noise=Unoise(n_min=-0.1, n_max=0.1))
-        base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=Unoise(n_min=-0.1, n_max=0.1))
+        base_lin_vel = ObsTerm(func=osracer_obs.base_lin_vel, noise=Unoise(n_min=-0.1, n_max=0.1))
+        base_ang_vel = ObsTerm(func=osracer_obs.base_ang_vel, noise=Unoise(n_min=-0.1, n_max=0.1))
         last_action = ObsTerm(func=mdp.last_action, clip=(-1.0, 1.0), noise=Unoise(-0.1, 0.1))
 
         def __post_init__(self):
@@ -228,13 +229,13 @@ class VisualEventsRandomCfg(VisualEventsCfg):
 
 
 def traversable_reward(env):
-    poses = mdp.root_pos_w(env)[..., :2]
+    poses = osracer_obs.root_pos_w(env)[..., :2]
     traversability = TraversabilityHashmapUtil().get_traversability(poses)
     return torch.where(traversability, 1.0, -1.0)
 
 
 def forward_vel(env):
-    return mdp.base_lin_vel(env)[:, 0]
+    return osracer_obs.base_lin_vel(env)[:, 0]
 
 
 @configclass
@@ -249,7 +250,7 @@ class VisualRewardsCfg:
 
 
 def out_of_map(env):
-    poses = mdp.root_pos_w(env)[..., :2]
+    poses = osracer_obs.root_pos_w(env)[..., :2]
     terrain = env.scene[SceneEntityCfg("terrain").name]
     w, h = terrain.cfg.width, terrain.cfg.height
     x_out = torch.logical_or(poses[..., 0] > w / 2, poses[..., 0] < -w / 2)
@@ -257,10 +258,25 @@ def out_of_map(env):
     return torch.logical_or(x_out, y_out)
 
 
+def non_finite_root_state(env):
+    robot = env.scene["robot"]
+    root_state = torch.cat(
+        (
+            robot.data.root_pos_w,
+            robot.data.root_quat_w,
+            robot.data.root_lin_vel_w,
+            robot.data.root_ang_vel_w,
+        ),
+        dim=-1,
+    )
+    return ~torch.isfinite(root_state).all(dim=-1)
+
+
 @configclass
 class VisualTerminationsCfg:
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
     out_range = DoneTerm(func=out_of_map)
+    non_finite_state = DoneTerm(func=non_finite_root_state)
 
 
 ######################

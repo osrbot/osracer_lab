@@ -37,6 +37,10 @@ scripts/                        train_osracer_drift.py
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py \
     --task Isaac-OSRacerVisualRL-v0 --headless
 
+# Visual RL higher-throughput probe on RTX 4080 SUPER
+~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py \
+    --task Isaac-OSRacerVisualRL-v0 --headless --num_envs 512
+
 # Resume from checkpoint
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py \
     --resume logs/rsl_rl/osracer_drift/model_1000.pt
@@ -63,6 +67,11 @@ Short probes:
 | 2048 | Recommended drift baseline, about 75k-92k steps/s |
 | 4096 | Runs, but throughput fluctuates and can drop near 50k-63k steps/s |
 | 8192 | Runs, but initialization and PhysX/CPU synchronization dominate; not recommended by default |
+
+Visual RL camera rendering is heavier than drift, but still leaves headroom on the RTX 4080 SUPER.
+The default `--num_envs 256` is the conservative training baseline: a 50-iteration validation run finished with `model_49.pt`, about 2.0k-2.1k steps/s, and about 7.1 GB VRAM.
+For higher GPU utilization, `--num_envs 512` completed a 10-iteration probe with `model_9.pt`, about 2.9k steps/s, and about 8.5 GB VRAM.
+The visual task includes finite observation wrappers and a non-finite root-state termination guard so rare unstable physics states reset before they reach RSL-RL as NaN observations.
 
 ## Headless Rendering
 
