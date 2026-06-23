@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 61]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 62]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 31]` |
 
 ## Implemented In `osracer_lab`
@@ -47,6 +47,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Sensor extrinsics measured-value checker/writer: `scripts/apply_sensor_extrinsics.py`
 - Calibration update dry-run planner: `scripts/plan_calibration_updates.py`
 - Measured parameter overlay export: `scripts/export_measured_overlay.py`
+- Camera calibration overlay gate: `scripts/check_camera_calibration_overlay.py`
 - Calibration review pack export: `scripts/create_calibration_review_pack.py`
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
   - Includes `source_authority_snapshot.json` when available.
@@ -103,6 +104,7 @@ MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json MEASURED_OVERLAY_OUTPU
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json CALIBRATION_REVIEW_PACK_OUTPUT=/tmp/osracer_calibration_review_pack scripts/validate_osracer_lab.sh calibration-review-pack
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
+MEASURED_OVERLAY_FILE=/tmp/osracer_measured_overlay.json scripts/validate_osracer_lab.sh camera-calibration-overlay
 python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json
 python3 scripts/mujoco_sim2sim_smoke.py --xml-out /tmp/osracer_overlay_smoke.xml --measured-overlay /tmp/osracer_measured_overlay.json
 python3 scripts/package_jetson_deployment.py \

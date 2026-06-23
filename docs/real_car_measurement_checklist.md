@@ -147,7 +147,16 @@ Calibrate AR0234 intrinsics before visual sim2real:
 ```bash
 # Record checkerboard/AprilTag images at the deployed camera resolution.
 # Fill camera_intrinsics_fx_fy_cx_cy_distortion in docs/real_car_measurements.json.
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+  MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json \
+  scripts/validate_osracer_lab.sh measured-overlay
+MEASURED_OVERLAY_FILE=/tmp/osracer_measured_overlay.json \
+  scripts/validate_osracer_lab.sh camera-calibration-overlay
 ```
+
+The overlay gate defaults to the ROS camera runtime resolution in
+`hardware_params.py` (`640x480`). Do not use the advertised `130 deg` FOV as a
+substitute for measured `fx`, `fy`, `cx`, `cy`, and distortion coefficients.
 
 Record passive policy observations:
 

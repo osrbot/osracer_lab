@@ -49,6 +49,8 @@ Targets:
                   Create a review pack from measurements, overlay, plan, and readiness gates.
   measured-overlay
                   Export measured parameter overlay JSON without mutating source files.
+  camera-calibration-overlay
+                  Validate measured AR0234 intrinsics in an overlay JSON.
   sensor-extrinsics-check
                   Compare measured sensor extrinsics against URDF/static TF.
   sensor-extrinsics-write
@@ -77,6 +79,7 @@ Environment overrides:
   MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack
   CALIBRATION_REVIEW_PACK_OUTPUT=/tmp/osracer_calibration_review_pack
   MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json
+  MEASURED_OVERLAY_FILE=/tmp/osracer_measured_overlay.json
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
 EOF
@@ -255,6 +258,10 @@ case "$target" in
         python3 "$ROOT_DIR/scripts/export_measured_overlay.py" \
             --measurements "$MEASUREMENTS_FILE" \
             --output "${MEASURED_OVERLAY_OUTPUT:-/tmp/osracer_measured_overlay.json}"
+        ;;
+    camera-calibration-overlay)
+        python3 "$ROOT_DIR/scripts/check_camera_calibration_overlay.py" \
+            "${MEASURED_OVERLAY_FILE:-/tmp/osracer_measured_overlay.json}"
         ;;
     sensor-extrinsics-check)
         if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
