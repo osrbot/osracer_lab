@@ -5,6 +5,14 @@ import argparse
 import json
 import re
 from pathlib import Path
+import importlib.util
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+HARDWARE_PARAMS_PATH = REPO_ROOT / "source" / "osracer_lab_assets" / "osracer_lab_assets" / "hardware_params.py"
+_hardware_spec = importlib.util.spec_from_file_location("osracer_hardware_params", HARDWARE_PARAMS_PATH)
+_hardware_module = importlib.util.module_from_spec(_hardware_spec)
+_hardware_spec.loader.exec_module(_hardware_module)
+hardware_summary = _hardware_module.hardware_summary
 
 REQUIRED_KEYS = (
     "full_vehicle_mass_kg_with_battery_jetson_sensors",
@@ -285,6 +293,96 @@ VALIDATORS = {
 }
 
 
+
+def get_measurement_value(measurements, name):
+    if name not in measurements:
+        return None
+    return entry_value(measurements[name])
+
+
+def steering_pair(value):
+    if isinstance(value, dict):
+        values = [value.get("left_rad"), value.get("right_rad")]
+    else:
+        values = value
+    return numeric_sequence(values, 2, "true_max_steering_rad_left_right", min_value=0.0, max_value=1.5)
+
+
+def serial_value(value):
+    if isinstance(value, dict):
+        return {
+            "baud_rate": number(value.get("baud_rate"), min_value=9600.0, max_value=10000000.0),
+            "command_latency_s": number(value.get("command_latency_s"), min_value=0.0, max_value=5.0),
+        }
+    baud, latency = numeric_sequence(value, 2, "serial_baud_rate_and_command_latency_s", min_value=0.0)
+    return {"baud_rate": baud, "command_latency_s": latency}
+
+
+def add_consistency_error(invalid, name, error):
+    invalid.append({"name": name, "error": error})
+
+
+def validate_consistency(measurements, complete, invalid):
+    complete_set = set(complete)
+    params = hardware_summary()
+    chassis = params["chassis"]
+    runtime = params["real_runtime"]
+    camera_runtime = params["camera_ar0234"]["ros_runtime"]
+
+    if {"minimum_stable_speed_mps", "true_max_speed_mps"}.issubset(complete_set):
+        minimum = number(get_measurement_value(measurements, "minimum_stable_speed_mps"), min_value=0.0, max_value=30.0)
+        maximum = number(get_measurement_value(measurements, "true_max_speed_mps"), min_value=0.0, max_value=30.0)
+        if minimum > maximum:
+            add_consistency_error(invalid, "minimum_stable_speed_mps", "minimum stable speed must be <= true max speed")
+        initial_limit = float(chassis["initial_real_test_max_speed_mps"])
+        if minimum > initial_limit:
+            add_consistency_error(
+                invalid,
+                "minimum_stable_speed_mps",
+                f"minimum stable speed must be <= initial real-test speed limit {initial_limit}",
+            )
+
+    if "true_max_steering_rad_left_right" in complete_set:
+        left, right = steering_pair(get_measurement_value(measurements, "true_max_steering_rad_left_right"))
+        if min(left, right) <= 0.0:
+            add_consistency_error(invalid, "true_max_steering_rad_left_right", "left/right steering limits must be positive")
+        elif abs(left - right) / max(left, right) > 0.25:
+            add_consistency_error(invalid, "true_max_steering_rad_left_right", "left/right steering limits differ by more than 25%")
+
+    if "battery_voltage_s_count" in complete_set:
+        value = get_measurement_value(measurements, "battery_voltage_s_count")
+        if isinstance(value, dict) and all(key in value for key in ("charged_v", "nominal_v", "cutoff_v")):
+            charged = number(value["charged_v"], min_value=1.0, max_value=60.0)
+            nominal = number(value["nominal_v"], min_value=1.0, max_value=60.0)
+            cutoff = number(value["cutoff_v"], min_value=1.0, max_value=60.0)
+            if not charged >= nominal >= cutoff:
+                add_consistency_error(invalid, "battery_voltage_s_count", "battery voltages must satisfy charged_v >= nominal_v >= cutoff_v")
+
+    if "camera_intrinsics_fx_fy_cx_cy_distortion" in complete_set:
+        value = get_measurement_value(measurements, "camera_intrinsics_fx_fy_cx_cy_distortion")
+        expected_width, expected_height = camera_runtime["configured_resolution_px"]
+        width = int(number(value.get("width_px"), min_value=1.0, max_value=10000.0))
+        height = int(number(value.get("height_px"), min_value=1.0, max_value=10000.0))
+        if (width, height) != (expected_width, expected_height):
+            add_consistency_error(
+                invalid,
+                "camera_intrinsics_fx_fy_cx_cy_distortion",
+                f"camera calibration resolution {width}x{height} must match runtime {expected_width}x{expected_height}",
+            )
+
+    if "serial_baud_rate_and_command_latency_s" in complete_set:
+        value = serial_value(get_measurement_value(measurements, "serial_baud_rate_and_command_latency_s"))
+        expected_baud = float(runtime["serial_baud"])
+        if value["baud_rate"] != expected_baud:
+            add_consistency_error(
+                invalid,
+                "serial_baud_rate_and_command_latency_s",
+                f"baud_rate must match runtime serial_baud {int(expected_baud)}",
+            )
+        if value["command_latency_s"] > 0.05:
+            add_consistency_error(invalid, "serial_baud_rate_and_command_latency_s", "command latency must be <= 0.05 s")
+
+
 def has_value(value):
     if value is None:
         return False
@@ -315,6 +413,7 @@ def validate_measurements(measurements, required=REQUIRED_KEYS):
             invalid.append({"name": name, "error": str(exc)})
         else:
             complete.append(name)
+    validate_consistency(measurements, complete, invalid)
     return {
         "complete": complete,
         "missing": missing,

@@ -27,6 +27,8 @@ Targets:
                   Check Isaac/MuJoCo sensor configs against hardware_params.py.
   real-measurements
                   Validate real-car measurement JSON values and sources.
+  measurement-consistency
+                  Self-check cross-field real-car measurement consistency gates.
   measurement-gap
                   Report grouped missing/incomplete/invalid real-car measurements.
   measurement-seed
@@ -165,6 +167,9 @@ case "$target" in
             exit 2
         fi
         python3 "$ROOT_DIR/scripts/validate_real_measurements.py" "$MEASUREMENTS_FILE"
+        ;;
+    measurement-consistency)
+        python3 "$ROOT_DIR/scripts/check_measurement_consistency.py"
         ;;
     measurement-gap)
         if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
