@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 57]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 28]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 58]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 29]` |
 
 ## Implemented In `osracer_lab`
 
@@ -48,6 +48,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Measured parameter overlay export: `scripts/export_measured_overlay.py`
 - Calibration review pack export: `scripts/create_calibration_review_pack.py`
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
+  - Includes `source_authority_snapshot.json` when available.
 - Documentation:
   - `docs/deployment.md`
   - `docs/hardware_parameters.md`
@@ -69,6 +70,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - `tools/jetson_runtime_monitor.sh`
   - `tools/jetson_runtime_summary.py`
 - Jetson deployment package verifier: `tools/verify_jetson_deployment.py`
+  - Verifies packaged source authority snapshot when included.
 - Jetson performance profile helper: `tools/jetson_performance_profile.sh`
 - TensorRT engine build helper: `tools/build_tensorrt_engine.sh`
 - Policy inference benchmark and trtexec log parser: `tools/benchmark_policy_inference.py`
