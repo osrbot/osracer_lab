@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 53]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 54]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 28]` |
 
 ## Implemented In `osracer_lab`
@@ -30,6 +30,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
 - Real-car measurement value validator: `scripts/validate_real_measurements.py`
+- Grouped real-car measurement gap report: `scripts/measurement_gap_report.py`
 - Real-car measurement seed generator: `scripts/collect_real_measurement_seed.py`
 - Field measurement pack generator: `scripts/create_measurement_pack.py`
 - Jetson sensor preflight measurement importer: `scripts/import_sensor_preflight_measurements.py`
@@ -84,6 +85,7 @@ MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_PACK_OUTPUT=/t
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SENSOR_SUMMARY_FILE=/tmp/osracer_sensor_summary_valid.json scripts/validate_osracer_lab.sh import-sensor-preflight
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SERIAL_LATENCY_FILE=/tmp/osracer_serial_latency_valid.json scripts/validate_osracer_lab.sh import-serial-latency
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_SESSION_FILE=/tmp/osracer_measurement_session_valid/measurement_session.json scripts/validate_osracer_lab.sh import-measurement-session
+MEASUREMENTS_FILE=docs/real_car_measurements.template.json scripts/validate_osracer_lab.sh measurement-gap
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh sim2real-readiness
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh calibration-plan
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json scripts/validate_osracer_lab.sh measured-overlay

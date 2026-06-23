@@ -49,6 +49,8 @@ Or run the individual import steps:
 scripts/validate_osracer_lab.sh measurement-seed
 # Fill every required value and source field with real measurements.
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
+  scripts/validate_osracer_lab.sh measurement-gap
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh sim2real-readiness

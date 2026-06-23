@@ -23,6 +23,8 @@ Targets:
                   Check Isaac/MuJoCo sensor configs against hardware_params.py.
   real-measurements
                   Validate real-car measurement JSON values and sources.
+  measurement-gap
+                  Report grouped missing/incomplete/invalid real-car measurements.
   measurement-seed
                   Create docs/real_car_measurements.json from template plus known repo facts.
   measurement-pack
@@ -136,6 +138,13 @@ case "$target" in
             exit 2
         fi
         python3 "$ROOT_DIR/scripts/validate_real_measurements.py" "$MEASUREMENTS_FILE"
+        ;;
+    measurement-gap)
+        if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE is required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/measurement_gap_report.py" "$MEASUREMENTS_FILE"
         ;;
     measurement-seed)
         python3 "$ROOT_DIR/scripts/collect_real_measurement_seed.py" \
