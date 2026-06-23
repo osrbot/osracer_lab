@@ -38,6 +38,7 @@ OVERLAY_GROUPS = {
         "encoder_ticks_per_revolution_and_mount_location",
     ],
     "imu": ["imu_model_rate_ranges_and_frame_alignment"],
+    "camera_calibration": ["camera_intrinsics_fx_fy_cx_cy_distortion"],
     "sensor_extrinsics": [
         "camera_extrinsic_xyz_rpy_in_base_link",
         "lidar_extrinsic_xyz_rpy_in_base_link",

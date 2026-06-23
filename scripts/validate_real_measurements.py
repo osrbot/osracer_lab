@@ -21,6 +21,7 @@ REQUIRED_KEYS = (
     "throttle_deadband_and_response_delay_s",
     "encoder_ticks_per_revolution_and_mount_location",
     "imu_model_rate_ranges_and_frame_alignment",
+    "camera_intrinsics_fx_fy_cx_cy_distortion",
     "camera_extrinsic_xyz_rpy_in_base_link",
     "lidar_extrinsic_xyz_rpy_in_base_link",
     "imu_extrinsic_xyz_rpy_in_base_link",
@@ -222,6 +223,26 @@ def validate_extrinsic(value, name):
     numeric_sequence(value, 6, name)
 
 
+def validate_camera_intrinsics(value, name):
+    if not isinstance(value, dict):
+        raise ValueError("camera intrinsics value must be an object")
+    for key in ("fx", "fy", "cx", "cy"):
+        if key not in value:
+            raise ValueError(f"camera intrinsics value must include {key}")
+        number(value[key], min_value=0.001, max_value=10000.0)
+    for key in ("width_px", "height_px"):
+        if key not in value:
+            raise ValueError(f"camera intrinsics value must include {key}")
+        number(value[key], min_value=1.0, max_value=10000.0)
+    if not has_text(str(value.get("distortion_model", ""))):
+        raise ValueError("camera intrinsics value must include distortion_model")
+    coeffs = value.get("distortion_coeffs")
+    if not isinstance(coeffs, (list, tuple)):
+        raise ValueError("camera intrinsics value must include distortion_coeffs list")
+    for coeff in coeffs:
+        number(coeff, min_value=-10.0, max_value=10.0)
+
+
 def validate_serial(value, name):
     if not isinstance(value, dict):
         numeric_sequence(value, 2, name, min_value=0.0)
@@ -254,6 +275,7 @@ VALIDATORS = {
     "throttle_deadband_and_response_delay_s": validate_throttle,
     "encoder_ticks_per_revolution_and_mount_location": validate_encoder,
     "imu_model_rate_ranges_and_frame_alignment": validate_imu,
+    "camera_intrinsics_fx_fy_cx_cy_distortion": validate_camera_intrinsics,
     "camera_extrinsic_xyz_rpy_in_base_link": validate_extrinsic,
     "lidar_extrinsic_xyz_rpy_in_base_link": validate_extrinsic,
     "imu_extrinsic_xyz_rpy_in_base_link": validate_extrinsic,

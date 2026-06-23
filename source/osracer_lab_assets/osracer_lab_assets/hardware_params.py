@@ -169,6 +169,7 @@ REQUIRED_REAL_CAR_MEASUREMENTS = (
     "throttle_deadband_and_response_delay_s",
     "encoder_ticks_per_revolution_and_mount_location",
     "imu_model_rate_ranges_and_frame_alignment",
+    "camera_intrinsics_fx_fy_cx_cy_distortion",
     "camera_extrinsic_xyz_rpy_in_base_link",
     "lidar_extrinsic_xyz_rpy_in_base_link",
     "imu_extrinsic_xyz_rpy_in_base_link",

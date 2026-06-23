@@ -125,6 +125,7 @@ handoff artifact for deciding whether any source write-back is approved.
 | IMU | Sample rate | Hz | Firmware config or measured ROS topic rate | missing |
 | IMU | Accel/gyro ranges | g, deg/s or rad/s | Firmware config or datasheet | missing |
 | IMU | Magnetometer availability and calibration state | yes/no, notes | ROS topic and firmware command check | missing |
+| Camera | Intrinsics and distortion at deployed resolution | fx/fy/cx/cy, model, coeffs | Checkerboard or AprilTag calibration with AR0234 camera | missing |
 | Timing | Serial command latency | s | Timestamp ROS publish to firmware echo/effect | missing |
 | Timing | Sensor timestamp source and clock sync | description | Driver/firmware inspection | missing |
 | Extrinsics | `base_link -> camera_link` | xyz rpy, meters/radians | Measure mount or calibrate; resolve URDF vs static TF | conflicting |
@@ -139,6 +140,13 @@ Record real topic rates:
 ros2 topic hz /odometry/filtered
 ros2 topic hz /imu_filter
 ros2 topic hz /rgb/image_raw
+```
+
+Calibrate AR0234 intrinsics before visual sim2real:
+
+```bash
+# Record checkerboard/AprilTag images at the deployed camera resolution.
+# Fill camera_intrinsics_fx_fy_cx_cy_distortion in docs/real_car_measurements.json.
 ```
 
 Record passive policy observations:

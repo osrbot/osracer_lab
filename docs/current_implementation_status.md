@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 60]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 61]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 31]` |
 
 ## Implemented In `osracer_lab`
@@ -43,6 +43,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Combined measurement session importer: `scripts/import_measurement_session.py`
 - Jetson environment evidence importer: `scripts/import_measurement_session.py` records `collection.jetson_environment`
 - Real-car measurement template: `docs/real_car_measurements.template.json`
+  - Includes camera intrinsics/distortion as a required visual sim2real measurement.
 - Sensor extrinsics measured-value checker/writer: `scripts/apply_sensor_extrinsics.py`
 - Calibration update dry-run planner: `scripts/plan_calibration_updates.py`
 - Measured parameter overlay export: `scripts/export_measured_overlay.py`
@@ -137,7 +138,7 @@ first-drive preparation, not calibrated closed-loop sim2real.
 ## Blocking Items Before Calibrated Closed Loop
 
 1. Resolve `base_link -> camera_link`, `base_link -> laser`, and `base_link -> imu_link` source-of-truth conflict between URDF and static TF.
-2. Measure and record the 20 required real-car parameters in `docs/real_car_measurements.json`, copied from `docs/real_car_measurements.template.json`, and pass `scripts/validate_osracer_lab.sh real-measurements`.
+2. Measure and record the 21 required real-car parameters in `docs/real_car_measurements.json`, copied from `docs/real_car_measurements.template.json`, and pass `scripts/validate_osracer_lab.sh real-measurements`.
 3. Put an authenticated `osrbot/osrcore` checkout at `/home/osrbot/Desktop/osracer/osrcore`, then pass `python3 scripts/check_source_authority.py --strict-osrcore`.
 4. Install/check Jetson runtime dependencies on the actual Orin Nano Super 8GB:
    - ROS 2 Jazzy runtime packages

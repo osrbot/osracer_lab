@@ -115,6 +115,14 @@
       "notes": "",
       "expected_format": "{model, rate_hz, accel_range_g, gyro_range_dps, frame_alignment}"
     },
+    "camera_intrinsics_fx_fy_cx_cy_distortion": {
+      "value": null,
+      "unit": "pixels and distortion coefficients",
+      "source": "",
+      "measured_at": "",
+      "notes": "",
+      "expected_format": "{fx, fy, cx, cy, width_px, height_px, distortion_model, distortion_coeffs}"
+    },
     "camera_extrinsic_xyz_rpy_in_base_link": {
       "value": null,
       "unit": "m, rad",

@@ -47,6 +47,7 @@ REVIEW_APPLY = {
     "throttle_deadband_and_response_delay_s": ["actuator deadband/delay model"],
     "encoder_ticks_per_revolution_and_mount_location": ["odom model and firmware/host consistency checks"],
     "imu_model_rate_ranges_and_frame_alignment": ["IMU noise/range model and frame convention docs"],
+    "camera_intrinsics_fx_fy_cx_cy_distortion": ["visual policy camera preprocessing and IsaacLab camera calibration after resolution review"],
     "serial_baud_rate_and_command_latency_s": ["runtime timing notes; already importable, not a geometry write"],
     "sensor_timestamp_sync_method": ["replay timing assumptions; already importable, not a geometry write"],
     "resolve_urdf_vs_static_tf_sensor_extrinsics": ["strict extrinsics gate after measured transforms are applied"],
@@ -102,7 +103,7 @@ def build_plan(measurements):
 
 
 def print_text(plan):
-    print(f"calibration_update_plan: {plan['valid_measurement_count']}/20 valid measurement item(s)")
+    print(f"calibration_update_plan: {plan['valid_measurement_count']}/21 valid measurement item(s)")
     print("auto_apply_ready:")
     for item in plan["auto_apply_ready"]:
         print(f"  - {item['measurement']}")

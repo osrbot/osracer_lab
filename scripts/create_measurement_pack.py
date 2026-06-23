@@ -33,6 +33,9 @@ GROUPS = {
     "imu": [
         "imu_model_rate_ranges_and_frame_alignment",
     ],
+    "camera_calibration": [
+        "camera_intrinsics_fx_fy_cx_cy_distortion",
+    ],
     "extrinsics": [
         "camera_extrinsic_xyz_rpy_in_base_link",
         "lidar_extrinsic_xyz_rpy_in_base_link",
@@ -60,6 +63,7 @@ METHODS = {
     "throttle_deadband_and_response_delay_s": "Step throttle command and record deadband plus response delay from odom/tachometer evidence.",
     "encoder_ticks_per_revolution_and_mount_location": "Read firmware/config/datasheet and note the physical mount location.",
     "imu_model_rate_ranges_and_frame_alignment": "Record IMU part number, topic/config rate, accel/gyro ranges, and base_link frame alignment.",
+    "camera_intrinsics_fx_fy_cx_cy_distortion": "Run checkerboard or AprilTag camera calibration at the deployed resolution and record fx, fy, cx, cy, image size, distortion model, and coefficients.",
     "camera_extrinsic_xyz_rpy_in_base_link": "Measure or calibrate base_link to camera_link as [x,y,z,roll,pitch,yaw] in meters/radians.",
     "lidar_extrinsic_xyz_rpy_in_base_link": "Measure base_link to laser as [x,y,z,roll,pitch,yaw] in meters/radians.",
     "imu_extrinsic_xyz_rpy_in_base_link": "Measure base_link to imu_link as [x,y,z,roll,pitch,yaw] in meters/radians.",
