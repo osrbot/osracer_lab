@@ -149,6 +149,6 @@ ros2 topic pub --once /ackermann_cmd ackermann_msgs/msg/AckermannDrive \
 The ROS 2 runtime path now exists in the sibling OSRacer workspace. Remaining work is validation and model fidelity:
 
 1. Fill the missing real-car mass, steering, motor, encoder, IMU, extrinsic, and timing parameters.
-2. Add MuJoCo sim2sim rollouts with the same action and observation contract.
+2. Extend the MuJoCo sim2sim smoke model in `docs/mujoco_sim2sim.md` into calibrated rollouts with the same action and observation contract.
 3. Replay recorded real-car observations through exported `policy.pt` before closed-loop driving.
 4. Add a low-speed real-car checklist tied to `/ackermann_cmd`.
