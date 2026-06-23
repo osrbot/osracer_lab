@@ -1,6 +1,6 @@
 # OSRacer Isaac / Jetson Implementation Status
 
-Date: 2026-06-23
+Date: 2026-06-24
 
 This document summarizes the current local implementation state across:
 
@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 69]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 36]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 71]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 37]` |
 
 ## Implemented In `osracer_lab`
 
@@ -79,6 +79,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - Verifies packaged source authority snapshot when included.
   - Requires CameraInfo-derived camera calibration for visual deployment packages.
 - Jetson performance profile helper: `tools/jetson_performance_profile.sh`
+  - Can write machine-readable JSON evidence with `--json-output`.
 - TensorRT engine build helper: `tools/build_tensorrt_engine.sh`
 - Policy inference benchmark and trtexec log parser: `tools/benchmark_policy_inference.py`
 - First-drive runbook: `docs/first_drive_runbook.md`
@@ -86,9 +87,11 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - Reports deployment package source authority snapshot as an explicit gate check.
   - Reports visual camera calibration overlay as an explicit gate check.
   - Reports policy inference p95 latency as an explicit gate check when supplied.
+  - Requires Jetson performance profile JSON evidence before first drive.
 - First-drive evidence pack: `tools/first_drive_evidence_pack.py`
   - Archives deployment package `source_authority_snapshot.json` when supplied.
   - Archives `policy_benchmark.json` when supplied by the first-drive gate.
+  - Archives `performance_profile.json` when supplied by the first-drive gate.
 - First-drive evidence pack verifier: `tools/verify_first_drive_evidence_pack.py`
   - Rechecks archived visual deployment packages for camera calibration evidence.
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
@@ -126,11 +129,14 @@ python3 scripts/package_jetson_deployment.py \
 Run from `osracer`:
 
 ```bash
+tools/jetson_performance_profile.sh --json-output /tmp/osracer_perf_profile_compat.json
 tools/jetson_preflight.sh
 tools/jetson_environment_report.py --output /tmp/osracer_jetson_environment.json
 tools/jetson_runtime_monitor.sh --duration 1 --output-dir /tmp/osracer_runtime_monitor_smoke
 tools/jetson_runtime_summary.py /tmp/osracer_runtime_monitor_smoke
 tools/verify_jetson_deployment.py /tmp/osracer_deploy_pkg_readme_clean --skip-policy-load
+python3 /tmp/osracer_test_perf.py
+bash /tmp/osracer_test_evidence_perf.sh
 ```
 
 ## Current Readiness Result
