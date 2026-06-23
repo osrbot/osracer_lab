@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 75]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 39]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 76]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 40]` |
 
 ## Implemented In `osracer_lab`
 
@@ -103,6 +103,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - Archives `tensorrt_build_report.json` when supplied by the first-drive gate.
 - First-drive evidence pack verifier: `tools/verify_first_drive_evidence_pack.py`
   - Rechecks archived visual deployment packages for camera calibration evidence.
+  - Rechecks archived Jetson performance profile and TensorRT build report semantics.
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
 
 ## Verified Commands
@@ -153,6 +154,7 @@ python3 /tmp/osracer_test_perf.py
 bash /tmp/osracer_test_evidence_perf.sh
 python3 /tmp/osracer_test_trt_report.py
 bash /tmp/osracer_test_trt_evidence.sh
+python3 /tmp/osracer_test_first_drive_verifier_reports.py
 ```
 
 ## Current Readiness Result
