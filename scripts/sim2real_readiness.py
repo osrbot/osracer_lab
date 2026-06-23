@@ -16,6 +16,7 @@ if str(REPO_ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 from check_runtime_contract import main as runtime_contract_main
+from apply_sensor_extrinsics import FRAME_MEASUREMENT_KEYS, build_review as build_extrinsics_review
 from osracer_lab_assets.hardware_params import hardware_summary
 from validate_real_measurements import validate_measurements
 
@@ -95,6 +96,27 @@ def summarize_measurements(required, measurements):
     return report["complete"], report["missing"], report["incomplete"], report["invalid"]
 
 
+def summarize_extrinsics(measurements, osracer_root, complete_measurements):
+    required = set(FRAME_MEASUREMENT_KEYS.values())
+    if not required.issubset(set(complete_measurements)):
+        missing = sorted(required - set(complete_measurements))
+        return {
+            "overall": "fail",
+            "all_frames_match": False,
+            "missing_or_invalid_measurements": missing,
+            "next_action": "record and validate measured sensor extrinsics",
+        }
+    try:
+        return build_extrinsics_review(measurements, osracer_root)
+    except Exception as exc:
+        return {
+            "overall": "fail",
+            "all_frames_match": False,
+            "error": str(exc),
+            "next_action": "fix sensor extrinsics review inputs",
+        }
+
+
 def build_report(osracer_root, measurements_path=None):
     params = hardware_summary()
     required = list(params["required_real_car_measurements"])
@@ -103,6 +125,7 @@ def build_report(osracer_root, measurements_path=None):
     remaining_count = len(missing_measurements) + len(incomplete_measurements) + len(invalid_measurements)
     normal_contract = run_runtime_contract(osracer_root, strict_extrinsics=False)
     strict_contract = run_runtime_contract(osracer_root, strict_extrinsics=True)
+    extrinsics_review = summarize_extrinsics(measurements, osracer_root, complete_measurements)
 
     gates = [
         gate(
@@ -114,6 +137,11 @@ def build_report(osracer_root, measurements_path=None):
             "strict_extrinsics",
             strict_contract["status"],
             "URDF and static TF must agree before calibrated visual/lidar/IMU sim2real",
+        ),
+        gate(
+            "measured_sensor_extrinsics_applied",
+            extrinsics_review["overall"],
+            "Measured camera/lidar/IMU extrinsics must match both URDF and static TF",
         ),
         gate(
             "required_real_measurements",
@@ -133,6 +161,7 @@ def build_report(osracer_root, measurements_path=None):
         "required_real_measurements": missing_measurements
         + incomplete_measurements
         + [item["name"] for item in invalid_measurements],
+        "sensor_extrinsics_review": extrinsics_review,
         "runtime_contract_log": normal_contract["log"],
         "strict_extrinsics_log": strict_contract["log"],
     }

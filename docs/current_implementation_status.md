@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 68]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 69]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 35]` |
 
 ## Implemented In `osracer_lab`
@@ -33,6 +33,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Source authority snapshot verifier: `scripts/verify_source_authority_snapshot.py`
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
+  - Reports measured sensor extrinsics application as an explicit gate.
 - Real-car measurement value validator: `scripts/validate_real_measurements.py`
 - Grouped real-car measurement gap report: `scripts/measurement_gap_report.py`
 - Real-car measurement seed generator: `scripts/collect_real_measurement_seed.py`
@@ -138,6 +139,7 @@ tools/verify_jetson_deployment.py /tmp/osracer_deploy_pkg_readme_clean --skip-po
 sim2real_readiness: fail
 [PASS] runtime_contract
 [FAIL] strict_extrinsics
+[FAIL] measured_sensor_extrinsics_applied
 [FAIL] required_real_measurements
 ```
 
