@@ -8,6 +8,7 @@ step the MJCF.
 """
 
 import argparse
+import csv
 import math
 from pathlib import Path
 
@@ -21,6 +22,8 @@ def parse_args():
     parser.add_argument("--rollout-steps", type=int, default=0, help="Run N MuJoCo steps after compiling")
     parser.add_argument("--speed-mps", type=float, default=0.3, help="Rollout target speed")
     parser.add_argument("--steering-rad", type=float, default=0.0, help="Rollout target steering")
+    parser.add_argument("--actions-csv", default=None, help="Replay speed_cmd/steering_cmd actions from CSV")
+    parser.add_argument("--steps-per-action", type=int, default=1, help="MuJoCo steps to apply each CSV action")
     parser.add_argument("--timestep", type=float, default=0.01)
     parser.add_argument("--mass-kg", type=float, default=3.0, help="Placeholder mass until measured")
     parser.add_argument("--wheel-width-m", type=float, default=0.025)
@@ -124,34 +127,99 @@ def compile_model(xml_path):
     return model.nq, model.nv, model.nu
 
 
-def run_rollout(xml_path, params, steps, speed_mps, steering_rad):
-    mujoco = _load_mujoco()
-    model = mujoco.MjModel.from_xml_path(str(xml_path))
-    data = mujoco.MjData(model)
-
+def clamp_action(params, speed_mps, steering_rad):
     chassis = params["chassis"]
     speed = max(0.0, min(speed_mps, chassis["simulation_max_speed_mps"]))
     steering = max(
         -chassis["simulation_max_steering_rad"],
         min(steering_rad, chassis["simulation_max_steering_rad"]),
     )
-    start_xy = data.qpos[:2].copy()
-    for _ in range(steps):
-        yaw = data.qpos[2]
-        yaw_rate = 0.0 if abs(steering) < 1e-9 else speed / chassis["wheelbase_m"] * math.tan(steering)
-        data.ctrl[:] = [speed * math.cos(yaw), speed * math.sin(yaw), yaw_rate]
-        mujoco.mj_step(model, data)
+    return speed, steering
+
+
+def step_ackermann(mujoco, model, data, params, speed_mps, steering_rad):
+    speed, steering = clamp_action(params, speed_mps, steering_rad)
+    yaw = data.qpos[2]
+    yaw_rate = 0.0 if abs(steering) < 1e-9 else speed / params["chassis"]["wheelbase_m"] * math.tan(steering)
+    data.ctrl[:] = [speed * math.cos(yaw), speed * math.sin(yaw), yaw_rate]
+    mujoco.mj_step(model, data)
+    return speed, steering
+
+
+def rollout_metrics(data, start_xy, steps, speed_mps=None, steering_rad=None, rows=None):
     end_xy = data.qpos[:2].copy()
     distance = ((end_xy[0] - start_xy[0]) ** 2 + (end_xy[1] - start_xy[1]) ** 2) ** 0.5
-    return {
+    metrics = {
         "steps": steps,
         "time_s": data.time,
-        "speed_mps": speed,
-        "steering_rad": steering,
         "distance_m": distance,
         "final_x_m": end_xy[0],
         "final_y_m": end_xy[1],
     }
+    if speed_mps is not None:
+        metrics["speed_mps"] = speed_mps
+    if steering_rad is not None:
+        metrics["steering_rad"] = steering_rad
+    if rows is not None:
+        metrics["rows"] = rows
+    return metrics
+
+
+def run_rollout(xml_path, params, steps, speed_mps, steering_rad):
+    mujoco = _load_mujoco()
+    model = mujoco.MjModel.from_xml_path(str(xml_path))
+    data = mujoco.MjData(model)
+
+    speed, steering = clamp_action(params, speed_mps, steering_rad)
+    start_xy = data.qpos[:2].copy()
+    for _ in range(steps):
+        step_ackermann(mujoco, model, data, params, speed, steering)
+    return rollout_metrics(data, start_xy, steps, speed_mps=speed, steering_rad=steering)
+
+
+def _read_float(row, names, row_number):
+    for name in names:
+        if name in row and row[name] != "":
+            value = float(row[name])
+            if not math.isfinite(value):
+                raise ValueError(f"row {row_number}: non-finite {name}={row[name]!r}")
+            return value
+    raise ValueError(f"row {row_number}: missing one of {', '.join(names)}")
+
+
+def read_actions_csv(path):
+    actions = []
+    with Path(path).open(newline="") as input_file:
+        reader = csv.DictReader(input_file)
+        if not reader.fieldnames:
+            raise ValueError("actions CSV has no header")
+        for row_number, row in enumerate(reader, start=2):
+            speed = _read_float(row, ("speed_cmd", "target_speed_mps", "speed_mps", "speed"), row_number)
+            steering = _read_float(
+                row,
+                ("steering_cmd", "target_steering_rad", "steering_rad", "steering"),
+                row_number,
+            )
+            actions.append((speed, steering))
+    if not actions:
+        raise ValueError("actions CSV has no rows")
+    return actions
+
+
+def run_actions_csv_rollout(xml_path, params, actions_path, steps_per_action):
+    mujoco = _load_mujoco()
+    model = mujoco.MjModel.from_xml_path(str(xml_path))
+    data = mujoco.MjData(model)
+    actions = read_actions_csv(actions_path)
+
+    start_xy = data.qpos[:2].copy()
+    steps = 0
+    for speed, steering in actions:
+        for _ in range(steps_per_action):
+            step_ackermann(mujoco, model, data, params, speed, steering)
+            steps += 1
+    metrics = rollout_metrics(data, start_xy, steps)
+    return {"rows": len(actions), **metrics}
 
 
 def main():
@@ -164,6 +232,8 @@ def main():
         raise ValueError("--wheel-width-m must be > 0")
     if args.rollout_steps < 0:
         raise ValueError("--rollout-steps must be >= 0")
+    if args.steps_per_action <= 0:
+        raise ValueError("--steps-per-action must be > 0")
 
     xml_path = Path(args.xml_out)
     xml_path.parent.mkdir(parents=True, exist_ok=True)
@@ -171,13 +241,19 @@ def main():
     xml_path.write_text(build_mjcf(params, args.mass_kg, args.wheel_width_m, args.timestep))
     print(f"wrote {xml_path}")
 
-    if args.compile or args.rollout_steps:
+    if args.compile or args.rollout_steps or args.actions_csv:
         nq, nv, nu = compile_model(xml_path)
         print(f"compiled nq={nq} nv={nv} nu={nu}")
     if args.rollout_steps:
         metrics = run_rollout(xml_path, params, args.rollout_steps, args.speed_mps, args.steering_rad)
         print(
             "rollout "
+            + " ".join(f"{key}={value:.6g}" if isinstance(value, float) else f"{key}={value}" for key, value in metrics.items())
+        )
+    if args.actions_csv:
+        metrics = run_actions_csv_rollout(xml_path, params, args.actions_csv, args.steps_per_action)
+        print(
+            "actions_csv_rollout "
             + " ".join(f"{key}={value:.6g}" if isinstance(value, float) else f"{key}={value}" for key, value in metrics.items())
         )
 

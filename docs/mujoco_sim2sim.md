@@ -50,11 +50,29 @@ compiled nq=3 nv=3 nu=3
 rollout steps=100 time_s=1 speed_mps=0.3 steering_rad=0.1 distance_m=...
 ```
 
+Replay actions produced by the sibling ROS workspace tool `tools/policy_replay_csv.py`:
+
+```bash
+python3 scripts/mujoco_sim2sim_smoke.py \
+  --xml-out /tmp/osracer_action_replay.xml \
+  --actions-csv /tmp/osracer_policy_replay.csv \
+  --steps-per-action 1
+```
+
+The action CSV must contain `speed_cmd` and `steering_cmd`. These are exactly the command columns appended by `tools/policy_replay_csv.py` in `/home/osrbot/Desktop/osracer/osracer`.
+
+Expected output:
+
+```text
+compiled nq=3 nv=3 nu=3
+actions_csv_rollout rows=... steps=... time_s=... distance_m=...
+```
+
 ## Next Work
 
 1. Replace placeholder mass with measured full-vehicle mass.
 2. Add measured steering servo latency and motor/ESC speed response.
 3. Add camera, lidar, and IMU extrinsics from the real car.
-4. Replay exported `policy.pt` through the MuJoCo kinematic model and compare against IsaacLab observations.
+4. Replay exported `policy.pt` through `tools/policy_replay_csv.py`, then feed its `speed_cmd` / `steering_cmd` output into the MuJoCo kinematic model.
 5. Add calibrated wheel-ground contact dynamics after tire and mass data are measured.
 6. Compare speed, yaw rate, turn radius, steering saturation, and termination behavior before real-car replay.
