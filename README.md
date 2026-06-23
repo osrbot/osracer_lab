@@ -60,6 +60,12 @@ cd source/osracer_lab_tasks   && pip install -e .
 cd source/osracer_lab_rl      && pip install -e .
 ```
 
+## Deployment Contract
+
+See `docs/deployment.md` for the current policy-to-vehicle contract.
+The simulation action is `[target_speed_mps, target_steering_rad]`; the preferred real-vehicle bridge is `ackermann_msgs/msg/AckermannDrive` on `ackermann_cmd`.
+The sibling OSRacer ROS 2 workspace converts that to the firmware serial command `v <speed_mps> <steering_deg>`.
+
 ## Performance Baseline
 
 On the RTX 4080 SUPER dev host, drift training is verified with `--num_envs 2048 --max_iterations 2000`.

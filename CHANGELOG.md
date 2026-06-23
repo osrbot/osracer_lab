@@ -8,11 +8,12 @@
     `root_euler_xyz`, `BlindObsCfg`, `reset_root_state_along_track`, `reset_root_state`,
     `TraversabilityHashmapUtil`, terrain geometry generation.
   — `wheeledlab` and `wheeledlab_tasks` are **no longer runtime dependencies**.
-- **Bug fix**: `root_link_name` in `UrdfFileCfg` set to `"base_link"` (was `None`).
-  URDF root `base_footprint` has no inertia; leaving it as root caused IsaacLab to pick
-  an incorrect articulation root.
+- **Bug fix**: `root_link_name=None` with `merge_fixed_joints=True` lets the URDF importer
+  merge `base_link` into the effective `base_footprint` articulation root.
 - `osracer_lab_tasks/setup.py` dependency list cleaned (`scipy` added, `wheeledlab*` removed).
 - `osracer_lab_tasks/common/__init__.py` now also exports `BlindObsCfg`.
+- Added deployment notes for mapping trained policy actions to the OSRacer ROS 2
+  `ackermann_cmd` bridge and firmware serial command format.
 
 ## [0.1.0]
 
