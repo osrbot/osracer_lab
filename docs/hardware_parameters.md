@@ -38,6 +38,10 @@ User-supplied AR0234 camera parameters:
 | Module size | `36 mm x 36 mm` |
 | Net weight | `59.9-67.5 g` |
 
+Current ROS camera launch uses `usb_cam` on `/dev/video0`, publishes `/rgb/image_raw`
+with `frame_id=camera_link`, and configures `640 x 480 @ 120 fps` using
+`mjpeg2rgb`.
+
 Important calibration note: AR0234 sensor size from the pixel pitch is about `5.76 mm x 3.6 mm`. A `2.7 mm` pinhole model from that sensor size does not directly produce a `130 deg` horizontal FOV, so the advertised FOV should be treated as a lens-level or diagonal claim until camera calibration confirms the real intrinsics.
 
 Current IsaacLab visual RL still uses a downsampled pinhole camera approximation. Do not change the trained visual task to `130 deg` until a checkerboard calibration provides `fx`, `fy`, `cx`, `cy`, and distortion coefficients.
@@ -68,6 +72,44 @@ User-supplied 25m lidar parameters:
 
 For sim2sim, lidar should be modeled first as a 270-degree planar scan with measured scan rate and angular resolution. Use the real driver timestamps during sim2real replay to catch time alignment issues before closed-loop tests.
 
+## Real Runtime Contract
+
+Values confirmed from the current `osracer` upper-computer code:
+
+| Parameter | Value |
+|---|---|
+| Chassis launch | `osracer_bringup chassis_ackermann.launch.py` |
+| Serial device | `/dev/osrbot_base` |
+| Serial baud | `460800` |
+| Command protocol | `v <speed_mps> <steering_deg>` |
+| Command watchdog | `0.5 s` |
+| Ackermann command topic | `/ackermann_cmd` |
+| Twist command topic | `/cmd_vel` |
+| Runtime odom topic | `/odometry/filtered` |
+| Runtime IMU topic | `/imu_filter` |
+| Raw magnetometer topic | `/magnetometer_data` |
+| RC topic | `/rc_data` |
+| IMU serial frame | `i qx qy qz qw ax ay az gx gy gz` |
+| Odom serial frame | `o px py pz vx vy vz yaw` |
+
+The bridge accepts `AckermannDrive.steering_angle` in radians, clamps it by
+`max_steering_angle_deg=30.0`, then sends steering to firmware in degrees.
+
+## Sensor Extrinsics
+
+There is a current source-of-truth conflict that must be resolved before
+calibrated sim2real:
+
+| Transform | URDF value `xyz rpy` | Static TF launch value `xyz rpy` |
+|---|---|---|
+| `base_link -> camera_link` | `0.12323 -0.017229 -0.053395 -1.5708 0 -1.5708` | `0.30 0 0.075 0 0 0` |
+| `base_link -> laser` | `-0.082558 -0.017229 0.034095 -0.00028339 -0.031729 0.0057633` | `0.10 0 0.13 0 0 0` |
+| `base_link -> imu_link` | `0.0417958953212156 -0.0177578126845364 -0.063598843109235 0 0 0` | `0.22 0 0.03 0 0 0` |
+
+Use measured physical mounting or a single generated robot description as the
+source of truth. Do not calibrate a camera/lidar/IMU sim2real pipeline against
+both sets.
+
 ## Still Required
 
 These values are still required before the sim2real model should be considered close to the real car:
@@ -83,6 +125,7 @@ These values are still required before the sim2real model should be considered c
 | IMU | Model, rate, accel/gyro ranges, magnetometer availability, frame alignment |
 | Extrinsics | Camera, lidar, and IMU `xyz + rpy` relative to `base_link` |
 | Timing | Serial baud rate, command latency, sensor timestamp source, clock sync method |
+| Frame tree | Resolve the URDF vs static TF disagreement for camera, lidar, and IMU |
 
 ## Use In The Pipeline
 

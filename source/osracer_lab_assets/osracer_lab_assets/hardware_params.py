@@ -30,6 +30,15 @@ OSRACER_CAMERA_AR0234 = {
     "supply_v": 5.0,
     "module_size_mm": (36.0, 36.0),
     "net_weight_g": (59.9, 67.5),
+    "ros_runtime": {
+        "driver": "usb_cam",
+        "device": "/dev/video0",
+        "frame_id": "camera_link",
+        "topic": "/rgb/image_raw",
+        "configured_resolution_px": (640, 480),
+        "configured_fps": 120.0,
+        "pixel_format": "mjpeg2rgb",
+    },
 }
 
 OSRACER_LIDAR_25M = {
@@ -51,6 +60,42 @@ OSRACER_LIDAR_25M = {
     "power_w_max": 2.0,
     "supply_v": (9.0, 36.0),
     "ip_rating": "IP65",
+    "ros_frame_id": "laser",
+}
+
+OSRACER_REAL_RUNTIME = {
+    "chassis_launch": "osracer_bringup chassis_ackermann.launch.py",
+    "serial_port": "/dev/osrbot_base",
+    "serial_baud": 460800,
+    "command_protocol": "v <speed_mps> <steering_deg>",
+    "command_watchdog_timeout_s": 0.5,
+    "cmd_vel_topic": "/cmd_vel",
+    "ackermann_cmd_topic": "/ackermann_cmd",
+    "imu_topic": "/imu_filter",
+    "odom_topic": "/odometry/filtered",
+    "raw_mag_topic": "/magnetometer_data",
+    "rc_topic": "/rc_data",
+    "imu_serial_frame": "i qx qy qz qw ax ay az gx gy gz",
+    "odom_serial_frame": "o px py pz vx vy vz yaw",
+    "safety_note": "ESP32 firmware handles serial timeout and SBUS fallback; ROS also clamps steering.",
+}
+
+OSRACER_SENSOR_EXTRINSICS = {
+    "base_footprint_to_base_link_static_tf_xyz_rpy": (0.0, 0.0, 0.055, 0.0, 0.0, 0.0),
+    "urdf_base_link_to_camera_link_xyz_rpy": (0.12323, -0.017229, -0.053395, -1.5708, 0.0, -1.5708),
+    "static_tf_base_link_to_camera_link_xyz_rpy": (0.30, 0.0, 0.075, 0.0, 0.0, 0.0),
+    "urdf_base_link_to_laser_xyz_rpy": (-0.082558, -0.017229, 0.034095, -0.00028339, -0.031729, 0.0057633),
+    "static_tf_base_link_to_laser_xyz_rpy": (0.10, 0.0, 0.13, 0.0, 0.0, 0.0),
+    "urdf_base_link_to_imu_link_xyz_rpy": (
+        0.0417958953212156,
+        -0.0177578126845364,
+        -0.063598843109235,
+        0.0,
+        0.0,
+        0.0,
+    ),
+    "static_tf_base_link_to_imu_link_xyz_rpy": (0.22, 0.0, 0.03, 0.0, 0.0, 0.0),
+    "status": "URDF and robot_description_tf.launch.py disagree; measure and choose one source before calibrated sim2real.",
 }
 
 REQUIRED_REAL_CAR_MEASUREMENTS = (
@@ -73,6 +118,7 @@ REQUIRED_REAL_CAR_MEASUREMENTS = (
     "imu_extrinsic_xyz_rpy_in_base_link",
     "serial_baud_rate_and_command_latency_s",
     "sensor_timestamp_sync_method",
+    "resolve_urdf_vs_static_tf_sensor_extrinsics",
 )
 
 
@@ -83,5 +129,7 @@ def hardware_summary():
         "chassis": OSRACER_CHASSIS,
         "camera_ar0234": OSRACER_CAMERA_AR0234,
         "lidar_25m": OSRACER_LIDAR_25M,
+        "real_runtime": OSRACER_REAL_RUNTIME,
+        "sensor_extrinsics": OSRACER_SENSOR_EXTRINSICS,
         "required_real_car_measurements": REQUIRED_REAL_CAR_MEASUREMENTS,
     }

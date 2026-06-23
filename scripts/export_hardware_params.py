@@ -3,7 +3,13 @@
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ASSETS_SRC = REPO_ROOT / "source" / "osracer_lab_assets"
+if str(ASSETS_SRC) not in sys.path:
+    sys.path.insert(0, str(ASSETS_SRC))
 
 from osracer_lab_assets.hardware_params import hardware_summary
 
