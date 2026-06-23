@@ -94,6 +94,7 @@ before copying to Jetson:
 ```bash
 python3 scripts/package_jetson_deployment.py \
   --policy logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/exported/policy.pt \
+  --measured-overlay /tmp/osracer_measured_overlay.json \
   --output-dir /tmp/osracer_jetson_deployment
 ```
 
@@ -102,6 +103,7 @@ The package contains:
 ```text
 policy.pt
 hardware_params.json
+measured_overlay.json  # optional, when --measured-overlay is passed
 README.md
 manifest.json
 SHA256SUMS

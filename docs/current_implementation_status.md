@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 44]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 21]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 45]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 22]` |
 
 ## Implemented In `osracer_lab`
 
@@ -86,6 +86,7 @@ python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.
 python3 scripts/mujoco_sim2sim_smoke.py --xml-out /tmp/osracer_overlay_smoke.xml --measured-overlay /tmp/osracer_measured_overlay.json
 python3 scripts/package_jetson_deployment.py \
   --policy /tmp/osracer_dummy_policy.pt \
+  --measured-overlay /tmp/osracer_measured_overlay.json \
   --output-dir /tmp/osracer_deploy_pkg_readme_clean
 ```
 
