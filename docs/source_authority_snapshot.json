@@ -1,0 +1,41 @@
+{
+  "osracer_contract": {
+    "cmd_vel_writes_v_command": true,
+    "converts_ackermann_rad_to_deg": true,
+    "launch_baud_rate": 460800,
+    "launch_cmd_watchdog_timeout_s": 0.5,
+    "launch_max_steering_angle_deg": 30.0,
+    "launch_port_name": "/dev/osrbot_base",
+    "launch_wheelbase_m": 0.285,
+    "readme_documents_stream_sync": true,
+    "readme_documents_sync_frames": true,
+    "writes_v_command_speed_steering_deg": true
+  },
+  "osrcore_contract": {
+    "serial_timeout_ms": 500,
+    "sn_get_supported": true,
+    "steering_center_us": 1500,
+    "steering_max_us": 2000,
+    "steering_min_us": 1000,
+    "steering_trim_default_deg": 0.0,
+    "stream_modes_documented": true,
+    "sync_frame_documented": true,
+    "sync_frame_sender_present": true,
+    "velocity_command_documented": true
+  },
+  "schema_version": 1,
+  "sources": {
+    "osracer_feat_demo": {
+      "branch": "feat-demo",
+      "head": "660fea8",
+      "remote": "https://github.com/osrbot/osracer.git",
+      "status_short": ""
+    },
+    "osrcore": {
+      "branch": "main",
+      "head": "9742339",
+      "remote": "https://github.com/osrbot/osrcore.git",
+      "status_short": ""
+    }
+  }
+}

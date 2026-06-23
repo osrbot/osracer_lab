@@ -17,6 +17,8 @@ Targets:
   export-smoke    Export the verified drift checkpoint to TorchScript.
   source-authority
                   Check source-of-truth repos: osrcore firmware and osracer feat-demo.
+  source-authority-snapshot
+                  Verify read-only osrcore/osracer source fact snapshot.
   runtime-contract
                   Check shared hardware/runtime parameters against osracer.
   sim-sensor-contract
@@ -63,6 +65,7 @@ Environment overrides:
   EXPORT_OUTPUT_DIR=/tmp/osracer_policy_export_smoke
   OSRACER_ROOT=../osracer
   OSRCORE_ROOT=/path/to/osrcore
+  SOURCE_AUTHORITY_SNAPSHOT=docs/source_authority_snapshot.json
   MEASUREMENTS_FILE=docs/real_car_measurements.json
   MEASUREMENT_SEED_OUTPUT=docs/real_car_measurements.json
   SENSOR_SUMMARY_FILE=/path/to/sensor_summary.json
@@ -124,6 +127,11 @@ case "$target" in
             args+=(--osrcore-root "$OSRCORE_ROOT")
         fi
         python3 "$ROOT_DIR/scripts/check_source_authority.py" "${args[@]}"
+        ;;
+    source-authority-snapshot)
+        python3 "$ROOT_DIR/scripts/verify_source_authority_snapshot.py" \
+            "${SOURCE_AUTHORITY_SNAPSHOT:-$ROOT_DIR/docs/source_authority_snapshot.json}" \
+            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
         ;;
     runtime-contract)
         python3 "$ROOT_DIR/scripts/check_runtime_contract.py" \

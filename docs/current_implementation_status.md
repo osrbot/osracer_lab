@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 54]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 55]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 28]` |
 
 ## Implemented In `osracer_lab`
@@ -27,6 +27,9 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - MuJoCo kinematic sim2sim smoke with measured overlay support: `scripts/mujoco_sim2sim_smoke.py`
 - Observation replay to MuJoCo pipeline: `scripts/run_sim2real_replay_pipeline.py`
 - Source authority check for `osrcore` and `osracer feat-demo`: `scripts/check_source_authority.py`
+  - Defaults to sibling `/home/osrbot/Desktop/osracer/osrcore` for direct firmware checks when present.
+- Read-only local source authority snapshot: `docs/source_authority_snapshot.json`
+- Source authority snapshot verifier: `scripts/verify_source_authority_snapshot.py`
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
 - Real-car measurement value validator: `scripts/validate_real_measurements.py`
@@ -79,6 +82,7 @@ Run from `osracer_lab`:
 
 ```bash
 scripts/validate_osracer_lab.sh source-authority
+scripts/validate_osracer_lab.sh source-authority-snapshot
 scripts/validate_osracer_lab.sh runtime-contract
 MEASUREMENT_SEED_OUTPUT=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh measurement-seed
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack scripts/validate_osracer_lab.sh measurement-pack
@@ -128,14 +132,15 @@ first-drive preparation, not calibrated closed-loop sim2real.
 
 1. Resolve `base_link -> camera_link`, `base_link -> laser`, and `base_link -> imu_link` source-of-truth conflict between URDF and static TF.
 2. Measure and record the 20 required real-car parameters in `docs/real_car_measurements.json`, copied from `docs/real_car_measurements.template.json`, and pass `scripts/validate_osracer_lab.sh real-measurements`.
-3. Install/check Jetson runtime dependencies on the actual Orin Nano Super 8GB:
+3. Put an authenticated `osrbot/osrcore` checkout at `/home/osrbot/Desktop/osracer/osrcore`, then pass `python3 scripts/check_source_authority.py --strict-osrcore`.
+4. Install/check Jetson runtime dependencies on the actual Orin Nano Super 8GB:
    - ROS 2 Jazzy runtime packages
    - `ackermann_msgs`
    - Torch or ONNX/TensorRT runtime for the deployment format
-4. Run passive real-car observation recording.
-5. Replay recorded observations through the packaged policy.
-6. Run MuJoCo action replay from the same observations.
-7. Only then enable low-speed closed loop on blocks, then floor.
+5. Run passive real-car observation recording.
+6. Replay recorded observations through the packaged policy.
+7. Run MuJoCo action replay from the same observations.
+8. Only then enable low-speed closed loop on blocks, then floor.
 
 ## Push-Readiness Notes
 

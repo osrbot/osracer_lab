@@ -22,8 +22,8 @@ def parse_args():
     )
     parser.add_argument(
         "--osrcore-root",
-        default=None,
-        help="Optional path to osrbot/osrcore firmware repo for direct firmware protocol checks",
+        default=str(REPO_ROOT.parent / "osrcore"),
+        help="Path to osrbot/osrcore firmware repo for direct firmware protocol checks",
     )
     parser.add_argument("--strict-osrcore", action="store_true", help="Fail when --osrcore-root is missing or invalid")
     return parser.parse_args()
@@ -88,12 +88,6 @@ def check_osracer(osracer_root, failures):
 
 
 def check_osrcore(osrcore_root, failures, strict):
-    if not osrcore_root:
-        if strict:
-            check(False, "osrcore_root_provided", failures)
-        else:
-            warn("osrcore_root_not_provided", "skip direct firmware repo check")
-        return
     osrcore_root = Path(osrcore_root)
     if not (osrcore_root / ".git").exists():
         if strict:
