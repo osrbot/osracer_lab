@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 46]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 22]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 47]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 23]` |
 
 ## Implemented In `osracer_lab`
 
@@ -64,6 +64,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - TensorRT engine build helper: `tools/build_tensorrt_engine.sh`
 - Policy inference benchmark and trtexec log parser: `tools/benchmark_policy_inference.py`
 - First-drive runbook: `docs/first_drive_runbook.md`
+- First-drive go/no-go gate: `tools/first_drive_gate.py`
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
 
 ## Verified Commands

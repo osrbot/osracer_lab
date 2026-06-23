@@ -153,6 +153,7 @@ def main():
                 "source": str(policy_path),
                 "bytes": policy_out.stat().st_size,
                 "sha256": sha256(policy_out),
+                "kind": "policy",
             },
             hardware_out.name: {
                 "source": "osracer_lab_assets.hardware_params",
@@ -165,6 +166,7 @@ def main():
                 "sha256": sha256(readme_out),
             },
         },
+        "policy_artifact": policy_out.name,
         "runtime_contract": {
             "action": "[target_speed_mps, target_steering_rad]",
             "initial_max_speed_mps": hardware_summary()["chassis"]["initial_real_test_max_speed_mps"],
