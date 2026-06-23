@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 67]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 68]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 35]` |
 
 ## Implemented In `osracer_lab`
@@ -51,6 +51,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Measured parameter overlay export: `scripts/export_measured_overlay.py`
 - Camera calibration overlay gate: `scripts/check_camera_calibration_overlay.py`
 - Calibration review pack export: `scripts/create_calibration_review_pack.py`
+  - Includes `sensor_extrinsics_review.json` for measured-vs-URDF/static-TF alignment.
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
   - Includes `source_authority_snapshot.json` when available.
 - Documentation:

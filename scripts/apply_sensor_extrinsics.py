@@ -180,6 +180,45 @@ def status_line(label, actual, expected):
     return f"[{status}] {label}: actual={fmt_tuple(actual)} measured={fmt_tuple(expected)}"
 
 
+def build_review(measurements, osracer_root):
+    osracer_root = Path(osracer_root).resolve()
+    urdf_path = osracer_root / "osracer_description" / "urdf" / "osracer.urdf"
+    static_tf_path = osracer_root / "osracer_description" / "launch" / "robot_description_tf.launch.py"
+    measured = measured_extrinsics(measurements)
+    current_urdf = parse_urdf_extrinsics(urdf_path)
+    current_static = parse_static_tf_extrinsics(static_tf_path.read_text(errors="replace"))
+    frames = {}
+    all_match = True
+    for frame, values in measured.items():
+        urdf_value = current_urdf.get(frame, ())
+        static_value = current_static.get(frame, ())
+        urdf_match = nearly_equal(urdf_value, values)
+        static_tf_match = nearly_equal(static_value, values)
+        frames[frame] = {
+            "measurement_key": FRAME_MEASUREMENT_KEYS[frame],
+            "measured_xyz_rpy": list(values),
+            "urdf_xyz_rpy": list(urdf_value),
+            "static_tf_xyz_rpy": list(static_value),
+            "urdf_matches_measured": urdf_match,
+            "static_tf_matches_measured": static_tf_match,
+            "ready": urdf_match and static_tf_match,
+        }
+        all_match = all_match and frames[frame]["ready"]
+    return {
+        "overall": "pass" if all_match else "fail",
+        "all_frames_match": all_match,
+        "osracer_root": str(osracer_root),
+        "urdf_path": str(urdf_path),
+        "static_tf_path": str(static_tf_path),
+        "frames": frames,
+        "next_action": (
+            "strict extrinsics are aligned"
+            if all_match
+            else "review measured extrinsics, then run sensor-extrinsics-write if approved"
+        ),
+    }
+
+
 def main():
     args = parse_args()
     osracer_root = Path(args.osracer_root).resolve()
@@ -187,7 +226,8 @@ def main():
     urdf_path = osracer_root / "osracer_description" / "urdf" / "osracer.urdf"
     static_tf_path = osracer_root / "osracer_description" / "launch" / "robot_description_tf.launch.py"
 
-    measured = measured_extrinsics(load_measurements(args.measurements))
+    measurements = load_measurements(args.measurements)
+    measured = measured_extrinsics(measurements)
     current_urdf = parse_urdf_extrinsics(urdf_path)
     current_static = parse_static_tf_extrinsics(static_tf_path.read_text(errors="replace"))
 

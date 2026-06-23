@@ -96,6 +96,9 @@ MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh sensor-extrinsics-check
 ```
 
+The calibration review pack also writes `sensor_extrinsics_review.json`, which
+records measured, URDF, and static TF values for each sensor frame.
+
 If the measured values are correct, apply them to the URDF, static TF launch,
 and IsaacLab hardware parameter source:
 

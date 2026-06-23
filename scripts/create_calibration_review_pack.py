@@ -15,6 +15,7 @@ if str(ASSETS_SRC) not in sys.path:
     sys.path.insert(0, str(ASSETS_SRC))
 
 from export_measured_overlay import build_overlay, load_measurements as load_overlay_measurements  # noqa: E402
+from apply_sensor_extrinsics import build_review as build_extrinsics_review  # noqa: E402
 from plan_calibration_updates import build_plan  # noqa: E402
 from sim2real_readiness import build_report as build_readiness_report  # noqa: E402
 from validate_real_measurements import REQUIRED_KEYS, load_measurements, validate_measurements  # noqa: E402
@@ -45,16 +46,19 @@ def copy_measurements(src, output_dir):
     return target
 
 
-def build_summary(measurements_path, validation, plan, readiness):
+def build_summary(measurements_path, validation, plan, readiness, extrinsics_review):
     complete_count = len(validation["complete"])
     remaining_count = len(validation["missing"]) + len(validation["incomplete"]) + len(validation["invalid"])
     auto_apply_count = len(plan["auto_apply_ready"])
     review_apply_count = len(plan["review_apply_ready"])
     ready = readiness["overall"] == "pass"
+    extrinsics_ready = extrinsics_review["overall"] == "pass"
     if ready:
         next_action = "review auto_apply_ready items, then run sensor-extrinsics-write if approved"
     elif remaining_count:
         next_action = "fill missing or incomplete measurements, then regenerate this review pack"
+    elif not extrinsics_ready:
+        next_action = "review sensor_extrinsics_review.json, then run sensor-extrinsics-write if approved"
     else:
         next_action = "resolve failed readiness gates before writing calibration changes"
     return {
@@ -66,6 +70,7 @@ def build_summary(measurements_path, validation, plan, readiness):
         "auto_apply_candidate_count": auto_apply_count,
         "review_apply_candidate_count": review_apply_count,
         "sim2real_readiness": readiness["overall"],
+        "sensor_extrinsics_review": extrinsics_review["overall"],
         "write_back_allowed_without_review": False,
         "recommended_next_action": next_action,
     }
@@ -82,6 +87,7 @@ def build_readme(summary):
         f"- Measurements complete: {summary['complete_measurements']}/{summary['required_measurements']}",
         f"- Remaining measurements: {summary['remaining_measurements']}",
         f"- Sim2real readiness: {summary['sim2real_readiness']}",
+        f"- Sensor extrinsics review: {summary['sensor_extrinsics_review']}",
         f"- Auto-apply candidates: {summary['auto_apply_candidate_count']}",
         f"- Review-required candidates: {summary['review_apply_candidate_count']}",
         "- Source write-back allowed without review: no",
@@ -92,6 +98,7 @@ def build_readme(summary):
         "- `validation_report.json`: required measurement validation result",
         "- `calibration_plan.json`: candidate source changes grouped by risk",
         "- `measured_overlay.json`: offline sim/replay overlay, safe to consume without mutating source",
+        "- `sensor_extrinsics_review.json`: measured-vs-URDF/static-TF alignment check",
         "- `sim2real_readiness.json`: readiness gates and logs",
         "- `review_summary.json`: compact status for handoff",
         "",
@@ -122,11 +129,13 @@ def main():
     overlay = build_overlay(measurement_doc, overlay_measurements)
     plan = build_plan(measurements)
     readiness = build_readiness_report(Path(args.osracer_root).expanduser().resolve(), measurements_path)
-    summary = build_summary(measurements_path, validation, plan, readiness)
+    extrinsics_review = build_extrinsics_review(measurements, Path(args.osracer_root).expanduser().resolve())
+    summary = build_summary(measurements_path, validation, plan, readiness, extrinsics_review)
 
     write_json(output_dir / "validation_report.json", validation)
     write_json(output_dir / "calibration_plan.json", plan)
     write_json(output_dir / "measured_overlay.json", overlay)
+    write_json(output_dir / "sensor_extrinsics_review.json", extrinsics_review)
     write_json(output_dir / "sim2real_readiness.json", readiness)
     write_json(output_dir / "review_summary.json", summary)
     (output_dir / "README.md").write_text(build_readme(summary), encoding="utf-8")
