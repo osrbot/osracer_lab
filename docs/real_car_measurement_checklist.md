@@ -47,6 +47,7 @@ Or run the individual import steps:
 
 ```bash
 scripts/validate_osracer_lab.sh measurement-seed
+  # Seeds repo-confirmed baud rate and firmware steering protocol units only.
 # Fill every required value and source field with real measurements.
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh measurement-gap

@@ -168,9 +168,14 @@ case "$target" in
         python3 "$ROOT_DIR/scripts/measurement_gap_report.py" "$MEASUREMENTS_FILE"
         ;;
     measurement-seed)
+        args=(--osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" \
+            --source-authority-snapshot "${SOURCE_AUTHORITY_SNAPSHOT:-$ROOT_DIR/docs/source_authority_snapshot.json}" \
+            --output "${MEASUREMENT_SEED_OUTPUT:-$ROOT_DIR/docs/real_car_measurements.json}")
+        if [[ "${MEASUREMENT_SEED_OVERWRITE:-}" == "1" ]]; then
+            args+=(--overwrite)
+        fi
         python3 "$ROOT_DIR/scripts/collect_real_measurement_seed.py" \
-            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" \
-            --output "${MEASUREMENT_SEED_OUTPUT:-$ROOT_DIR/docs/real_car_measurements.json}"
+            "${args[@]}"
         ;;
     measurement-pack)
         args=(--output-dir "${MEASUREMENT_PACK_OUTPUT:-/tmp/osracer_real_measurement_pack}" --overwrite)

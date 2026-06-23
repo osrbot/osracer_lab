@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 56]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 57]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 28]` |
 
 ## Implemented In `osracer_lab`
@@ -36,6 +36,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Real-car measurement value validator: `scripts/validate_real_measurements.py`
 - Grouped real-car measurement gap report: `scripts/measurement_gap_report.py`
 - Real-car measurement seed generator: `scripts/collect_real_measurement_seed.py`
+  - Seeds firmware-derived steering protocol units from `docs/source_authority_snapshot.json` when available.
 - Field measurement pack generator: `scripts/create_measurement_pack.py`
 - Jetson sensor preflight measurement importer: `scripts/import_sensor_preflight_measurements.py`
 - Serial latency measurement importer: `scripts/import_serial_latency_measurement.py`

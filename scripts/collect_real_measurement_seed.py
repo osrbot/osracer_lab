@@ -34,6 +34,11 @@ def parse_args():
         default=str(REPO_ROOT.parent / "osracer"),
         help="Path to the osracer feat-demo checkout.",
     )
+    parser.add_argument(
+        "--source-authority-snapshot",
+        default=str(REPO_ROOT / "docs" / "source_authority_snapshot.json"),
+        help="Optional source authority snapshot JSON produced from read-only osrcore/osracer sources.",
+    )
     parser.add_argument("--overwrite", action="store_true", help="Overwrite output if it already exists.")
     return parser.parse_args()
 
@@ -56,6 +61,15 @@ def run(command, cwd=None):
 def load_json(path):
     with Path(path).open("r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def load_optional_json(path):
+    if not path:
+        return None
+    candidate = Path(path)
+    if not candidate.is_file():
+        return None
+    return load_json(candidate)
 
 
 def write_json(path, data, overwrite=False):
@@ -102,6 +116,38 @@ def osracer_git_facts(osracer_root):
     }
 
 
+def seed_source_authority_snapshot(data, snapshot, measured_at):
+    if not isinstance(snapshot, dict):
+        return []
+    measurements = data["measurements"]
+    osrcore_contract = snapshot.get("osrcore_contract", {})
+    seeded = []
+    steering_values = [
+        osrcore_contract.get("steering_min_us"),
+        osrcore_contract.get("steering_center_us"),
+        osrcore_contract.get("steering_max_us"),
+    ]
+    if all(value is not None for value in steering_values):
+        merge_partial(
+            measurements,
+            "steering_servo_pwm_min_center_max_or_protocol_units",
+            steering_values,
+            "docs/source_authority_snapshot.json osrcore_contract steering_min/center/max",
+            measured_at,
+            "Seeded from firmware contract PWM/protocol units only. Still measure true wheel steering angle and response time on the real car.",
+        )
+        seeded.append("steering_servo_pwm_min_center_max_or_protocol_units")
+
+    collection = data.setdefault("collection", {})
+    collection["source_authority_snapshot"] = {
+        "sources": snapshot.get("sources", {}),
+        "osrcore_contract": osrcore_contract,
+        "osracer_contract": snapshot.get("osracer_contract", {}),
+    }
+    seeded.append("collection.source_authority_snapshot")
+    return seeded
+
+
 def main():
     args = parse_args()
     data = load_json(args.template)
@@ -111,6 +157,7 @@ def main():
     params = hardware_summary()
     runtime = params["real_runtime"]
     source_authority = params["source_authority"]
+    source_snapshot = load_optional_json(args.source_authority_snapshot)
     now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
     source = (
         f"{source_authority['upper_computer_repo']} and "
@@ -139,6 +186,11 @@ def main():
             "serial_port": runtime["serial_port"],
             "serial_baud": runtime["serial_baud"],
             "command_protocol": runtime["command_protocol"],
+            "serial_timeout_ms": (
+                source_snapshot.get("osrcore_contract", {}).get("serial_timeout_ms")
+                if isinstance(source_snapshot, dict)
+                else None
+            ),
             "ackermann_cmd_topic": runtime["ackermann_cmd_topic"],
             "imu_topic": runtime["imu_topic"],
             "odom_topic": runtime["odom_topic"],
@@ -150,10 +202,13 @@ def main():
             "Measure serial command latency; baud rate alone is intentionally not enough for readiness.",
         ],
     }
+    seeded_from_snapshot = seed_source_authority_snapshot(data, source_snapshot, now)
 
     write_json(args.output, data, overwrite=args.overwrite)
     print(f"wrote {Path(args.output).resolve()}")
     print("seeded: serial_baud_rate_and_command_latency_s.baud_rate")
+    for item in seeded_from_snapshot:
+        print(f"seeded: {item}")
     print("remaining measurements still require real hardware evidence")
 
 
