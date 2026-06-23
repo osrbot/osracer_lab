@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 71]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 37]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 72]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 38]` |
 
 ## Implemented In `osracer_lab`
 
@@ -81,6 +81,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Jetson performance profile helper: `tools/jetson_performance_profile.sh`
   - Can write machine-readable JSON evidence with `--json-output`.
 - TensorRT engine build helper: `tools/build_tensorrt_engine.sh`
+  - Can write machine-readable build reports with `--report`.
 - Policy inference benchmark and trtexec log parser: `tools/benchmark_policy_inference.py`
 - First-drive runbook: `docs/first_drive_runbook.md`
 - First-drive go/no-go gate: `tools/first_drive_gate.py`
@@ -88,10 +89,12 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - Reports visual camera calibration overlay as an explicit gate check.
   - Reports policy inference p95 latency as an explicit gate check when supplied.
   - Requires Jetson performance profile JSON evidence before first drive.
+  - Requires TensorRT build report evidence for ONNX deployment packages.
 - First-drive evidence pack: `tools/first_drive_evidence_pack.py`
   - Archives deployment package `source_authority_snapshot.json` when supplied.
   - Archives `policy_benchmark.json` when supplied by the first-drive gate.
   - Archives `performance_profile.json` when supplied by the first-drive gate.
+  - Archives `tensorrt_build_report.json` when supplied by the first-drive gate.
 - First-drive evidence pack verifier: `tools/verify_first_drive_evidence_pack.py`
   - Rechecks archived visual deployment packages for camera calibration evidence.
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
@@ -130,6 +133,7 @@ Run from `osracer`:
 
 ```bash
 tools/jetson_performance_profile.sh --json-output /tmp/osracer_perf_profile_compat.json
+tools/build_tensorrt_engine.sh --onnx /tmp/osracer_trt_test/policy.onnx --engine /tmp/osracer_trt_test/policy.engine --fp16 --workspace-mb 1024 --log /tmp/osracer_trt_test/build.log --report /tmp/osracer_trt_test/build_report.json --dry-run
 tools/jetson_preflight.sh
 tools/jetson_environment_report.py --output /tmp/osracer_jetson_environment.json
 tools/jetson_runtime_monitor.sh --duration 1 --output-dir /tmp/osracer_runtime_monitor_smoke
@@ -137,6 +141,8 @@ tools/jetson_runtime_summary.py /tmp/osracer_runtime_monitor_smoke
 tools/verify_jetson_deployment.py /tmp/osracer_deploy_pkg_readme_clean --skip-policy-load
 python3 /tmp/osracer_test_perf.py
 bash /tmp/osracer_test_evidence_perf.sh
+python3 /tmp/osracer_test_trt_report.py
+bash /tmp/osracer_test_trt_evidence.sh
 ```
 
 ## Current Readiness Result
