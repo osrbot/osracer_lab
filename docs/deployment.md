@@ -172,6 +172,7 @@ scripts/validate_osracer_lab.sh sim2real-readiness
 ```
 
 - Treat `scripts/validate_osracer_lab.sh sim2real-ready-strict` as the gate for calibrated closed-loop sim2real. It should fail until measured real-car parameters and unified sensor extrinsics are in place.
+- Use `scripts/validate_osracer_lab.sh measured-overlay` for offline replay/sim experiments with measured values before writing reviewed calibration changes back into source files.
 - Start with `speed <= 0.3 m/s` until the inference node and watchdog behavior are verified.
 - Keep `steering_angle` inside `[-0.488, 0.488]` rad to match the simulation action envelope.
 - Verify `cmd_watchdog_timeout_s=0.5` stops stale commands.

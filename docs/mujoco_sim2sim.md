@@ -21,6 +21,14 @@ Export the shared hardware parameter source:
 python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json
 ```
 
+After real measurements are collected, export a separate measured overlay for offline sim/replay experiments without mutating source files:
+
+```bash
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json \
+  scripts/validate_osracer_lab.sh measured-overlay
+```
+
 Generate the MuJoCo smoke-test model:
 
 ```bash

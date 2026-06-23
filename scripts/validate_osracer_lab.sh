@@ -39,6 +39,8 @@ Targets:
                   Fail unless all sim2real readiness gates pass.
   calibration-plan
                   Plan repo updates from measured parameters without writing files.
+  measured-overlay
+                  Export measured parameter overlay JSON without mutating source files.
   sensor-extrinsics-check
                   Compare measured sensor extrinsics against URDF/static TF.
   sensor-extrinsics-write
@@ -63,6 +65,7 @@ Environment overrides:
   SERIAL_LATENCY_FILE=/path/to/serial_latency.json
   MEASUREMENT_SESSION_FILE=/path/to/measurement_session.json
   MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack
+  MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
 EOF
@@ -192,7 +195,17 @@ case "$target" in
             echo "MEASUREMENTS_FILE is required" >&2
             exit 2
         fi
-        python3 "$ROOT_DIR/scripts/plan_calibration_updates.py"             --measurements "$MEASUREMENTS_FILE"
+        python3 "$ROOT_DIR/scripts/plan_calibration_updates.py" \
+            --measurements "$MEASUREMENTS_FILE"
+        ;;
+    measured-overlay)
+        if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE is required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/export_measured_overlay.py" \
+            --measurements "$MEASUREMENTS_FILE" \
+            --output "${MEASURED_OVERLAY_OUTPUT:-/tmp/osracer_measured_overlay.json}"
         ;;
     sensor-extrinsics-check)
         if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
