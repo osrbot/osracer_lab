@@ -21,6 +21,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - TorchScript policy export: `scripts/export_osracer_policy.py`
 - Hardware parameter source: `source/osracer_lab_assets/osracer_lab_assets/hardware_params.py`
 - Hardware parameter JSON export: `scripts/export_hardware_params.py`
+- AR0234-derived IsaacLab pinhole camera helper: `ar0234_pinhole_camera_cfg()`
 - MuJoCo kinematic sim2sim smoke: `scripts/mujoco_sim2sim_smoke.py`
 - Observation replay to MuJoCo pipeline: `scripts/run_sim2real_replay_pipeline.py`
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`

@@ -46,7 +46,7 @@ with `frame_id=camera_link`, and configures `640 x 480 @ 120 fps` using
 
 Important calibration note: AR0234 sensor size from the pixel pitch is about `5.76 mm x 3.6 mm`. A `2.7 mm` pinhole model from that sensor size does not directly produce a `130 deg` horizontal FOV, so the advertised FOV should be treated as a lens-level or diagonal claim until camera calibration confirms the real intrinsics.
 
-Current IsaacLab visual RL still uses a downsampled pinhole camera approximation. Do not change the trained visual task to `130 deg` until a checkerboard calibration provides `fx`, `fy`, `cx`, `cy`, and distortion coefficients.
+IsaacLab visual RL uses a downsampled image tensor, but its pinhole camera focal length and aperture now come from `ar0234_pinhole_camera_cfg()` in `hardware_params.py`. Do not change the trained visual task to the advertised `130 deg` until a checkerboard calibration provides `fx`, `fy`, `cx`, `cy`, and distortion coefficients.
 
 ## Lidar
 

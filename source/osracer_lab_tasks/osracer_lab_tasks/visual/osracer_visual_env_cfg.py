@@ -48,9 +48,17 @@ from osracer_lab_tasks.visual.utils import (
     generate_random_poses,
 )
 
-from osracer_lab_assets import OSRACER_LAB_ASSETS_DATA_DIR, OSRACER_VISUAL_CFG
+from osracer_lab_assets import (
+    OSRACER_LAB_ASSETS_DATA_DIR,
+    OSRACER_SENSOR_EXTRINSICS,
+    OSRACER_VISUAL_CFG,
+    ar0234_pinhole_camera_cfg,
+)
 from osracer_lab_tasks.common import OSRacerAckermannActionCfg
 from . import mdp_sensors
+
+VISUAL_CAMERA_PINHOLE_CFG = ar0234_pinhole_camera_cfg()
+VISUAL_CAMERA_XYZ_RPY = OSRACER_SENSOR_EXTRINSICS["urdf_base_link_to_camera_link_xyz_rpy"]
 
 ##########################
 ###### OBSERVATIONS ######
@@ -170,14 +178,14 @@ class OSRacerVisualSceneCfg(InteractiveSceneCfg):
         width=80,
         data_types=["rgb"],
         spawn=sim_utils.PinholeCameraCfg(
-            focal_length=1.93,
-            horizontal_aperture=3.896,
-            vertical_aperture=2.453,
-            clipping_range=(0.01, 1e2),
+            focal_length=VISUAL_CAMERA_PINHOLE_CFG["focal_length"],
+            horizontal_aperture=VISUAL_CAMERA_PINHOLE_CFG["horizontal_aperture"],
+            vertical_aperture=VISUAL_CAMERA_PINHOLE_CFG["vertical_aperture"],
+            clipping_range=VISUAL_CAMERA_PINHOLE_CFG["clipping_range"],
         ),
         offset=TiledCameraCfg.OffsetCfg(
-            pos=(0.12323, -0.017229, -0.053395),
-            rot=tuple(R.from_euler("xyz", [-90.0, 0.0, -90.0], degrees=True).as_quat().tolist()),
+            pos=VISUAL_CAMERA_XYZ_RPY[:3],
+            rot=tuple(R.from_euler("xyz", VISUAL_CAMERA_XYZ_RPY[3:]).as_quat().tolist()),
             convention="ros",
         ),
         debug_vis=False,

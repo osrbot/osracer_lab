@@ -41,6 +41,32 @@ OSRACER_CAMERA_AR0234 = {
     },
 }
 
+
+def ar0234_sensor_size_mm():
+    """Return AR0234 active sensor size inferred from resolution and pixel pitch."""
+
+    width_px, height_px = OSRACER_CAMERA_AR0234["resolution_px"]
+    pixel_width_um, pixel_height_um = OSRACER_CAMERA_AR0234["pixel_size_um"]
+    return (width_px * pixel_width_um / 1000.0, height_px * pixel_height_um / 1000.0)
+
+
+def ar0234_pinhole_camera_cfg():
+    """Return IsaacLab PinholeCameraCfg values derived from AR0234 sensor facts.
+
+    The advertised 130 deg FOV is kept as a hardware note, but this pinhole
+    approximation uses the physical focal length and active sensor size until
+    checkerboard calibration provides fx/fy/cx/cy/distortion.
+    """
+
+    horizontal_aperture, vertical_aperture = ar0234_sensor_size_mm()
+    return {
+        "focal_length": OSRACER_CAMERA_AR0234["lens_focal_length_mm"],
+        "horizontal_aperture": horizontal_aperture,
+        "vertical_aperture": vertical_aperture,
+        "clipping_range": (0.01, 100.0),
+    }
+
+
 OSRACER_LIDAR_25M = {
     "scan_type": "mechanical_rotating",
     "range_method": "pulse_tof",
@@ -129,6 +155,7 @@ def hardware_summary():
         "chassis": OSRACER_CHASSIS,
         "camera_ar0234": OSRACER_CAMERA_AR0234,
         "lidar_25m": OSRACER_LIDAR_25M,
+        "camera_pinhole_cfg": ar0234_pinhole_camera_cfg(),
         "real_runtime": OSRACER_REAL_RUNTIME,
         "sensor_extrinsics": OSRACER_SENSOR_EXTRINSICS,
         "required_real_car_measurements": REQUIRED_REAL_CAR_MEASUREMENTS,
