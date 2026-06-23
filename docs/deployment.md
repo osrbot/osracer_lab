@@ -88,6 +88,32 @@ ONNX export is available when explicitly requested:
   --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
 ```
 
+Package the exported policy with hardware parameters, manifest, and checksums
+before copying to Jetson:
+
+```bash
+python3 scripts/package_jetson_deployment.py \
+  --policy logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/exported/policy.pt \
+  --output-dir /tmp/osracer_jetson_deployment
+```
+
+The package contains:
+
+```text
+policy.pt
+hardware_params.json
+manifest.json
+SHA256SUMS
+```
+
+On Jetson, verify the package before launch:
+
+```bash
+cd /path/to/osracer_jetson_deployment
+sha256sum -c SHA256SUMS
+/path/to/osracer/tools/jetson_preflight.sh --policy policy.pt --offline-smoke
+```
+
 Add a separate inference node in the OSRacer ROS 2 workspace rather than coupling deployment code into the IsaacLab training package.
 
 Recommended node responsibilities:

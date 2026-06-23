@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+"""Package exported OSRacer policy artifacts for Jetson deployment."""
+
+import argparse
+import hashlib
+import json
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ASSETS_SRC = REPO_ROOT / "source" / "osracer_lab_assets"
+if str(ASSETS_SRC) not in sys.path:
+    sys.path.insert(0, str(ASSETS_SRC))
+
+from osracer_lab_assets.hardware_params import hardware_summary
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Package OSRacer policy artifacts for Jetson.")
+    parser.add_argument("--policy", required=True, help="Exported policy file, for example policy.pt")
+    parser.add_argument("--output-dir", required=True, help="Deployment package output directory")
+    parser.add_argument("--name", default="osracer_jetson_deployment", help="Package name written to manifest")
+    parser.add_argument("--task", default="Isaac-OSRacerDriftRL-v0")
+    parser.add_argument("--format", default="torchscript", choices=("torchscript", "onnx", "tensorrt"))
+    parser.add_argument("--notes", default="", help="Short operator note for the manifest")
+    return parser.parse_args()
+
+
+def sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def git_value(args):
+    try:
+        return subprocess.check_output(args, cwd=REPO_ROOT, text=True, stderr=subprocess.DEVNULL).strip()
+    except Exception:
+        return None
+
+
+def write_json(path, payload):
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
+def main():
+    args = parse_args()
+    policy_path = Path(args.policy).resolve()
+    if not policy_path.is_file():
+        raise FileNotFoundError(policy_path)
+
+    output_dir = Path(args.output_dir).resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    policy_out = output_dir / policy_path.name
+    hardware_out = output_dir / "hardware_params.json"
+    manifest_out = output_dir / "manifest.json"
+    sha_out = output_dir / "SHA256SUMS"
+
+    shutil.copy2(policy_path, policy_out)
+    write_json(hardware_out, hardware_summary())
+
+    manifest = {
+        "name": args.name,
+        "created_unix_s": int(time.time()),
+        "task": args.task,
+        "format": args.format,
+        "notes": args.notes,
+        "repo": {
+            "root": str(REPO_ROOT),
+            "head": git_value(["git", "rev-parse", "HEAD"]),
+            "branch": git_value(["git", "branch", "--show-current"]),
+            "dirty": bool(git_value(["git", "status", "--porcelain"])),
+        },
+        "artifacts": {
+            policy_out.name: {
+                "source": str(policy_path),
+                "bytes": policy_out.stat().st_size,
+                "sha256": sha256(policy_out),
+            },
+            hardware_out.name: {
+                "source": "osracer_lab_assets.hardware_params",
+                "bytes": hardware_out.stat().st_size,
+                "sha256": sha256(hardware_out),
+            },
+        },
+        "runtime_contract": {
+            "action": "[target_speed_mps, target_steering_rad]",
+            "initial_max_speed_mps": hardware_summary()["chassis"]["initial_real_test_max_speed_mps"],
+            "max_steering_rad": hardware_summary()["chassis"]["simulation_max_steering_rad"],
+            "ackermann_topic": hardware_summary()["real_runtime"]["ackermann_cmd_topic"],
+        },
+    }
+    write_json(manifest_out, manifest)
+
+    lines = []
+    for path in (policy_out, hardware_out, manifest_out):
+        lines.append(f"{sha256(path)}  {path.name}")
+    sha_out.write_text("\n".join(lines) + "\n")
+
+    print(f"wrote {output_dir}")
+    for path in (policy_out, hardware_out, manifest_out, sha_out):
+        print(f"  {path.name} ({path.stat().st_size} bytes)")
+
+
+if __name__ == "__main__":
+    main()
