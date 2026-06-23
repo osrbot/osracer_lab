@@ -12,3 +12,6 @@ wandb/
 
 # IsaacLab URDF->USD conversion cache (runtime generated)
 source/osracer_lab_assets/data/Robots/OSRacer/usd/
+
+# Visual terrain maps generated at task import/runtime
+source/osracer_lab_assets/data/rgb_maps/

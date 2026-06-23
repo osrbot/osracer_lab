@@ -16,7 +16,10 @@ def startup(parser=None, prelaunch_callback=None, register_cfgs=True):
     if prelaunch_callback is not None:
         prelaunch_callback(args_cli)
 
-    args_cli.enable_cameras = True
+    # Enable cameras for visual RL, but keep blind tasks on the lighter headless path.
+    # Forcing cameras on drift loads the RTX Hydra engine and has crashed headless runs.
+    if not getattr(args_cli, "enable_cameras", False):
+        args_cli.enable_cameras = "Visual" in getattr(args_cli, "task", "")
     sys.argv = [sys.argv[0]] + hydra_args
 
     app_launcher = AppLauncher(args_cli)

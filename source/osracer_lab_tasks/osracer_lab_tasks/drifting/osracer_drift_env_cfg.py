@@ -99,7 +99,7 @@ class DriftEventsCfg:
 class DriftEventsRandomCfg(DriftEventsCfg):
     change_wheel_friction = EventTerm(
         func=mdp.randomize_rigid_body_material,
-        mode="prestartup",
+        mode="startup",
         params={
             "static_friction_range": (0.3, 0.5),
             "dynamic_friction_range": (0.3, 0.5),
@@ -113,7 +113,7 @@ class DriftEventsRandomCfg(DriftEventsCfg):
 
     randomize_gains = EventTerm(
         func=mdp.randomize_actuator_gains,
-        mode="prestartup",
+        mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", joint_names=[".*rear.*wheel.*"]),
             "damping_distribution_params": (10.0, 50.0),
@@ -145,9 +145,9 @@ class DriftEventsRandomCfg(DriftEventsCfg):
 
     add_base_mass = EventTerm(
         func=mdp.randomize_rigid_body_mass,
-        mode="prestartup",
+        mode="startup",
         params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=["base_link"]),
+            "asset_cfg": SceneEntityCfg("robot", body_names=["base_footprint"]),
             "mass_distribution_params": (0.3, 0.5),
             "operation": "add",
             "distribution": "uniform",

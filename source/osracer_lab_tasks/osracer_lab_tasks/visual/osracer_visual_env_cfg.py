@@ -2,14 +2,14 @@
 
 Mirrors the WheeledLab mushr_visual_env_cfg pattern:
   - Procedurally generated traversability terrain (white=traversable, black=obstacle)
-  - TiledCameraCfg attached to base_link with camera_joint offset
+  - TiledCameraCfg attached to base_footprint with camera_joint offset
   - Visual observation: cropped + augmented grayscale camera + proprioception
   - Rewards: traversability signal + forward velocity
 
 Camera placement notes:
   URDF camera_joint: xyz=(0.12323, -0.017229, -0.053395), rpy=(-90°, 0°, -90°)
-  With merge_fixed_joints=True the camera_link prim is absorbed into base_link,
-  so TiledCamera is attached to base_link with the above offset.
+  With merge_fixed_joints=True the camera_link and base_link prims are absorbed
+  into base_footprint, so TiledCamera is attached there with the above offset.
   The rpy matches MuSHR exactly → same OffsetCfg rotation values.
 """
 
@@ -160,10 +160,10 @@ class OSRacerVisualSceneCfg(InteractiveSceneCfg):
     robot: ArticulationCfg = OSRACER_VISUAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
     ground.init_state.pos = (0.0, 0.0, -1e-4)
 
-    # Camera attached to base_link (camera_link merged in via merge_fixed_joints=True).
+    # Camera attached to base_footprint (camera/base links merged via merge_fixed_joints=True).
     # pos = camera_joint xyz from URDF; rot matches camera_joint rpy=(-90°,0°,-90°).
     camera = TiledCameraCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/base_link/camera",
+        prim_path="{ENV_REGEX_NS}/Robot/base_footprint/camera",
         update_period=0.1,
         height=60,
         width=80,
@@ -215,7 +215,7 @@ class VisualEventsRandomCfg(VisualEventsCfg):
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=["base_link"]),
+            "asset_cfg": SceneEntityCfg("robot", body_names=["base_footprint"]),
             "mass_distribution_params": (1.0, 3.0),
             "operation": "abs",
         },

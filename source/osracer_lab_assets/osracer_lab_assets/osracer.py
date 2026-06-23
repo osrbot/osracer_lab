@@ -81,13 +81,16 @@ _ARTICULATION_PROPS = sim_utils.ArticulationRootPropertiesCfg(
 
 # joint_drive=None: actuators= dict owns all drive properties.
 # The UrdfFileCfg default (target_type="position") conflicts with DCMotorCfg.
-# root_link_name="base_link": URDF root is base_footprint (no inertia); must be explicit.
+# root_link_name=None: merge_fixed_joints=True merges base_link into base_footprint;
+# the effective root after merge is base_footprint (with merged inertia). Setting
+# "base_link" explicitly points to a post-merge ghost → null prim from the importer.
 _OSRACER_SPAWN_BASE = sim_utils.UrdfFileCfg(
     asset_path=OSRACER_URDF_PATH,
     usd_dir=os.path.join(OSRACER_ROBOT_DIR, "usd", "blind"),
+    force_usd_conversion=True,
     fix_base=False,
     merge_fixed_joints=True,
-    root_link_name="base_link",
+    root_link_name=None,
     joint_drive=None,
     rigid_props=_RIGID_PROPS,
     articulation_props=_ARTICULATION_PROPS,

@@ -1,19 +1,26 @@
-"""Initial RSL-RL PPO runner config for OSRacer."""
+"""RSL-RL PPO runner config for OSRacer drift task."""
 
-from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlPpoActorCriticCfg, RslRlPpoAlgorithmCfg
+from isaaclab.utils import configclass
+from isaaclab_rl.rsl_rl import RslRlMLPModelCfg, RslRlOnPolicyRunnerCfg, RslRlPpoAlgorithmCfg
 
 
+@configclass
 class OSRacerPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 5000
     save_interval = 100
     experiment_name = "osracer_drift"
-    empirical_normalization = False
-    policy = RslRlPpoActorCriticCfg(
-        init_noise_std=1.0,
-        actor_hidden_dims=[128, 128],
-        critic_hidden_dims=[128, 128],
+    obs_groups = {"actor": ["policy"], "critic": ["policy"]}
+    actor = RslRlMLPModelCfg(
+        hidden_dims=[128, 128],
         activation="elu",
+        obs_normalization=False,
+        distribution_cfg=RslRlMLPModelCfg.GaussianDistributionCfg(init_std=1.0),
+    )
+    critic = RslRlMLPModelCfg(
+        hidden_dims=[128, 128],
+        activation="elu",
+        obs_normalization=False,
     )
     algorithm = RslRlPpoAlgorithmCfg(
         value_loss_coef=1.0,

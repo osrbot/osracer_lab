@@ -25,16 +25,20 @@ parser.add_argument("--resume", type=str, default=None, help="Path to checkpoint
 parser.add_argument("--log_dir", type=str, default="logs/rsl_rl")
 simulation_app, args_cli = startup(parser=parser)
 
+import importlib.metadata as metadata
 import os
+from datetime import datetime
 
 import gymnasium as gym
 import torch
 
 from isaaclab_tasks.utils import get_checkpoint_path, parse_env_cfg
-from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper
+from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, handle_deprecated_rsl_rl_cfg
 
 
 def main():
+    installed_version = metadata.version("rsl-rl-lib")
+
     # --- env config ---
     env_cfg = parse_env_cfg(
         args_cli.task,
@@ -51,7 +55,14 @@ def main():
     if args_cli.max_iterations is not None:
         runner_cfg.max_iterations = args_cli.max_iterations
 
-    log_dir = os.path.join(args_cli.log_dir, runner_cfg.experiment_name)
+    # migrate deprecated policy= → actor=/critic= for rsl_rl >= 4.0.0
+    runner_cfg = handle_deprecated_rsl_rl_cfg(runner_cfg, installed_version)
+
+    log_dir = os.path.join(
+        args_cli.log_dir,
+        runner_cfg.experiment_name,
+        datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+    )
     os.makedirs(log_dir, exist_ok=True)
 
     # --- runner ---
