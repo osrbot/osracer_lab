@@ -24,13 +24,18 @@ alignment procedure.
 Create the machine-readable measurement file before updating calibrated sim parameters:
 
 ```bash
-cp docs/real_car_measurements.template.json docs/real_car_measurements.json
+scripts/validate_osracer_lab.sh measurement-seed
 # Fill every required value and source field with real measurements.
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh sim2real-readiness
 ```
+
+`measurement-seed` writes only repo-confirmed facts and collection metadata. It
+does not invent mass, steering, speed, IMU range, latency, or extrinsic values.
+The seeded baud rate is intentionally not enough to pass the serial latency
+measurement gate.
 
 The readiness gate only counts an item as complete when `value` and `source` are
 non-empty and `value` matches the template `expected_format`. Keep

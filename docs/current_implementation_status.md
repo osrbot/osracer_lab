@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 35]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 37]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 19]` |
 
 ## Implemented In `osracer_lab`
@@ -30,6 +30,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
 - Real-car measurement value validator: `scripts/validate_real_measurements.py`
+- Real-car measurement seed generator: `scripts/collect_real_measurement_seed.py`
 - Real-car measurement template: `docs/real_car_measurements.template.json`
 - Sensor extrinsics measured-value checker/writer: `scripts/apply_sensor_extrinsics.py`
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
@@ -65,7 +66,8 @@ Run from `osracer_lab`:
 ```bash
 scripts/validate_osracer_lab.sh source-authority
 scripts/validate_osracer_lab.sh runtime-contract
-scripts/validate_osracer_lab.sh sim2real-readiness
+MEASUREMENT_SEED_OUTPUT=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh measurement-seed
+MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh sim2real-readiness
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
 python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json

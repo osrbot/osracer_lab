@@ -202,12 +202,20 @@ def validate_encoder(value, name):
 
 def validate_imu(value, name):
     if not isinstance(value, dict):
-        raise ValueError("IMU value must be an object with model and rate_hz")
+        raise ValueError("IMU value must be an object with model, rate_hz, ranges, and frame_alignment")
     if not has_text(str(value.get("model", ""))):
         raise ValueError("IMU value must include model")
     if "rate_hz" not in value:
         raise ValueError("IMU value must include rate_hz")
     number(value["rate_hz"], min_value=1.0, max_value=2000.0)
+    if "accel_range_g" not in value:
+        raise ValueError("IMU value must include accel_range_g")
+    number(value["accel_range_g"], min_value=0.1, max_value=200.0)
+    if "gyro_range_dps" not in value:
+        raise ValueError("IMU value must include gyro_range_dps")
+    number(value["gyro_range_dps"], min_value=1.0, max_value=100000.0)
+    if not has_text(str(value.get("frame_alignment", ""))):
+        raise ValueError("IMU value must include frame_alignment")
 
 
 def validate_extrinsic(value, name):
@@ -221,8 +229,9 @@ def validate_serial(value, name):
     if "baud_rate" not in value:
         raise ValueError("serial value must include baud_rate")
     number(value["baud_rate"], min_value=9600.0, max_value=10000000.0)
-    if "command_latency_s" in value:
-        number(value["command_latency_s"], min_value=0.0, max_value=5.0)
+    if "command_latency_s" not in value:
+        raise ValueError("serial value must include command_latency_s")
+    number(value["command_latency_s"], min_value=0.0, max_value=5.0)
 
 
 def validate_description(value, name):
