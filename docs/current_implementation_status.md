@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 77]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 40]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 78]` after this documentation commit |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 41]` after the Jetson documentation commit |
 
 ## Implemented In `osracer_lab`
 
@@ -68,6 +68,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - `docs/mujoco_sim2sim.md`
   - `docs/real_car_measurement_checklist.md`
   - `docs/extrinsics_alignment.md`
+  - `docs/handoff_push_readiness.md`
 
 ## Implemented In `osracer`
 
@@ -147,7 +148,6 @@ Run from `osracer`:
 tools/jetson_performance_profile.sh --json-output /tmp/osracer_perf_profile_compat.json
 tools/build_tensorrt_engine.sh --onnx /tmp/osracer_trt_test/policy.onnx --engine /tmp/osracer_trt_test/policy.engine --fp16 --workspace-mb 1024 --log /tmp/osracer_trt_test/build.log --report /tmp/osracer_trt_test/build_report.json --dry-run
 bash /tmp/osracer_session_topic_smoke.sh
-MEASUREMENT_PACK_OUTPUT=/tmp/osracer_measurement_pack_topic_smoke scripts/validate_osracer_lab.sh measurement-pack
 tools/jetson_preflight.sh
 tools/jetson_environment_report.py --output /tmp/osracer_jetson_environment.json
 tools/jetson_runtime_monitor.sh --duration 1 --output-dir /tmp/osracer_runtime_monitor_smoke
@@ -194,6 +194,7 @@ first-drive preparation, not calibrated closed-loop sim2real.
 Before any push:
 
 ```bash
+git status --short --branch
 git diff --check
 rg -n "<team-sensitive-patterns>" .
 ```
