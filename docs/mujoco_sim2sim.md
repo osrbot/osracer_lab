@@ -35,6 +35,14 @@ Generate the MuJoCo smoke-test model:
 python3 scripts/mujoco_sim2sim_smoke.py --xml-out /tmp/osracer_minimal.xml
 ```
 
+Generate the same model with measured overlay values applied only for offline testing:
+
+```bash
+python3 scripts/mujoco_sim2sim_smoke.py \
+  --xml-out /tmp/osracer_measured_overlay.xml \
+  --measured-overlay /tmp/osracer_measured_overlay.json
+```
+
 If MuJoCo is installed in the active Python environment:
 
 ```bash
@@ -85,7 +93,8 @@ python3 scripts/run_sim2real_replay_pipeline.py \
   --policy /path/to/policy.pt \
   --output-dir /tmp/osracer_sim2real_replay \
   --min-rows 100 \
-  --max-clamped-ratio 0.5
+  --max-clamped-ratio 0.5 \
+  --measured-overlay /tmp/osracer_measured_overlay.json
 ```
 
 The pipeline writes:

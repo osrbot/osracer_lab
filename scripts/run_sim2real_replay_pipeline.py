@@ -47,6 +47,7 @@ def parse_args():
     parser.add_argument("--max-speed-mps", type=float, default=0.3)
     parser.add_argument("--max-steering-rad", type=float, default=0.488)
     parser.add_argument("--steps-per-action", type=int, default=1)
+    parser.add_argument("--measured-overlay", default=None, help="Measured overlay JSON passed to MuJoCo replay")
     parser.add_argument("--skip-summary", action="store_true", help="Skip policy replay summary gate")
     parser.add_argument("--min-rows", type=int, default=1)
     parser.add_argument("--max-clamped-ratio", type=float, default=None)
@@ -137,6 +138,8 @@ def main():
         "--steps-per-action",
         str(args.steps_per_action),
     ]
+    if args.measured_overlay:
+        mujoco_command.extend(["--measured-overlay", str(Path(args.measured_overlay).resolve())])
     run_command(mujoco_command, env=mujoco_env)
 
     print(f"policy_replay={policy_out}", flush=True)

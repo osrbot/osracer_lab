@@ -9,6 +9,7 @@ step the MJCF.
 
 import argparse
 import csv
+import json
 import math
 import sys
 from pathlib import Path
@@ -29,6 +30,7 @@ def parse_args():
     parser.add_argument("--speed-mps", type=float, default=0.3, help="Rollout target speed")
     parser.add_argument("--steering-rad", type=float, default=0.0, help="Rollout target steering")
     parser.add_argument("--actions-csv", default=None, help="Replay speed_cmd/steering_cmd actions from CSV")
+    parser.add_argument("--measured-overlay", default=None, help="Measured overlay JSON from scripts/export_measured_overlay.py")
     parser.add_argument("--steps-per-action", type=int, default=1, help="MuJoCo steps to apply each CSV action")
     parser.add_argument("--timestep", type=float, default=0.01)
     parser.add_argument("--mass-kg", type=float, default=3.0, help="Placeholder mass until measured")
@@ -43,7 +45,51 @@ def _geom_block(name, pos, size, rgba):
     )
 
 
-def build_mjcf(params, mass_kg, wheel_width_m, timestep):
+def _overlay_value(overlay, group, key):
+    return overlay.get("measured_overlay", {}).get(group, {}).get(key)
+
+
+def apply_measured_overlay(params, overlay_path):
+    if not overlay_path:
+        return params, {"enabled": False}
+    with Path(overlay_path).open("r", encoding="utf-8") as f:
+        overlay = json.load(f)
+    params = json.loads(json.dumps(params))
+    applied = {"enabled": True, "path": str(Path(overlay_path).resolve()), "fields": {}}
+
+    chassis = params["chassis"]
+    value = _overlay_value(overlay, "chassis", "front_track_m")
+    if value is not None:
+        chassis["rear_track_m"] = float(value)
+        applied["fields"]["chassis.rear_track_m"] = "front_track_m"
+    value = _overlay_value(overlay, "chassis", "tire_width_m")
+    if value is not None:
+        chassis["measured_tire_width_m"] = float(value)
+        applied["fields"]["chassis.measured_tire_width_m"] = "tire_width_m"
+    value = _overlay_value(overlay, "powertrain", "true_max_speed_mps")
+    if value is not None:
+        chassis["simulation_max_speed_mps"] = float(value)
+        applied["fields"]["chassis.simulation_max_speed_mps"] = "true_max_speed_mps"
+    value = _overlay_value(overlay, "steering", "true_max_steering_rad_left_right")
+    if isinstance(value, dict):
+        left = float(value["left_rad"])
+        right = float(value["right_rad"])
+        chassis["simulation_max_steering_rad"] = min(abs(left), abs(right))
+        applied["fields"]["chassis.simulation_max_steering_rad"] = "true_max_steering_rad_left_right"
+    elif isinstance(value, list) and len(value) >= 2:
+        chassis["simulation_max_steering_rad"] = min(abs(float(value[0])), abs(float(value[1])))
+        applied["fields"]["chassis.simulation_max_steering_rad"] = "true_max_steering_rad_left_right"
+
+    mass = _overlay_value(overlay, "chassis", "full_vehicle_mass_kg_with_battery_jetson_sensors")
+    if mass is not None:
+        applied["mass_kg"] = float(mass)
+    timing = overlay.get("measured_overlay", {}).get("timing", {})
+    if timing:
+        applied["timing"] = timing
+    return params, applied
+
+
+def build_mjcf(params, mass_kg, wheel_width_m, timestep, overlay_applied=None):
     chassis = params["chassis"]
     camera = params["camera_ar0234"]
     lidar_scan = params["lidar_planar_scan_cfg"]
@@ -56,6 +102,8 @@ def build_mjcf(params, mass_kg, wheel_width_m, timestep):
     steering_limit = chassis["simulation_max_steering_rad"]
     max_speed = chassis["simulation_max_speed_mps"]
     wheel_radius = chassis["wheel_radius_m"]
+    wheel_width_m = float(chassis.get("measured_tire_width_m", wheel_width_m))
+    overlay_applied = overlay_applied or {"enabled": False}
 
     body_length = wheelbase + 0.12
     body_width = rear_track + 0.08
@@ -117,6 +165,8 @@ def build_mjcf(params, mass_kg, wheel_width_m, timestep):
        lidar_scan_rate_hz={lidar_scan["scan_rate_hz"]}
        lidar_ray_count={lidar_scan["ray_count"]}
        lidar_max_range_m={lidar_scan["max_range_m"]}
+       measured_overlay_enabled={overlay_applied.get("enabled", False)}
+       measured_overlay_fields={json.dumps(overlay_applied.get("fields", {}), sort_keys=True)}
   -->
 </mujoco>
 """
@@ -247,8 +297,9 @@ def main():
 
     xml_path = Path(args.xml_out)
     xml_path.parent.mkdir(parents=True, exist_ok=True)
-    params = hardware_summary()
-    xml_path.write_text(build_mjcf(params, args.mass_kg, args.wheel_width_m, args.timestep))
+    params, overlay_applied = apply_measured_overlay(hardware_summary(), args.measured_overlay)
+    mass_kg = float(overlay_applied.get("mass_kg", args.mass_kg))
+    xml_path.write_text(build_mjcf(params, mass_kg, args.wheel_width_m, args.timestep, overlay_applied))
     print(f"wrote {xml_path}")
 
     if args.compile or args.rollout_steps or args.actions_csv:

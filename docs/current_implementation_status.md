@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 43]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 44]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 21]` |
 
 ## Implemented In `osracer_lab`
@@ -24,7 +24,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - AR0234-derived IsaacLab pinhole camera helper: `ar0234_pinhole_camera_cfg()`
 - 25m lidar planar scan helper: `lidar_25m_planar_scan_cfg()`
 - Simulation sensor contract check: `scripts/check_sim_sensor_contract.py`
-- MuJoCo kinematic sim2sim smoke: `scripts/mujoco_sim2sim_smoke.py`
+- MuJoCo kinematic sim2sim smoke with measured overlay support: `scripts/mujoco_sim2sim_smoke.py`
 - Observation replay to MuJoCo pipeline: `scripts/run_sim2real_replay_pipeline.py`
 - Source authority check for `osrcore` and `osracer feat-demo`: `scripts/check_source_authority.py`
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
@@ -83,6 +83,7 @@ MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json MEASURED_OVERLAY_OUTPU
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
 python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json
+python3 scripts/mujoco_sim2sim_smoke.py --xml-out /tmp/osracer_overlay_smoke.xml --measured-overlay /tmp/osracer_measured_overlay.json
 python3 scripts/package_jetson_deployment.py \
   --policy /tmp/osracer_dummy_policy.pt \
   --output-dir /tmp/osracer_deploy_pkg_readme_clean
