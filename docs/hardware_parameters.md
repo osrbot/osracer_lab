@@ -1,6 +1,7 @@
 # OSRacer Hardware Parameters
 
 This is the current real-vehicle parameter source for sim2sim, sim2real, and Jetson deployment work.
+Use `docs/real_car_measurement_checklist.md` to collect the missing measured values.
 
 ## Chassis Parameters
 
