@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 49]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 24]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 50]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 25]` |
 
 ## Implemented In `osracer_lab`
 
@@ -54,7 +54,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Policy observation recorder for real-car passive logs
 - CSV policy replay: `tools/policy_replay_csv.py`
 - Replay summary gate: `tools/policy_replay_summary.py`
-- Jetson preflight: `tools/jetson_preflight.sh`
+- Jetson preflight: `tools/jetson_preflight.sh --environment-output /tmp/osracer_jetson_environment.json`
 - Jetson environment report: `tools/jetson_environment_report.py`
 - Read-only real-car readiness check: `tools/real_car_readiness_check.sh`
 - Jetson runtime monitor and summary:
