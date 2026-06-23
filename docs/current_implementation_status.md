@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 62]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 63]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 31]` |
 
 ## Implemented In `osracer_lab`
@@ -40,6 +40,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Field measurement pack generator: `scripts/create_measurement_pack.py`
 - Jetson sensor preflight measurement importer: `scripts/import_sensor_preflight_measurements.py`
 - Serial latency measurement importer: `scripts/import_serial_latency_measurement.py`
+- ROS CameraInfo calibration importer: `scripts/import_camera_info_calibration.py`
 - Combined measurement session importer: `scripts/import_measurement_session.py`
 - Jetson environment evidence importer: `scripts/import_measurement_session.py` records `collection.jetson_environment`
 - Real-car measurement template: `docs/real_car_measurements.template.json`
@@ -96,6 +97,7 @@ MEASUREMENT_SEED_OUTPUT=/tmp/osracer_measurements_seed.json scripts/validate_osr
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack scripts/validate_osracer_lab.sh measurement-pack
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SENSOR_SUMMARY_FILE=/tmp/osracer_sensor_summary_valid.json scripts/validate_osracer_lab.sh import-sensor-preflight
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SERIAL_LATENCY_FILE=/tmp/osracer_serial_latency_valid.json scripts/validate_osracer_lab.sh import-serial-latency
+MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json CAMERA_INFO_FILE=/tmp/osracer_camera_info_valid.json scripts/validate_osracer_lab.sh import-camera-info
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_SESSION_FILE=/tmp/osracer_measurement_session_valid/measurement_session.json scripts/validate_osracer_lab.sh import-measurement-session
 MEASUREMENTS_FILE=docs/real_car_measurements.template.json scripts/validate_osracer_lab.sh measurement-gap
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh sim2real-readiness

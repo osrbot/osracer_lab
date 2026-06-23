@@ -146,7 +146,12 @@ Calibrate AR0234 intrinsics before visual sim2real:
 
 ```bash
 # Record checkerboard/AprilTag images at the deployed camera resolution.
-# Fill camera_intrinsics_fx_fy_cx_cy_distortion in docs/real_car_measurements.json.
+# Export the resulting ROS CameraInfo message as JSON/YAML.
+ros2 topic echo --once /camera_info > /tmp/osracer_camera_info.yaml
+
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+  CAMERA_INFO_FILE=/tmp/osracer_camera_info.yaml \
+  scripts/validate_osracer_lab.sh import-camera-info
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
   MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json \
   scripts/validate_osracer_lab.sh measured-overlay

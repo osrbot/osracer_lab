@@ -37,6 +37,8 @@ Targets:
                   Import Jetson sensor_summary.json evidence into measurement JSON.
   import-serial-latency
                   Import serial_latency_probe.py JSON into measurement JSON.
+  import-camera-info
+                  Import ROS CameraInfo calibration into measurement JSON.
   import-measurement-session
                   Import jetson_measurement_session.sh manifest into measurement JSON.
   sim2real-readiness
@@ -75,6 +77,7 @@ Environment overrides:
   MEASUREMENT_SEED_OUTPUT=docs/real_car_measurements.json
   SENSOR_SUMMARY_FILE=/path/to/sensor_summary.json
   SERIAL_LATENCY_FILE=/path/to/serial_latency.json
+  CAMERA_INFO_FILE=/path/to/camera_info.json
   MEASUREMENT_SESSION_FILE=/path/to/measurement_session.json
   MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack
   CALIBRATION_REVIEW_PACK_OUTPUT=/tmp/osracer_calibration_review_pack
@@ -205,6 +208,16 @@ case "$target" in
         python3 "$ROOT_DIR/scripts/import_serial_latency_measurement.py" \
             --measurements "$MEASUREMENTS_FILE" \
             --serial-report "$SERIAL_LATENCY_FILE" \
+            --write
+        ;;
+    import-camera-info)
+        if [[ -z "${MEASUREMENTS_FILE:-}" || -z "${CAMERA_INFO_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE and CAMERA_INFO_FILE are required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/import_camera_info_calibration.py" \
+            --measurements "$MEASUREMENTS_FILE" \
+            --camera-info "$CAMERA_INFO_FILE" \
             --write
         ;;
     import-measurement-session)
