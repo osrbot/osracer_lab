@@ -2,6 +2,7 @@
 
 This is the current real-vehicle parameter source for sim2sim, sim2real, and Jetson deployment work.
 Use `docs/real_car_measurement_checklist.md` to collect the missing measured values.
+Use `docs/extrinsics_alignment.md` to resolve the current camera, lidar, and IMU frame conflict.
 
 ## Chassis Parameters
 
@@ -110,6 +111,7 @@ calibrated sim2real:
 Use measured physical mounting or a single generated robot description as the
 source of truth. Do not calibrate a camera/lidar/IMU sim2real pipeline against
 both sets.
+Follow `docs/extrinsics_alignment.md` before enabling strict extrinsic checks.
 
 ## Still Required
 

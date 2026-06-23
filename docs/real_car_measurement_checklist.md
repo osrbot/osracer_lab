@@ -2,6 +2,8 @@
 
 Use this checklist to turn real hardware facts into calibrated sim2sim and
 sim2real parameters. Keep raw notes, photos, and logs with each measurement.
+Use `docs/extrinsics_alignment.md` for the camera, lidar, and IMU frame
+alignment procedure.
 
 ## Confirmed From Current Repos
 
