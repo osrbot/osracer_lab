@@ -11,7 +11,8 @@ It is not push approval.
 | Area | Path | Branch | Role |
 |---|---|---|---|
 | Isaac / sim / deployment tooling | `/home/osrbot/Desktop/osracer/osracer_lab` | `main` | Primary development tree for OSRacer Isaac tooling |
-| ROS upper computer | `/home/osrbot/Desktop/osracer/osracer` | `feat-demo` | Vehicle ROS bringup, Jetson tools, first-drive gates |
+| ROS upper computer on server | `/home/osrbot/Desktop/osracer/osracer` | `feat-demo` | Server mirror for vehicle ROS bringup, Jetson tools, first-drive gates; do not push `feat-demo` from here |
+| ROS upper computer on Mac | `/Users/winter/.codex/worktrees/904a/osracer` | `feat-demo` | Authoritative local push-prep worktree for `feat-demo` |
 | Firmware source authority | `/home/osrbot/Desktop/osracer/osrcore` | source checkout | Read-only authority for firmware protocol and steering units |
 
 `osracer` must stay on `feat-demo`. Do not use another ROS branch as the vehicle

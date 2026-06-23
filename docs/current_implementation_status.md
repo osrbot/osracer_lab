@@ -13,9 +13,9 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 80]` after this documentation correction |
-| `osracer` on server | `feat-demo` | `feat-demo based on public/feat-demo [ahead 40]`; server tree left unchanged for push prep |
-| `osracer` on Mac | `feat-demo` at `/Users/winter/.codex/worktrees/904a/osracer` | aligned to the server `feat-demo` baseline, then carries the local Jetson documentation push-prep commit |
+| `osracer_lab` | `main` | `main...origin/main [ahead 81]` after this documentation correction |
+| `osracer` on server | `feat-demo` | synchronized to Mac/GitHub `feat-demo` at `6d96f52`; server is not used for `feat-demo` push |
+| `osracer` on Mac | `feat-demo` at `/Users/winter/.codex/worktrees/904a/osracer` | authoritative local push-prep worktree for `feat-demo`, currently `6d96f52` |
 
 ## Implemented In `osracer_lab`
 
@@ -109,7 +109,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - Rechecks archived visual deployment packages for camera calibration evidence.
   - Rechecks archived Jetson performance profile and TensorRT build report semantics.
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
-  - Jetson documentation changes are prepared on Mac `feat-demo` at `/Users/winter/.codex/worktrees/904a/osracer`, not on the server `feat-demo` worktree.
+  - Jetson documentation changes are merged into Mac `feat-demo` at `/Users/winter/.codex/worktrees/904a/osracer`; the server `feat-demo` is kept synchronized but is not used for pushing.
 
 ## Verified Commands
 
