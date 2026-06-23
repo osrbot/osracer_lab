@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 73]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 38]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 74]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 39]` |
 
 ## Implemented In `osracer_lab`
 
@@ -46,6 +46,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - ROS CameraInfo calibration importer: `scripts/import_camera_info_calibration.py`
 - Combined measurement session importer: `scripts/import_measurement_session.py`
   - Imports CameraInfo calibration when `tools.jetson_measurement_session.sh` captured it.
+  - Field measurement pack now shows explicit camera/lidar/IMU/odom topic arguments for the combined session.
 - Jetson environment evidence importer: `scripts/import_measurement_session.py` records `collection.jetson_environment`
 - Real-car measurement template: `docs/real_car_measurements.template.json`
   - Includes camera intrinsics/distortion as a required visual sim2real measurement.
@@ -73,6 +74,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Jetson preflight: `tools/jetson_preflight.sh --environment-output /tmp/osracer_jetson_environment.json`
 - Jetson environment report: `tools/jetson_environment_report.py`
 - Jetson measurement session now includes environment and CameraInfo evidence: `tools/jetson_measurement_session.sh`
+  - Accepts camera/lidar/IMU/odom topic overrides and records them in `measurement_session.json`.
 - Read-only real-car readiness check: `tools/real_car_readiness_check.sh`
 - Jetson runtime monitor and summary:
   - `tools/jetson_runtime_monitor.sh`
@@ -137,6 +139,8 @@ Run from `osracer`:
 ```bash
 tools/jetson_performance_profile.sh --json-output /tmp/osracer_perf_profile_compat.json
 tools/build_tensorrt_engine.sh --onnx /tmp/osracer_trt_test/policy.onnx --engine /tmp/osracer_trt_test/policy.engine --fp16 --workspace-mb 1024 --log /tmp/osracer_trt_test/build.log --report /tmp/osracer_trt_test/build_report.json --dry-run
+bash /tmp/osracer_session_topic_smoke.sh
+MEASUREMENT_PACK_OUTPUT=/tmp/osracer_measurement_pack_topic_smoke scripts/validate_osracer_lab.sh measurement-pack
 tools/jetson_preflight.sh
 tools/jetson_environment_report.py --output /tmp/osracer_jetson_environment.json
 tools/jetson_runtime_monitor.sh --duration 1 --output-dir /tmp/osracer_runtime_monitor_smoke
