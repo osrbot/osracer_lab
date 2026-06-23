@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 40]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 41]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 21]` |
 
 ## Implemented In `osracer_lab`
@@ -31,6 +31,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
 - Real-car measurement value validator: `scripts/validate_real_measurements.py`
 - Real-car measurement seed generator: `scripts/collect_real_measurement_seed.py`
+- Field measurement pack generator: `scripts/create_measurement_pack.py`
 - Jetson sensor preflight measurement importer: `scripts/import_sensor_preflight_measurements.py`
 - Serial latency measurement importer: `scripts/import_serial_latency_measurement.py`
 - Combined measurement session importer: `scripts/import_measurement_session.py`
@@ -70,6 +71,7 @@ Run from `osracer_lab`:
 scripts/validate_osracer_lab.sh source-authority
 scripts/validate_osracer_lab.sh runtime-contract
 MEASUREMENT_SEED_OUTPUT=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh measurement-seed
+MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack scripts/validate_osracer_lab.sh measurement-pack
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SENSOR_SUMMARY_FILE=/tmp/osracer_sensor_summary_valid.json scripts/validate_osracer_lab.sh import-sensor-preflight
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SERIAL_LATENCY_FILE=/tmp/osracer_serial_latency_valid.json scripts/validate_osracer_lab.sh import-serial-latency
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_SESSION_FILE=/tmp/osracer_measurement_session_valid/measurement_session.json scripts/validate_osracer_lab.sh import-measurement-session

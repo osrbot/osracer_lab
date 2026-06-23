@@ -23,6 +23,13 @@ alignment procedure.
 
 Create the machine-readable measurement file before updating calibrated sim parameters:
 
+Generate a field pack for manual measurements and evidence files:
+
+```bash
+MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack \
+  scripts/validate_osracer_lab.sh measurement-pack
+```
+
 A combined Jetson evidence session can collect sensor topic rates and serial query latency in one directory:
 
 ```bash

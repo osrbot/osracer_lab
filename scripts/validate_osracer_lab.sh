@@ -25,6 +25,8 @@ Targets:
                   Validate real-car measurement JSON values and sources.
   measurement-seed
                   Create docs/real_car_measurements.json from template plus known repo facts.
+  measurement-pack
+                  Create a field measurement pack for manual sim2real values.
   import-sensor-preflight
                   Import Jetson sensor_summary.json evidence into measurement JSON.
   import-serial-latency
@@ -58,6 +60,7 @@ Environment overrides:
   SENSOR_SUMMARY_FILE=/path/to/sensor_summary.json
   SERIAL_LATENCY_FILE=/path/to/serial_latency.json
   MEASUREMENT_SESSION_FILE=/path/to/measurement_session.json
+  MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
 EOF
@@ -130,6 +133,13 @@ case "$target" in
         python3 "$ROOT_DIR/scripts/collect_real_measurement_seed.py" \
             --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" \
             --output "${MEASUREMENT_SEED_OUTPUT:-$ROOT_DIR/docs/real_car_measurements.json}"
+        ;;
+    measurement-pack)
+        args=(--output-dir "${MEASUREMENT_PACK_OUTPUT:-/tmp/osracer_real_measurement_pack}" --overwrite)
+        if [[ -n "${MEASUREMENTS_FILE:-}" ]]; then
+            args+=(--measurements "$MEASUREMENTS_FILE")
+        fi
+        python3 "$ROOT_DIR/scripts/create_measurement_pack.py" "${args[@]}"
         ;;
     import-sensor-preflight)
         if [[ -z "${MEASUREMENTS_FILE:-}" || -z "${SENSOR_SUMMARY_FILE:-}" ]]; then
