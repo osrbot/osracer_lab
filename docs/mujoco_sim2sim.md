@@ -68,6 +68,23 @@ compiled nq=3 nv=3 nu=3
 actions_csv_rollout rows=... steps=... time_s=... distance_m=...
 ```
 
+Run the full offline pipeline from recorded observations:
+
+```bash
+OSRACER_MUJOCO_PYTHON=/tmp/osracer_mujoco_venv/bin/python \
+python3 scripts/run_sim2real_replay_pipeline.py \
+  --observations /tmp/osracer_policy_observations.csv \
+  --policy /path/to/policy.pt \
+  --output-dir /tmp/osracer_sim2real_replay
+```
+
+The pipeline writes:
+
+```text
+/tmp/osracer_sim2real_replay/policy_replay.csv
+/tmp/osracer_sim2real_replay/mujoco_replay.xml
+```
+
 ## Next Work
 
 1. Replace placeholder mass with measured full-vehicle mass.
