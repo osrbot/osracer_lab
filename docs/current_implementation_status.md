@@ -14,7 +14,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 | Repository | Branch | State |
 |---|---|---|
 | `osracer_lab` | `main` | `main...origin/main [ahead 47]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 23]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 24]` |
 
 ## Implemented In `osracer_lab`
 
@@ -55,6 +55,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - CSV policy replay: `tools/policy_replay_csv.py`
 - Replay summary gate: `tools/policy_replay_summary.py`
 - Jetson preflight: `tools/jetson_preflight.sh`
+- Jetson environment report: `tools/jetson_environment_report.py`
 - Read-only real-car readiness check: `tools/real_car_readiness_check.sh`
 - Jetson runtime monitor and summary:
   - `tools/jetson_runtime_monitor.sh`
@@ -97,6 +98,7 @@ Run from `osracer`:
 
 ```bash
 tools/jetson_preflight.sh
+tools/jetson_environment_report.py --output /tmp/osracer_jetson_environment.json
 tools/jetson_runtime_monitor.sh --duration 1 --output-dir /tmp/osracer_runtime_monitor_smoke
 tools/jetson_runtime_summary.py /tmp/osracer_runtime_monitor_smoke
 tools/verify_jetson_deployment.py /tmp/osracer_deploy_pkg_readme_clean --skip-policy-load
