@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 81]` after this documentation correction |
+| `osracer_lab` | `main` | local-ahead push-prep state; run `git status --short --branch` before pushing |
 | `osracer` on server | `feat-demo` | synchronized to Mac/GitHub `feat-demo` at `6d96f52`; server is not used for `feat-demo` push |
 | `osracer` on Mac | `feat-demo` at `/Users/winter/.codex/worktrees/904a/osracer` | authoritative local push-prep worktree for `feat-demo`, currently `6d96f52` |
 
