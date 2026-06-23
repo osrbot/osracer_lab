@@ -35,7 +35,8 @@ A combined Jetson evidence session can collect sensor topic rates and serial que
 ```bash
 cd /home/osrbot/Desktop/osracer/osracer
 tools/jetson_measurement_session.sh --output-dir /tmp/osracer_measurement_session
-# The session includes sensor preflight, Jetson environment, and serial latency evidence.
+# The session includes sensor preflight, Jetson environment, serial latency,
+# and one CameraInfo sample when /camera_info is available.
 cd /home/osrbot/Desktop/osracer/osracer_lab
 scripts/validate_osracer_lab.sh measurement-seed
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
@@ -146,7 +147,8 @@ Calibrate AR0234 intrinsics before visual sim2real:
 
 ```bash
 # Record checkerboard/AprilTag images at the deployed camera resolution.
-# Export the resulting ROS CameraInfo message as JSON/YAML.
+# If the combined measurement session was not used, export the resulting ROS
+# CameraInfo message as JSON/YAML.
 ros2 topic echo --once /camera_info > /tmp/osracer_camera_info.yaml
 
 MEASUREMENTS_FILE=docs/real_car_measurements.json \

@@ -17,6 +17,7 @@ def load_module(name, path):
 
 sensor_importer = load_module("sensor_importer", SCRIPT_DIR / "import_sensor_preflight_measurements.py")
 serial_importer = load_module("serial_importer", SCRIPT_DIR / "import_serial_latency_measurement.py")
+camera_importer = load_module("camera_importer", SCRIPT_DIR / "import_camera_info_calibration.py")
 
 
 def parse_args():
@@ -105,6 +106,20 @@ def apply_session(measurements, session, session_file):
             errors.append(f"serial_latency: {error}")
     elif serial.get("status") not in (None, "skipped"):
         errors.append("serial_latency: serial_report missing")
+
+    camera = tools.get("camera_info", {})
+    camera_info = resolve_path(session_file, camera.get("camera_info"))
+    if camera_info and camera_info.exists():
+        try:
+            report = camera_importer.load_json(camera_info)
+            runtime = camera_importer.hardware_summary()["camera_ar0234"]["ros_runtime"]
+            width_px, height_px = runtime["configured_resolution_px"]
+            sub_changes = camera_importer.apply_import(measurements, report, camera_info, width_px, height_px)
+            changes.extend(sub_changes)
+        except ValueError as exc:
+            errors.append(f"camera_info: {exc}")
+    elif camera.get("status") not in (None, "skipped"):
+        errors.append("camera_info: camera_info file missing")
 
     return changes, errors
 
