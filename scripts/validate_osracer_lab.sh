@@ -39,6 +39,8 @@ Targets:
                   Fail unless all sim2real readiness gates pass.
   calibration-plan
                   Plan repo updates from measured parameters without writing files.
+  calibration-review-pack
+                  Create a review pack from measurements, overlay, plan, and readiness gates.
   measured-overlay
                   Export measured parameter overlay JSON without mutating source files.
   sensor-extrinsics-check
@@ -65,6 +67,7 @@ Environment overrides:
   SERIAL_LATENCY_FILE=/path/to/serial_latency.json
   MEASUREMENT_SESSION_FILE=/path/to/measurement_session.json
   MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack
+  CALIBRATION_REVIEW_PACK_OUTPUT=/tmp/osracer_calibration_review_pack
   MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
@@ -197,6 +200,17 @@ case "$target" in
         fi
         python3 "$ROOT_DIR/scripts/plan_calibration_updates.py" \
             --measurements "$MEASUREMENTS_FILE"
+        ;;
+    calibration-review-pack)
+        if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE is required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/create_calibration_review_pack.py" \
+            --measurements "$MEASUREMENTS_FILE" \
+            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" \
+            --output-dir "${CALIBRATION_REVIEW_PACK_OUTPUT:-/tmp/osracer_calibration_review_pack}" \
+            --overwrite
         ;;
     measured-overlay)
         if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then

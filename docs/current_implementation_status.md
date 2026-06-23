@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 45]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 46]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 22]` |
 
 ## Implemented In `osracer_lab`
@@ -39,6 +39,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Sensor extrinsics measured-value checker/writer: `scripts/apply_sensor_extrinsics.py`
 - Calibration update dry-run planner: `scripts/plan_calibration_updates.py`
 - Measured parameter overlay export: `scripts/export_measured_overlay.py`
+- Calibration review pack export: `scripts/create_calibration_review_pack.py`
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
 - Documentation:
   - `docs/deployment.md`
@@ -80,6 +81,7 @@ MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_SESSION_FILE=/
 MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh sim2real-readiness
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh calibration-plan
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json scripts/validate_osracer_lab.sh measured-overlay
+MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json CALIBRATION_REVIEW_PACK_OUTPUT=/tmp/osracer_calibration_review_pack scripts/validate_osracer_lab.sh calibration-review-pack
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
 python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json

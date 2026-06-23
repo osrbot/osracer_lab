@@ -88,6 +88,17 @@ non-empty and `value` matches the template `expected_format`. Keep
 `docs/real_car_measurements.json` local if it contains lab notes, serials, or
 other non-public details.
 
+Generate a review pack before writing measured values back into source files:
+
+```bash
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+  scripts/validate_osracer_lab.sh calibration-review-pack
+```
+
+The review pack contains validation results, the calibration plan, a measured
+overlay for offline sim/replay, and sim2real readiness gates. Treat it as the
+handoff artifact for deciding whether any source write-back is approved.
+
 ## Must Measure Before Calibrated Sim2Real
 
 | Area | Parameter | Unit / Format | Suggested method | Current status |
