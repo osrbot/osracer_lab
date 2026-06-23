@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 74]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 75]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 39]` |
 
 ## Implemented In `osracer_lab`
@@ -34,6 +34,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
   - Reports measured sensor extrinsics application as an explicit gate.
+- Hardware params loader for non-Isaac CLI tools: `scripts/hardware_params_loader.py`
 - Real-car measurement value validator: `scripts/validate_real_measurements.py`
   - Checks cross-field consistency for speed envelope, steering symmetry, battery voltage order, camera runtime resolution, and serial latency/baud.
 - Measurement consistency self-check: `scripts/check_measurement_consistency.py`
@@ -56,6 +57,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Camera calibration overlay gate: `scripts/check_camera_calibration_overlay.py`
 - Calibration review pack export: `scripts/create_calibration_review_pack.py`
   - Includes `sensor_extrinsics_review.json` for measured-vs-URDF/static-TF alignment.
+  - Archives text evidence referenced by measurement-session collection metadata into `evidence/` plus `evidence_manifest.json`.
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
   - Includes `source_authority_snapshot.json` when available.
 - Documentation:
@@ -123,6 +125,7 @@ MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json scripts/validate_osracer_l
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh calibration-plan
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json scripts/validate_osracer_lab.sh measured-overlay
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json CALIBRATION_REVIEW_PACK_OUTPUT=/tmp/osracer_calibration_review_pack scripts/validate_osracer_lab.sh calibration-review-pack
+bash /tmp/osracer_run_review_pack_evidence_test.sh
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
 MEASURED_OVERLAY_FILE=/tmp/osracer_measured_overlay.json scripts/validate_osracer_lab.sh camera-calibration-overlay

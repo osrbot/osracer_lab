@@ -12,7 +12,7 @@ ASSETS_SRC = REPO_ROOT / "source" / "osracer_lab_assets"
 if str(ASSETS_SRC) not in sys.path:
     sys.path.insert(0, str(ASSETS_SRC))
 
-from osracer_lab_assets.hardware_params import hardware_summary  # noqa: E402
+from hardware_params_loader import hardware_summary  # noqa: E402
 
 CAMERA_KEY = "camera_intrinsics_fx_fy_cx_cy_distortion"
 

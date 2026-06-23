@@ -19,7 +19,7 @@ ASSETS_SRC = REPO_ROOT / "source" / "osracer_lab_assets"
 if str(ASSETS_SRC) not in sys.path:
     sys.path.insert(0, str(ASSETS_SRC))
 
-from osracer_lab_assets.hardware_params import hardware_summary
+from hardware_params_loader import hardware_summary
 
 
 def parse_args():

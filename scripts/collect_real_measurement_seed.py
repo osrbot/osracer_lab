@@ -12,7 +12,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "source" / "osracer_lab_assets"))
 
-from osracer_lab_assets.hardware_params import hardware_summary  # noqa: E402
+from hardware_params_loader import hardware_summary  # noqa: E402
 
 
 def parse_args():

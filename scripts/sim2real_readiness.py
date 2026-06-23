@@ -17,7 +17,7 @@ if str(REPO_ROOT / "scripts") not in sys.path:
 
 from check_runtime_contract import main as runtime_contract_main
 from apply_sensor_extrinsics import FRAME_MEASUREMENT_KEYS, build_review as build_extrinsics_review
-from osracer_lab_assets.hardware_params import hardware_summary
+from hardware_params_loader import hardware_summary
 from validate_real_measurements import validate_measurements
 
 

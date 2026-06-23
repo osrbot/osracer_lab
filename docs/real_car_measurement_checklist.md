@@ -107,8 +107,10 @@ MEASUREMENTS_FILE=docs/real_car_measurements.json \
 ```
 
 The review pack contains validation results, the calibration plan, a measured
-overlay for offline sim/replay, and sim2real readiness gates. Treat it as the
-handoff artifact for deciding whether any source write-back is approved.
+overlay for offline sim/replay, sim2real readiness gates, and copied text evidence
+from the combined measurement session when those files are referenced in the
+measurement JSON. Treat it as the handoff artifact for deciding whether any
+source write-back is approved.
 
 ## Must Measure Before Calibrated Sim2Real
 

@@ -2,6 +2,7 @@
 """Create a calibration review pack from OSRacer real-car measurements."""
 
 import argparse
+import hashlib
 import json
 import shutil
 import sys
@@ -40,13 +41,87 @@ def write_json(path, data):
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def sha256(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def resolve_existing_file(path_value):
+    if not path_value:
+        return None
+    path = Path(path_value).expanduser()
+    if path.is_file():
+        return path.resolve()
+    return None
+
+
+def copy_evidence_file(src, evidence_dir, label, copied_names):
+    suffix = src.suffix or ".txt"
+    stem = label
+    target = evidence_dir / f"{stem}{suffix}"
+    index = 2
+    while target.name in copied_names or target.exists():
+        target = evidence_dir / f"{stem}_{index}{suffix}"
+        index += 1
+    shutil.copy2(src, target)
+    copied_names.add(target.name)
+    return {
+        "source": str(src),
+        "path": str(target),
+        "bytes": target.stat().st_size,
+        "sha256": sha256(target),
+    }
+
+
+def evidence_sources(measurement_doc):
+    collection = measurement_doc.get("collection", {}) if isinstance(measurement_doc, dict) else {}
+    sources = {
+        "measurement_session": collection.get("measurement_session", {}).get("session_file")
+        if isinstance(collection.get("measurement_session"), dict)
+        else None,
+        "sensor_summary": collection.get("sensor_preflight", {}).get("sensor_summary")
+        if isinstance(collection.get("sensor_preflight"), dict)
+        else None,
+        "jetson_environment": collection.get("jetson_environment", {}).get("report_file")
+        if isinstance(collection.get("jetson_environment"), dict)
+        else None,
+        "serial_latency": collection.get("serial_latency_probe", {}).get("serial_report")
+        if isinstance(collection.get("serial_latency_probe"), dict)
+        else None,
+        "camera_info": collection.get("camera_info_calibration", {}).get("camera_info")
+        if isinstance(collection.get("camera_info_calibration"), dict)
+        else None,
+    }
+    return sources
+
+
+def copy_evidence_files(measurement_doc, output_dir):
+    evidence_dir = output_dir / "evidence"
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    manifest = {"files": {}, "missing": {}, "notes": []}
+    copied_names = set()
+    for label, source in evidence_sources(measurement_doc).items():
+        src = resolve_existing_file(source)
+        if src is None:
+            if source:
+                manifest["missing"][label] = str(source)
+            continue
+        manifest["files"][label] = copy_evidence_file(src, evidence_dir, label, copied_names)
+    if not manifest["files"]:
+        manifest["notes"].append("No collection evidence files were found in the measurement JSON.")
+    return manifest
+
+
 def copy_measurements(src, output_dir):
     target = output_dir / "real_car_measurements.review.json"
     shutil.copy2(src, target)
     return target
 
 
-def build_summary(measurements_path, validation, plan, readiness, extrinsics_review):
+def build_summary(measurements_path, validation, plan, readiness, extrinsics_review, evidence_manifest):
     complete_count = len(validation["complete"])
     remaining_count = len(validation["missing"]) + len(validation["incomplete"]) + len(validation["invalid"])
     auto_apply_count = len(plan["auto_apply_ready"])
@@ -69,6 +144,8 @@ def build_summary(measurements_path, validation, plan, readiness, extrinsics_rev
         "invalid_measurements": validation["invalid"],
         "auto_apply_candidate_count": auto_apply_count,
         "review_apply_candidate_count": review_apply_count,
+        "evidence_file_count": len(evidence_manifest.get("files", {})),
+        "missing_evidence_files": evidence_manifest.get("missing", {}),
         "sim2real_readiness": readiness["overall"],
         "sensor_extrinsics_review": extrinsics_review["overall"],
         "write_back_allowed_without_review": False,
@@ -100,6 +177,8 @@ def build_readme(summary):
         "- `measured_overlay.json`: offline sim/replay overlay, safe to consume without mutating source",
         "- `sensor_extrinsics_review.json`: measured-vs-URDF/static-TF alignment check",
         "- `sim2real_readiness.json`: readiness gates and logs",
+        "- `evidence_manifest.json`: archived measurement-session evidence file index",
+        "- `evidence/`: copied session, sensor, environment, serial, and CameraInfo evidence files when present",
         "- `review_summary.json`: compact status for handoff",
         "",
         "## Next Action",
@@ -126,17 +205,19 @@ def main():
     validation["valid"] = not (validation["missing"] or validation["incomplete"] or validation["invalid"])
 
     measurement_doc, overlay_measurements = load_overlay_measurements(measurements_path)
+    evidence_manifest = copy_evidence_files(measurement_doc, output_dir)
     overlay = build_overlay(measurement_doc, overlay_measurements)
     plan = build_plan(measurements)
     readiness = build_readiness_report(Path(args.osracer_root).expanduser().resolve(), measurements_path)
     extrinsics_review = build_extrinsics_review(measurements, Path(args.osracer_root).expanduser().resolve())
-    summary = build_summary(measurements_path, validation, plan, readiness, extrinsics_review)
+    summary = build_summary(measurements_path, validation, plan, readiness, extrinsics_review, evidence_manifest)
 
     write_json(output_dir / "validation_report.json", validation)
     write_json(output_dir / "calibration_plan.json", plan)
     write_json(output_dir / "measured_overlay.json", overlay)
     write_json(output_dir / "sensor_extrinsics_review.json", extrinsics_review)
     write_json(output_dir / "sim2real_readiness.json", readiness)
+    write_json(output_dir / "evidence_manifest.json", evidence_manifest)
     write_json(output_dir / "review_summary.json", summary)
     (output_dir / "README.md").write_text(build_readme(summary), encoding="utf-8")
 

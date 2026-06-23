@@ -13,7 +13,7 @@ if str(ASSETS_SRC) not in sys.path:
 if str(REPO_ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
-from osracer_lab_assets.hardware_params import hardware_summary  # noqa: E402
+from hardware_params_loader import hardware_summary  # noqa: E402
 from plan_calibration_updates import build_plan  # noqa: E402
 from validate_real_measurements import entry_value, validate_measurements  # noqa: E402
 

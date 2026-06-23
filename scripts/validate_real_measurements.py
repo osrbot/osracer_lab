@@ -5,14 +5,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-import importlib.util
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-HARDWARE_PARAMS_PATH = REPO_ROOT / "source" / "osracer_lab_assets" / "osracer_lab_assets" / "hardware_params.py"
-_hardware_spec = importlib.util.spec_from_file_location("osracer_hardware_params", HARDWARE_PARAMS_PATH)
-_hardware_module = importlib.util.module_from_spec(_hardware_spec)
-_hardware_spec.loader.exec_module(_hardware_module)
-hardware_summary = _hardware_module.hardware_summary
+from hardware_params_loader import hardware_summary
 
 REQUIRED_KEYS = (
     "full_vehicle_mass_kg_with_battery_jetson_sensors",

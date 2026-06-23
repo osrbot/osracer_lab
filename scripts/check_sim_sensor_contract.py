@@ -16,7 +16,7 @@ if str(REPO_ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 from mujoco_sim2sim_smoke import build_mjcf
-from osracer_lab_assets.hardware_params import hardware_summary
+from hardware_params_loader import hardware_summary
 
 
 def parse_args():
