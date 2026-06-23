@@ -309,9 +309,19 @@ def cart_off_track(env, straight: float, corner_in_radius: float, corner_out_rad
     )
 
 
+def non_finite_root_state(env, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
+    asset: RigidObject = env.scene[asset_cfg.name]
+    root_state = torch.cat(
+        (asset.data.root_pos_w, asset.data.root_quat_w, asset.data.root_lin_vel_w, asset.data.root_ang_vel_w),
+        dim=-1,
+    )
+    return ~torch.isfinite(root_state).all(dim=-1)
+
+
 @configclass
 class DriftTerminationsCfg:
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
+    non_finite_state = DoneTerm(func=non_finite_root_state)
     out_of_bounds = DoneTerm(
         func=cart_off_track,
         params={"straight": STRAIGHT, "corner_in_radius": CORNER_IN_RADIUS, "corner_out_radius": CORNER_OUT_RADIUS},

@@ -29,6 +29,10 @@ scripts/                        train_osracer_drift.py
 # Drift (headless)
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py --headless
 
+# Drift training baseline on RTX 4080 SUPER
+~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py \
+    --headless --num_envs 2048 --max_iterations 2000
+
 # Visual RL
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py \
     --task Isaac-OSRacerVisualRL-v0 --headless
@@ -45,6 +49,20 @@ cd source/osracer_lab_assets  && pip install -e .
 cd source/osracer_lab_tasks   && pip install -e .
 cd source/osracer_lab_rl      && pip install -e .
 ```
+
+## Performance Baseline
+
+On the RTX 4080 SUPER dev host, drift training is verified with `--num_envs 2048 --max_iterations 2000`.
+This run finished successfully and wrote `model_1999.pt`, with about 75k-80k steps/s near the end and no non-finite state resets.
+
+Short probes:
+
+| num_envs | Result |
+|---:|---|
+| 1024 | Stable, about 61k steps/s, underutilizes the GPU |
+| 2048 | Recommended drift baseline, about 75k-92k steps/s |
+| 4096 | Runs, but throughput fluctuates and can drop near 50k-63k steps/s |
+| 8192 | Runs, but initialization and PhysX/CPU synchronization dominate; not recommended by default |
 
 ## Headless Rendering
 
