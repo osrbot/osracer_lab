@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 55]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 56]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 28]` |
 
 ## Implemented In `osracer_lab`
@@ -29,6 +29,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Source authority check for `osrcore` and `osracer feat-demo`: `scripts/check_source_authority.py`
   - Defaults to sibling `/home/osrbot/Desktop/osracer/osrcore` for direct firmware checks when present.
 - Read-only local source authority snapshot: `docs/source_authority_snapshot.json`
+- Source authority snapshot generator: `scripts/create_source_authority_snapshot.py`
 - Source authority snapshot verifier: `scripts/verify_source_authority_snapshot.py`
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`

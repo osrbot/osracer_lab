@@ -19,6 +19,8 @@ Targets:
                   Check source-of-truth repos: osrcore firmware and osracer feat-demo.
   source-authority-snapshot
                   Verify read-only osrcore/osracer source fact snapshot.
+  source-authority-snapshot-create
+                  Create source authority snapshot from read-only source repos.
   runtime-contract
                   Check shared hardware/runtime parameters against osracer.
   sim-sensor-contract
@@ -66,6 +68,7 @@ Environment overrides:
   OSRACER_ROOT=../osracer
   OSRCORE_ROOT=/path/to/osrcore
   SOURCE_AUTHORITY_SNAPSHOT=docs/source_authority_snapshot.json
+  SOURCE_AUTHORITY_SNAPSHOT_OUTPUT=docs/source_authority_snapshot.json
   MEASUREMENTS_FILE=docs/real_car_measurements.json
   MEASUREMENT_SEED_OUTPUT=docs/real_car_measurements.json
   SENSOR_SUMMARY_FILE=/path/to/sensor_summary.json
@@ -132,6 +135,16 @@ case "$target" in
         python3 "$ROOT_DIR/scripts/verify_source_authority_snapshot.py" \
             "${SOURCE_AUTHORITY_SNAPSHOT:-$ROOT_DIR/docs/source_authority_snapshot.json}" \
             --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
+        ;;
+    source-authority-snapshot-create)
+        if [[ -z "${OSRCORE_ROOT:-}" || -z "${OSRACER_ROOT:-}" ]]; then
+            echo "OSRCORE_ROOT and OSRACER_ROOT are required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/create_source_authority_snapshot.py" \
+            --osrcore-root "$OSRCORE_ROOT" \
+            --osracer-root "$OSRACER_ROOT" \
+            --output "${SOURCE_AUTHORITY_SNAPSHOT_OUTPUT:-$ROOT_DIR/docs/source_authority_snapshot.json}"
         ;;
     runtime-contract)
         python3 "$ROOT_DIR/scripts/check_runtime_contract.py" \
