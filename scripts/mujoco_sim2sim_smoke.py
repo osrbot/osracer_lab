@@ -10,7 +10,13 @@ step the MJCF.
 import argparse
 import csv
 import math
+import sys
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ASSETS_SRC = REPO_ROOT / "source" / "osracer_lab_assets"
+if str(ASSETS_SRC) not in sys.path:
+    sys.path.insert(0, str(ASSETS_SRC))
 
 from osracer_lab_assets.hardware_params import hardware_summary
 
@@ -40,7 +46,7 @@ def _geom_block(name, pos, size, rgba):
 def build_mjcf(params, mass_kg, wheel_width_m, timestep):
     chassis = params["chassis"]
     camera = params["camera_ar0234"]
-    lidar = params["lidar_25m"]
+    lidar_scan = params["lidar_planar_scan_cfg"]
 
     wheelbase = chassis["wheelbase_m"]
     rear_track = chassis["rear_track_m"]
@@ -106,7 +112,11 @@ def build_mjcf(params, mass_kg, wheel_width_m, timestep):
        yaw_rate = speed / wheelbase * tan(steering)
        visual wheel_radius_m={wheel_radius}
        camera = {camera["sensor"]}, advertised_fov_deg={camera["advertised_fov_deg"]}
-       lidar_horizontal_fov_deg={lidar["horizontal_fov_deg"]}
+       lidar_horizontal_fov_deg={lidar_scan["horizontal_fov_deg"]}
+       lidar_angular_resolution_deg={lidar_scan["angular_resolution_deg"]}
+       lidar_scan_rate_hz={lidar_scan["scan_rate_hz"]}
+       lidar_ray_count={lidar_scan["ray_count"]}
+       lidar_max_range_m={lidar_scan["max_range_m"]}
   -->
 </mujoco>
 """

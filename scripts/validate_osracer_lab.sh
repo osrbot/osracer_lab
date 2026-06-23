@@ -17,6 +17,8 @@ Targets:
   export-smoke    Export the verified drift checkpoint to TorchScript.
   runtime-contract
                   Check shared hardware/runtime parameters against osracer.
+  sim-sensor-contract
+                  Check Isaac/MuJoCo sensor configs against hardware_params.py.
   real-measurements
                   Validate real-car measurement JSON values and sources.
   sim2real-readiness
@@ -91,6 +93,9 @@ case "$target" in
     runtime-contract)
         python3 "$ROOT_DIR/scripts/check_runtime_contract.py" \
             --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
+        ;;
+    sim-sensor-contract)
+        python3 "$ROOT_DIR/scripts/check_sim_sensor_contract.py"
         ;;
     real-measurements)
         if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then

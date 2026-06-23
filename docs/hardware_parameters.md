@@ -72,7 +72,12 @@ User-supplied 25m lidar parameters:
 | Supply | `9-36 V` |
 | Protection | IP65 |
 
-For sim2sim, lidar should be modeled first as a 270-degree planar scan with measured scan rate and angular resolution. Use the real driver timestamps during sim2real replay to catch time alignment issues before closed-loop tests.
+For sim2sim, lidar is modeled first as a conservative 270-degree planar scan
+from `lidar_25m_planar_scan_cfg()`: `0.25 deg`, `10 Hz`, `25 m`, `1081`
+rays. Use the real driver timestamps during sim2real replay to catch time
+alignment issues before closed-loop tests; switch the scan config to `0.1 deg`
+or a faster rate only after the physical unit is configured and measured that
+way.
 
 ## Real Runtime Contract
 
@@ -141,6 +146,7 @@ Check that this parameter source still matches the upper-computer repo:
 
 ```bash
 python3 scripts/check_runtime_contract.py --osracer-root /home/osrbot/Desktop/osracer/osracer
+scripts/validate_osracer_lab.sh sim-sensor-contract
 ```
 
 After the camera, lidar, and IMU extrinsics are measured and unified, make the

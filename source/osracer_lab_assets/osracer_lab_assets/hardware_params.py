@@ -89,6 +89,28 @@ OSRACER_LIDAR_25M = {
     "ros_frame_id": "laser",
 }
 
+
+def lidar_25m_planar_scan_cfg(scan_rate_hz=10, angular_resolution_deg=0.25):
+    """Return a conservative 2D scan model for sim2sim and replay checks."""
+
+    lidar = OSRACER_LIDAR_25M
+    if scan_rate_hz not in lidar["scan_rate_hz"]:
+        raise ValueError(f"unsupported lidar scan_rate_hz: {scan_rate_hz}")
+    if angular_resolution_deg not in lidar["angular_resolution_deg"]:
+        raise ValueError(f"unsupported lidar angular_resolution_deg: {angular_resolution_deg}")
+    horizontal_fov_deg = lidar["horizontal_fov_deg"]
+    ray_count = int(round(horizontal_fov_deg / angular_resolution_deg)) + 1
+    return {
+        "horizontal_fov_deg": horizontal_fov_deg,
+        "angular_resolution_deg": angular_resolution_deg,
+        "scan_rate_hz": scan_rate_hz,
+        "max_range_m": lidar["range_m_at_70pct_reflectivity"],
+        "min_range_m": 0.05,
+        "ray_count": ray_count,
+        "frame_id": lidar["ros_frame_id"],
+    }
+
+
 OSRACER_REAL_RUNTIME = {
     "chassis_launch": "osracer_bringup chassis_ackermann.launch.py",
     "serial_port": "/dev/osrbot_base",
@@ -156,6 +178,7 @@ def hardware_summary():
         "camera_ar0234": OSRACER_CAMERA_AR0234,
         "lidar_25m": OSRACER_LIDAR_25M,
         "camera_pinhole_cfg": ar0234_pinhole_camera_cfg(),
+        "lidar_planar_scan_cfg": lidar_25m_planar_scan_cfg(),
         "real_runtime": OSRACER_REAL_RUNTIME,
         "sensor_extrinsics": OSRACER_SENSOR_EXTRINSICS,
         "required_real_car_measurements": REQUIRED_REAL_CAR_MEASUREMENTS,
