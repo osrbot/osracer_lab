@@ -21,6 +21,10 @@ Targets:
                   Summarize sim2real gates without failing on incomplete gates.
   sim2real-ready-strict
                   Fail unless all sim2real readiness gates pass.
+  sensor-extrinsics-check
+                  Compare measured sensor extrinsics against URDF/static TF.
+  sensor-extrinsics-write
+                  Write measured sensor extrinsics into URDF/static TF/hardware params.
   drift-baseline  Run the verified long drift baseline.
   all-smoke       Run static + drift-smoke + visual-smoke.
 
@@ -99,6 +103,25 @@ case "$target" in
             args+=(--measurements "$MEASUREMENTS_FILE")
         fi
         python3 "$ROOT_DIR/scripts/sim2real_readiness.py" "${args[@]}"
+        ;;
+    sensor-extrinsics-check)
+        if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE is required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/apply_sensor_extrinsics.py" \
+            --measurements "$MEASUREMENTS_FILE" \
+            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
+        ;;
+    sensor-extrinsics-write)
+        if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE is required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/apply_sensor_extrinsics.py" \
+            --measurements "$MEASUREMENTS_FILE" \
+            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" \
+            --write
         ;;
     drift-baseline)
         run_train --headless \

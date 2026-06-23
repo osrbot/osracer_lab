@@ -77,10 +77,34 @@ There should be one intended static transform for each sensor frame.
 
 ## Repo Update Gate
 
-After updating transforms, run:
+After recording measured `camera_extrinsic_xyz_rpy_in_base_link`,
+`lidar_extrinsic_xyz_rpy_in_base_link`, and
+`imu_extrinsic_xyz_rpy_in_base_link` in the measurement JSON, use this value
+format for each item:
+
+```json
+{"value": [x, y, z, roll, pitch, yaw], "source": "measurement note or log"}
+```
+
+Review the planned alignment first:
 
 ```bash
 cd /home/osrbot/Desktop/osracer/osracer_lab
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+  scripts/validate_osracer_lab.sh sensor-extrinsics-check
+```
+
+If the measured values are correct, apply them to the URDF, static TF launch,
+and IsaacLab hardware parameter source:
+
+```bash
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+  scripts/validate_osracer_lab.sh sensor-extrinsics-write
+```
+
+After updating transforms, run:
+
+```bash
 scripts/validate_osracer_lab.sh runtime-contract
 python3 scripts/check_runtime_contract.py \
   --osracer-root /home/osrbot/Desktop/osracer/osracer \
