@@ -17,6 +17,10 @@ Targets:
   export-smoke    Export the verified drift checkpoint to TorchScript.
   runtime-contract
                   Check shared hardware/runtime parameters against osracer.
+  sim2real-readiness
+                  Summarize sim2real gates without failing on incomplete gates.
+  sim2real-ready-strict
+                  Fail unless all sim2real readiness gates pass.
   drift-baseline  Run the verified long drift baseline.
   all-smoke       Run static + drift-smoke + visual-smoke.
 
@@ -80,6 +84,15 @@ case "$target" in
     runtime-contract)
         python3 "$ROOT_DIR/scripts/check_runtime_contract.py" \
             --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
+        ;;
+    sim2real-readiness)
+        python3 "$ROOT_DIR/scripts/sim2real_readiness.py" \
+            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
+        ;;
+    sim2real-ready-strict)
+        python3 "$ROOT_DIR/scripts/sim2real_readiness.py" \
+            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" \
+            --strict
         ;;
     drift-baseline)
         run_train --headless \

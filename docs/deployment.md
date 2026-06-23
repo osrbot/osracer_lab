@@ -137,6 +137,13 @@ ros2 topic pub --once /ackermann_cmd ackermann_msgs/msg/AckermannDrive \
 
 ## Safety Gates Before Real Driving
 
+- Check the current sim2real gate summary before enabling closed loop:
+
+```bash
+scripts/validate_osracer_lab.sh sim2real-readiness
+```
+
+- Treat `scripts/validate_osracer_lab.sh sim2real-ready-strict` as the gate for calibrated closed-loop sim2real. It should fail until measured real-car parameters and unified sensor extrinsics are in place.
 - Start with `speed <= 0.3 m/s` until the inference node and watchdog behavior are verified.
 - Keep `steering_angle` inside `[-0.488, 0.488]` rad to match the simulation action envelope.
 - Verify `cmd_watchdog_timeout_s=0.5` stops stale commands.

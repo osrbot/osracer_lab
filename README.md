@@ -47,6 +47,7 @@ scripts/validate_osracer_lab.sh drift-smoke
 scripts/validate_osracer_lab.sh visual-smoke
 scripts/validate_osracer_lab.sh visual-perf
 scripts/validate_osracer_lab.sh runtime-contract
+scripts/validate_osracer_lab.sh sim2real-readiness
 
 # Resume from checkpoint
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py \
