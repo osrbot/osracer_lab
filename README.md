@@ -71,6 +71,7 @@ cd source/osracer_lab_rl      && pip install -e .
 ## Deployment Contract
 
 See `docs/deployment.md` for the current policy-to-vehicle contract.
+See `docs/hardware_parameters.md` for the current real-car camera, lidar, chassis, and missing calibration parameters.
 The simulation action is `[target_speed_mps, target_steering_rad]`; the preferred real-vehicle bridge is `ackermann_msgs/msg/AckermannDrive` on `ackermann_cmd`.
 The sibling OSRacer ROS 2 workspace converts that to the firmware serial command `v <speed_mps> <steering_deg>`.
 Use `scripts/export_osracer_policy.py` to export trained checkpoints to TorchScript before building a ROS 2 inference node; ONNX export is available with `--format onnx`.

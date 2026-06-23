@@ -10,3 +10,4 @@ OSRACER_LAB_ASSETS_METADATA = toml.load(os.path.join(OSRACER_LAB_ASSETS_EXT_DIR,
 __version__ = OSRACER_LAB_ASSETS_METADATA["package"]["version"]
 
 from .osracer import *
+from .hardware_params import *

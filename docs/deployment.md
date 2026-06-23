@@ -1,8 +1,8 @@
 # OSRacer Policy Deployment Notes
 
 This repository currently verifies training and simulation and ships a checkpoint export script.
-It does not yet ship a ROS 2 inference node.
-Use this document as the deployment contract for the next implementation step.
+The sibling ROS 2 workspace `/home/osrbot/Desktop/osracer/osracer` ships the runtime inference node and CSV replay tool.
+Use this document as the deployment contract between training, export, replay, and real-car bringup.
 
 ## Current Verified Artifacts
 
@@ -102,6 +102,7 @@ Recommended node responsibilities:
 
 Drift policy deployment is the first practical target because it uses proprioceptive state rather than camera tensors.
 Visual policy deployment needs an additional camera preprocessing node that matches `visual/mdp_sensors/observations.py`.
+Real hardware parameters are tracked in `docs/hardware_parameters.md` and `osracer_lab_assets.hardware_params`.
 
 ## Bringup Sequence
 
@@ -143,10 +144,11 @@ ros2 topic pub --once /ackermann_cmd ackermann_msgs/msg/AckermannDrive \
 - Run the car on blocks before floor testing.
 - Keep RC/manual override available during all first-drive tests.
 
-## Next Missing Implementation
+## Next Missing Work
 
-The remaining code work is the ROS 2 runtime path:
+The ROS 2 runtime path now exists in the sibling OSRacer workspace. Remaining work is validation and model fidelity:
 
-1. Add a ROS 2 inference node in the OSRacer workspace.
-2. Add an offline observation contract test so the inference node and IsaacLab task use the same observation ordering.
-3. Add a low-speed real-car checklist tied to `/ackermann_cmd`.
+1. Fill the missing real-car mass, steering, motor, encoder, IMU, extrinsic, and timing parameters.
+2. Add MuJoCo sim2sim rollouts with the same action and observation contract.
+3. Replay recorded real-car observations through exported `policy.pt` before closed-loop driving.
+4. Add a low-speed real-car checklist tied to `/ackermann_cmd`.
