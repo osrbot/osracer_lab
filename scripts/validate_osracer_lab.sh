@@ -15,6 +15,8 @@ Targets:
   visual-smoke    Run a short camera/visual training check.
   visual-perf     Run the RTX 4080 SUPER visual throughput probe.
   export-smoke    Export the verified drift checkpoint to TorchScript.
+  runtime-contract
+                  Check shared hardware/runtime parameters against osracer.
   drift-baseline  Run the verified long drift baseline.
   all-smoke       Run static + drift-smoke + visual-smoke.
 
@@ -27,6 +29,7 @@ Environment overrides:
   VISUAL_PERF_ITERS=10
   EXPORT_CHECKPOINT=logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
   EXPORT_OUTPUT_DIR=/tmp/osracer_policy_export_smoke
+  OSRACER_ROOT=../osracer
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
 EOF
@@ -73,6 +76,10 @@ case "$target" in
             --checkpoint "${EXPORT_CHECKPOINT:-logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt}" \
             --output_dir "${EXPORT_OUTPUT_DIR:-/tmp/osracer_policy_export_smoke}" \
             --format jit
+        ;;
+    runtime-contract)
+        python3 "$ROOT_DIR/scripts/check_runtime_contract.py" \
+            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
         ;;
     drift-baseline)
         run_train --headless \
