@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 65]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 33]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 66]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 34]` |
 
 ## Implemented In `osracer_lab`
 
@@ -85,6 +85,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - First-drive evidence pack: `tools/first_drive_evidence_pack.py`
   - Archives deployment package `source_authority_snapshot.json` when supplied.
 - First-drive evidence pack verifier: `tools/verify_first_drive_evidence_pack.py`
+  - Rechecks archived visual deployment packages for camera calibration evidence.
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
 
 ## Verified Commands
