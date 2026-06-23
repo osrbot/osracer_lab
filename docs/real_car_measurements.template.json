@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "vehicle": "osracer_real_car",
+  "measurement_rule": "Each required item passes only when value and source are both non-empty.",
+  "measurements": {
+    "full_vehicle_mass_kg_with_battery_jetson_sensors": {
+      "value": null,
+      "unit": "kg",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "front_track_m": {
+      "value": null,
+      "unit": "m",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "tire_width_m": {
+      "value": null,
+      "unit": "m",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "front_rear_weight_distribution": {
+      "value": null,
+      "unit": "kg or percent",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "true_max_steering_rad_left_right": {
+      "value": null,
+      "unit": "rad",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "steering_servo_pwm_min_center_max_or_protocol_units": {
+      "value": null,
+      "unit": "PWM us or firmware units",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "steering_response_time_s": {
+      "value": null,
+      "unit": "s",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "motor_kv_or_rated_rpm": {
+      "value": null,
+      "unit": "KV or rpm",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "battery_voltage_s_count": {
+      "value": null,
+      "unit": "V and cell count",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "true_max_speed_mps": {
+      "value": null,
+      "unit": "m/s",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "minimum_stable_speed_mps": {
+      "value": null,
+      "unit": "m/s",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "throttle_deadband_and_response_delay_s": {
+      "value": null,
+      "unit": "command units and s",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "encoder_ticks_per_revolution_and_mount_location": {
+      "value": null,
+      "unit": "ticks/rev and frame",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "imu_model_rate_ranges_and_frame_alignment": {
+      "value": null,
+      "unit": "model, Hz, ranges, frame",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "camera_extrinsic_xyz_rpy_in_base_link": {
+      "value": null,
+      "unit": "m, rad",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "lidar_extrinsic_xyz_rpy_in_base_link": {
+      "value": null,
+      "unit": "m, rad",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "imu_extrinsic_xyz_rpy_in_base_link": {
+      "value": null,
+      "unit": "m, rad",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "serial_baud_rate_and_command_latency_s": {
+      "value": null,
+      "unit": "baud and s",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "sensor_timestamp_sync_method": {
+      "value": null,
+      "unit": "description",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    },
+    "resolve_urdf_vs_static_tf_sensor_extrinsics": {
+      "value": null,
+      "unit": "description",
+      "source": "",
+      "measured_at": "",
+      "notes": ""
+    }
+  }
+}

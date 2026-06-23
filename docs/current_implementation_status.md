@@ -25,6 +25,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Observation replay to MuJoCo pipeline: `scripts/run_sim2real_replay_pipeline.py`
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
+- Real-car measurement template: `docs/real_car_measurements.template.json`
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
 - Documentation:
   - `docs/deployment.md`
@@ -55,6 +56,7 @@ Run from `osracer_lab`:
 ```bash
 scripts/validate_osracer_lab.sh runtime-contract
 scripts/validate_osracer_lab.sh sim2real-readiness
+MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
 python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json
 python3 scripts/package_jetson_deployment.py \
   --policy /tmp/osracer_dummy_policy.pt \
@@ -87,7 +89,7 @@ first-drive preparation, not calibrated closed-loop sim2real.
 ## Blocking Items Before Calibrated Closed Loop
 
 1. Resolve `base_link -> camera_link`, `base_link -> laser`, and `base_link -> imu_link` source-of-truth conflict between URDF and static TF.
-2. Measure and record the 20 required real-car parameters listed by `sim2real-readiness`.
+2. Measure and record the 20 required real-car parameters in `docs/real_car_measurements.json`, copied from `docs/real_car_measurements.template.json`.
 3. Install/check Jetson runtime dependencies on the actual Orin Nano Super 8GB:
    - ROS 2 Jazzy runtime packages
    - `ackermann_msgs`

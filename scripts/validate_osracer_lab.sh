@@ -34,6 +34,7 @@ Environment overrides:
   EXPORT_CHECKPOINT=logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
   EXPORT_OUTPUT_DIR=/tmp/osracer_policy_export_smoke
   OSRACER_ROOT=../osracer
+  MEASUREMENTS_FILE=docs/real_car_measurements.json
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
 EOF
@@ -86,13 +87,18 @@ case "$target" in
             --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
         ;;
     sim2real-readiness)
-        python3 "$ROOT_DIR/scripts/sim2real_readiness.py" \
-            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
+        args=(--osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}")
+        if [[ -n "${MEASUREMENTS_FILE:-}" ]]; then
+            args+=(--measurements "$MEASUREMENTS_FILE")
+        fi
+        python3 "$ROOT_DIR/scripts/sim2real_readiness.py" "${args[@]}"
         ;;
     sim2real-ready-strict)
-        python3 "$ROOT_DIR/scripts/sim2real_readiness.py" \
-            --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" \
-            --strict
+        args=(--osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" --strict)
+        if [[ -n "${MEASUREMENTS_FILE:-}" ]]; then
+            args+=(--measurements "$MEASUREMENTS_FILE")
+        fi
+        python3 "$ROOT_DIR/scripts/sim2real_readiness.py" "${args[@]}"
         ;;
     drift-baseline)
         run_train --headless \

@@ -20,6 +20,20 @@ alignment procedure.
 | Camera | AR0234, global shutter, `2.7 mm`, advertised `130 deg` | user-supplied camera spec |
 | Lidar | 270 deg mechanical pulse-TOF, `>=25 m`, Class 1 | user-supplied lidar spec |
 
+
+Create the machine-readable measurement file before updating calibrated sim parameters:
+
+```bash
+cp docs/real_car_measurements.template.json docs/real_car_measurements.json
+# Fill every required value and source field with real measurements.
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+  scripts/validate_osracer_lab.sh sim2real-readiness
+```
+
+The readiness gate only counts an item as complete when both `value` and `source`
+are non-empty. Keep `docs/real_car_measurements.json` local if it contains lab
+notes, serials, or other non-public details.
+
 ## Must Measure Before Calibrated Sim2Real
 
 | Area | Parameter | Unit / Format | Suggested method | Current status |
