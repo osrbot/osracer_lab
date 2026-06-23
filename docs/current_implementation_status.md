@@ -14,7 +14,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 | Repository | Branch | State |
 |---|---|---|
 | `osracer_lab` | `main` | `main...origin/main [ahead 69]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 35]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 36]` |
 
 ## Implemented In `osracer_lab`
 
@@ -85,8 +85,10 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - First-drive go/no-go gate: `tools/first_drive_gate.py`
   - Reports deployment package source authority snapshot as an explicit gate check.
   - Reports visual camera calibration overlay as an explicit gate check.
+  - Reports policy inference p95 latency as an explicit gate check when supplied.
 - First-drive evidence pack: `tools/first_drive_evidence_pack.py`
   - Archives deployment package `source_authority_snapshot.json` when supplied.
+  - Archives `policy_benchmark.json` when supplied by the first-drive gate.
 - First-drive evidence pack verifier: `tools/verify_first_drive_evidence_pack.py`
   - Rechecks archived visual deployment packages for camera calibration evidence.
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
