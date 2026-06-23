@@ -75,7 +75,9 @@ OSRACER_MUJOCO_PYTHON=/tmp/osracer_mujoco_venv/bin/python \
 python3 scripts/run_sim2real_replay_pipeline.py \
   --observations /tmp/osracer_policy_observations.csv \
   --policy /path/to/policy.pt \
-  --output-dir /tmp/osracer_sim2real_replay
+  --output-dir /tmp/osracer_sim2real_replay \
+  --min-rows 100 \
+  --max-clamped-ratio 0.5
 ```
 
 The pipeline writes:
@@ -84,6 +86,8 @@ The pipeline writes:
 /tmp/osracer_sim2real_replay/policy_replay.csv
 /tmp/osracer_sim2real_replay/mujoco_replay.xml
 ```
+
+The pipeline runs `tools/policy_replay_summary.py` before MuJoCo replay. It fails before simulation when action statistics exceed the configured gates.
 
 ## Next Work
 
