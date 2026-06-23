@@ -25,6 +25,8 @@ Targets:
                   Validate real-car measurement JSON values and sources.
   measurement-seed
                   Create docs/real_car_measurements.json from template plus known repo facts.
+  import-sensor-preflight
+                  Import Jetson sensor_summary.json evidence into measurement JSON.
   sim2real-readiness
                   Summarize sim2real gates without failing on incomplete gates.
   sim2real-ready-strict
@@ -49,6 +51,7 @@ Environment overrides:
   OSRCORE_ROOT=/path/to/osrcore
   MEASUREMENTS_FILE=docs/real_car_measurements.json
   MEASUREMENT_SEED_OUTPUT=docs/real_car_measurements.json
+  SENSOR_SUMMARY_FILE=/path/to/sensor_summary.json
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
 EOF
@@ -121,6 +124,16 @@ case "$target" in
         python3 "$ROOT_DIR/scripts/collect_real_measurement_seed.py" \
             --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" \
             --output "${MEASUREMENT_SEED_OUTPUT:-$ROOT_DIR/docs/real_car_measurements.json}"
+        ;;
+    import-sensor-preflight)
+        if [[ -z "${MEASUREMENTS_FILE:-}" || -z "${SENSOR_SUMMARY_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE and SENSOR_SUMMARY_FILE are required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/import_sensor_preflight_measurements.py" \
+            --measurements "$MEASUREMENTS_FILE" \
+            --sensor-summary "$SENSOR_SUMMARY_FILE" \
+            --write
         ;;
     sim2real-readiness)
         args=(--osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}")

@@ -32,6 +32,19 @@ MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh sim2real-readiness
 ```
 
+After running `tools/jetson_sensor_preflight.sh` in the `osracer` repo on the
+Jetson, attach its topic-rate evidence to the measurement file:
+
+```bash
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+SENSOR_SUMMARY_FILE=/tmp/osracer_sensor_preflight/sensor_summary.json \
+  scripts/validate_osracer_lab.sh import-sensor-preflight
+```
+
+`import-sensor-preflight` only completes `sensor_timestamp_sync_method` when the
+required camera, lidar, IMU, and odom topics are present and have parsed rates.
+It does not fill IMU ranges, extrinsics, serial latency, or physical dynamics.
+
 `measurement-seed` writes only repo-confirmed facts and collection metadata. It
 does not invent mass, steering, speed, IMU range, latency, or extrinsic values.
 The seeded baud rate is intentionally not enough to pass the serial latency
