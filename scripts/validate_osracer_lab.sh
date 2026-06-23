@@ -37,6 +37,8 @@ Targets:
                   Summarize sim2real gates without failing on incomplete gates.
   sim2real-ready-strict
                   Fail unless all sim2real readiness gates pass.
+  calibration-plan
+                  Plan repo updates from measured parameters without writing files.
   sensor-extrinsics-check
                   Compare measured sensor extrinsics against URDF/static TF.
   sensor-extrinsics-write
@@ -184,6 +186,13 @@ case "$target" in
             args+=(--measurements "$MEASUREMENTS_FILE")
         fi
         python3 "$ROOT_DIR/scripts/sim2real_readiness.py" "${args[@]}"
+        ;;
+    calibration-plan)
+        if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE is required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/plan_calibration_updates.py"             --measurements "$MEASUREMENTS_FILE"
         ;;
     sensor-extrinsics-check)
         if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then

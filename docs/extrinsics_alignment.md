@@ -91,6 +91,8 @@ Review the planned alignment first:
 ```bash
 cd /home/osrbot/Desktop/osracer/osracer_lab
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
+  scripts/validate_osracer_lab.sh calibration-plan
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh sensor-extrinsics-check
 ```
 
