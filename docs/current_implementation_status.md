@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 50]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 25]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 51]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 26]` |
 
 ## Implemented In `osracer_lab`
 
@@ -35,6 +35,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Jetson sensor preflight measurement importer: `scripts/import_sensor_preflight_measurements.py`
 - Serial latency measurement importer: `scripts/import_serial_latency_measurement.py`
 - Combined measurement session importer: `scripts/import_measurement_session.py`
+- Jetson environment evidence importer: `scripts/import_measurement_session.py` records `collection.jetson_environment`
 - Real-car measurement template: `docs/real_car_measurements.template.json`
 - Sensor extrinsics measured-value checker/writer: `scripts/apply_sensor_extrinsics.py`
 - Calibration update dry-run planner: `scripts/plan_calibration_updates.py`
@@ -56,6 +57,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Replay summary gate: `tools/policy_replay_summary.py`
 - Jetson preflight: `tools/jetson_preflight.sh --environment-output /tmp/osracer_jetson_environment.json`
 - Jetson environment report: `tools/jetson_environment_report.py`
+- Jetson measurement session now includes environment evidence: `tools/jetson_measurement_session.sh`
 - Read-only real-car readiness check: `tools/real_car_readiness_check.sh`
 - Jetson runtime monitor and summary:
   - `tools/jetson_runtime_monitor.sh`

@@ -35,6 +35,7 @@ A combined Jetson evidence session can collect sensor topic rates and serial que
 ```bash
 cd /home/osrbot/Desktop/osracer/osracer
 tools/jetson_measurement_session.sh --output-dir /tmp/osracer_measurement_session
+# The session includes sensor preflight, Jetson environment, and serial latency evidence.
 cd /home/osrbot/Desktop/osracer/osracer_lab
 scripts/validate_osracer_lab.sh measurement-seed
 MEASUREMENTS_FILE=docs/real_car_measurements.json \

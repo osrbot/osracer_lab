@@ -45,6 +45,25 @@ def resolve_path(session_file, maybe_path):
     return (Path(session_file).resolve().parent / path).resolve()
 
 
+
+def import_environment_report(measurements, report, report_path):
+    collection = measurements.setdefault("collection", {})
+    jetson = report.get("jetson", {}) if isinstance(report.get("jetson"), dict) else {}
+    ros = report.get("ros", {}) if isinstance(report.get("ros"), dict) else {}
+    collection["jetson_environment"] = {
+        "report_file": str(Path(report_path).resolve()),
+        "overall": report.get("overall"),
+        "is_jetson": jetson.get("is_jetson"),
+        "device_model": jetson.get("device_model"),
+        "nv_tegra_release": jetson.get("nv_tegra_release"),
+        "ros_distro": ros.get("distro"),
+        "ros_setup_exists": ros.get("setup_exists"),
+        "failures": report.get("failures", []),
+        "warnings": report.get("warnings", []),
+    }
+    return "collection.jetson_environment"
+
+
 def apply_session(measurements, session, session_file):
     changes = []
     errors = []
@@ -67,6 +86,14 @@ def apply_session(measurements, session, session_file):
             errors.append(f"sensor_preflight: {error}")
     elif sensor.get("status") not in (None, "skipped"):
         errors.append("sensor_preflight: sensor_summary missing")
+
+    environment = tools.get("jetson_environment", {})
+    environment_report = resolve_path(session_file, environment.get("environment_report"))
+    if environment_report and environment_report.exists():
+        report = load_json(environment_report)
+        changes.append(import_environment_report(measurements, report, environment_report))
+    elif environment.get("status") not in (None, "skipped"):
+        errors.append("jetson_environment: environment_report missing")
 
     serial = tools.get("serial_latency", {})
     serial_report = resolve_path(session_file, serial.get("serial_report"))
