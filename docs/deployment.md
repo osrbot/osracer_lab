@@ -1,6 +1,7 @@
 # OSRacer Policy Deployment Notes
 
-This repository currently verifies training and simulation. It does not yet ship a policy export or ROS 2 inference node.
+This repository currently verifies training and simulation and ships a checkpoint export script.
+It does not yet ship a ROS 2 inference node.
 Use this document as the deployment contract for the next implementation step.
 
 ## Current Verified Artifacts
@@ -65,6 +66,28 @@ Note: the simulation steering limit `0.488 rad` is about 27.96 deg, slightly bel
 
 ## Recommended ROS 2 Integration Shape
 
+Export a checkpoint before integrating with ROS 2:
+
+```bash
+~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
+  --headless \
+  --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
+```
+
+The default output directory is `<checkpoint_dir>/exported/` and contains:
+
+```text
+policy.pt
+```
+
+ONNX export is available when explicitly requested:
+
+```bash
+~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
+  --headless --format onnx \
+  --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
+```
+
 Add a separate inference node in the OSRacer ROS 2 workspace rather than coupling deployment code into the IsaacLab training package.
 
 Recommended node responsibilities:
@@ -122,9 +145,8 @@ ros2 topic pub --once /ackermann_cmd ackermann_msgs/msg/AckermannDrive \
 
 ## Next Missing Implementation
 
-The remaining code work is an export/deployment path:
+The remaining code work is the ROS 2 runtime path:
 
-1. Add a policy export script for RSL-RL checkpoints.
-2. Add a ROS 2 inference node in the OSRacer workspace.
-3. Add an offline observation contract test so the inference node and IsaacLab task use the same observation ordering.
-4. Add a low-speed real-car checklist tied to `/ackermann_cmd`.
+1. Add a ROS 2 inference node in the OSRacer workspace.
+2. Add an offline observation contract test so the inference node and IsaacLab task use the same observation ordering.
+3. Add a low-speed real-car checklist tied to `/ackermann_cmd`.

@@ -50,6 +50,14 @@ scripts/validate_osracer_lab.sh visual-perf
 # Resume from checkpoint
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/train_osracer_drift.py \
     --resume logs/rsl_rl/osracer_drift/model_1000.pt
+
+# Export checkpoint for deployment
+~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
+    --headless --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
+
+# Optional ONNX export
+~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
+    --headless --format onnx --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
 ```
 
 ## Installation
@@ -65,6 +73,7 @@ cd source/osracer_lab_rl      && pip install -e .
 See `docs/deployment.md` for the current policy-to-vehicle contract.
 The simulation action is `[target_speed_mps, target_steering_rad]`; the preferred real-vehicle bridge is `ackermann_msgs/msg/AckermannDrive` on `ackermann_cmd`.
 The sibling OSRacer ROS 2 workspace converts that to the firmware serial command `v <speed_mps> <steering_deg>`.
+Use `scripts/export_osracer_policy.py` to export trained checkpoints to TorchScript before building a ROS 2 inference node; ONNX export is available with `--format onnx`.
 
 ## Performance Baseline
 

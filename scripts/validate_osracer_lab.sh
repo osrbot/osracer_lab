@@ -14,6 +14,7 @@ Targets:
   drift-smoke     Run a short drift training check.
   visual-smoke    Run a short camera/visual training check.
   visual-perf     Run the RTX 4080 SUPER visual throughput probe.
+  export-smoke    Export the verified drift checkpoint to TorchScript.
   drift-baseline  Run the verified long drift baseline.
   all-smoke       Run static + drift-smoke + visual-smoke.
 
@@ -24,6 +25,8 @@ Environment overrides:
   VISUAL_SMOKE_ENVS=64
   VISUAL_PERF_ENVS=512
   VISUAL_PERF_ITERS=10
+  EXPORT_CHECKPOINT=logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
+  EXPORT_OUTPUT_DIR=/tmp/osracer_policy_export_smoke
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
 EOF
@@ -64,6 +67,12 @@ case "$target" in
         run_train --task Isaac-OSRacerVisualRL-v0 --headless \
             --num_envs "${VISUAL_PERF_ENVS:-512}" \
             --max_iterations "${VISUAL_PERF_ITERS:-10}"
+        ;;
+    export-smoke)
+        "$ISAACLAB_SH" -p "$ROOT_DIR/scripts/export_osracer_policy.py" --headless \
+            --checkpoint "${EXPORT_CHECKPOINT:-logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt}" \
+            --output_dir "${EXPORT_OUTPUT_DIR:-/tmp/osracer_policy_export_smoke}" \
+            --format jit
         ;;
     drift-baseline)
         run_train --headless \
