@@ -17,6 +17,8 @@ Targets:
   export-smoke    Export the verified drift checkpoint to TorchScript.
   runtime-contract
                   Check shared hardware/runtime parameters against osracer.
+  real-measurements
+                  Validate real-car measurement JSON values and sources.
   sim2real-readiness
                   Summarize sim2real gates without failing on incomplete gates.
   sim2real-ready-strict
@@ -89,6 +91,13 @@ case "$target" in
     runtime-contract)
         python3 "$ROOT_DIR/scripts/check_runtime_contract.py" \
             --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}"
+        ;;
+    real-measurements)
+        if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE is required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/validate_real_measurements.py" "$MEASUREMENTS_FILE"
         ;;
     sim2real-readiness)
         args=(--osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}")

@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 31]` |
-| `osracer` | `dev` | `dev...origin/dev [ahead 13]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 33]` |
+| `osracer` | `dev` | `dev...origin/dev [ahead 17]` |
 
 ## Implemented In `osracer_lab`
 
@@ -25,6 +25,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Observation replay to MuJoCo pipeline: `scripts/run_sim2real_replay_pipeline.py`
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
+- Real-car measurement value validator: `scripts/validate_real_measurements.py`
 - Real-car measurement template: `docs/real_car_measurements.template.json`
 - Sensor extrinsics measured-value checker/writer: `scripts/apply_sensor_extrinsics.py`
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
@@ -47,6 +48,9 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - `tools/jetson_runtime_monitor.sh`
   - `tools/jetson_runtime_summary.py`
 - Jetson deployment package verifier: `tools/verify_jetson_deployment.py`
+- Jetson performance profile helper: `tools/jetson_performance_profile.sh`
+- TensorRT engine build helper: `tools/build_tensorrt_engine.sh`
+- Policy inference benchmark and trtexec log parser: `tools/benchmark_policy_inference.py`
 - First-drive runbook: `docs/first_drive_runbook.md`
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
 
@@ -57,6 +61,7 @@ Run from `osracer_lab`:
 ```bash
 scripts/validate_osracer_lab.sh runtime-contract
 scripts/validate_osracer_lab.sh sim2real-readiness
+MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
 python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json
 python3 scripts/package_jetson_deployment.py \
@@ -90,7 +95,7 @@ first-drive preparation, not calibrated closed-loop sim2real.
 ## Blocking Items Before Calibrated Closed Loop
 
 1. Resolve `base_link -> camera_link`, `base_link -> laser`, and `base_link -> imu_link` source-of-truth conflict between URDF and static TF.
-2. Measure and record the 20 required real-car parameters in `docs/real_car_measurements.json`, copied from `docs/real_car_measurements.template.json`.
+2. Measure and record the 20 required real-car parameters in `docs/real_car_measurements.json`, copied from `docs/real_car_measurements.template.json`, and pass `scripts/validate_osracer_lab.sh real-measurements`.
 3. Install/check Jetson runtime dependencies on the actual Orin Nano Super 8GB:
    - ROS 2 Jazzy runtime packages
    - `ackermann_msgs`

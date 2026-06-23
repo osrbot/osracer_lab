@@ -17,6 +17,7 @@ if str(REPO_ROOT / "scripts") not in sys.path:
 
 from check_runtime_contract import main as runtime_contract_main
 from osracer_lab_assets.hardware_params import hardware_summary
+from validate_real_measurements import validate_measurements
 
 
 def parse_args():
@@ -89,50 +90,17 @@ def load_measurements(path):
     return measurements, str(path)
 
 
-def has_value(value):
-    if value is None:
-        return False
-    if isinstance(value, str):
-        return bool(value.strip())
-    if isinstance(value, (list, tuple, dict)):
-        return bool(value)
-    return True
-
-
-def measurement_value(entry):
-    if isinstance(entry, dict):
-        return entry.get("value")
-    return entry
-
-
-def measurement_source(entry):
-    if isinstance(entry, dict):
-        return entry.get("source")
-    return "inline"
-
-
 def summarize_measurements(required, measurements):
-    missing = []
-    incomplete = []
-    complete = []
-    for name in required:
-        if name not in measurements:
-            missing.append(name)
-            continue
-        entry = measurements[name]
-        if has_value(measurement_value(entry)) and has_value(measurement_source(entry)):
-            complete.append(name)
-        else:
-            incomplete.append(name)
-    return complete, missing, incomplete
+    report = validate_measurements(measurements, required)
+    return report["complete"], report["missing"], report["incomplete"], report["invalid"]
 
 
 def build_report(osracer_root, measurements_path=None):
     params = hardware_summary()
     required = list(params["required_real_car_measurements"])
     measurements, loaded_measurements_path = load_measurements(measurements_path)
-    complete_measurements, missing_measurements, incomplete_measurements = summarize_measurements(required, measurements)
-    remaining_count = len(missing_measurements) + len(incomplete_measurements)
+    complete_measurements, missing_measurements, incomplete_measurements, invalid_measurements = summarize_measurements(required, measurements)
+    remaining_count = len(missing_measurements) + len(incomplete_measurements) + len(invalid_measurements)
     normal_contract = run_runtime_contract(osracer_root, strict_extrinsics=False)
     strict_contract = run_runtime_contract(osracer_root, strict_extrinsics=True)
 
@@ -150,7 +118,7 @@ def build_report(osracer_root, measurements_path=None):
         gate(
             "required_real_measurements",
             "fail" if remaining_count else "pass",
-            f"{len(complete_measurements)}/{len(required)} measured real-car parameter item(s) complete",
+            f"{len(complete_measurements)}/{len(required)} measured real-car parameter item(s) complete and format-valid",
         ),
     ]
     overall = "pass" if all(item["status"] == "pass" for item in gates) else "fail"
@@ -161,7 +129,10 @@ def build_report(osracer_root, measurements_path=None):
         "complete_real_measurements": complete_measurements,
         "missing_real_measurements": missing_measurements,
         "incomplete_real_measurements": incomplete_measurements,
-        "required_real_measurements": missing_measurements + incomplete_measurements,
+        "invalid_real_measurements": invalid_measurements,
+        "required_real_measurements": missing_measurements
+        + incomplete_measurements
+        + [item["name"] for item in invalid_measurements],
         "runtime_contract_log": normal_contract["log"],
         "strict_extrinsics_log": strict_contract["log"],
     }
@@ -183,6 +154,10 @@ def print_text(report):
         print("incomplete_measurements:")
         for name in report["incomplete_real_measurements"]:
             print(f"  - {name}")
+    if report["invalid_real_measurements"]:
+        print("invalid_measurements:")
+        for item in report["invalid_real_measurements"]:
+            print(f"  - {item['name']}: {item['error']}")
 
 
 def main():

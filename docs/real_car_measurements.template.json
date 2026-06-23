@@ -1,147 +1,219 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "vehicle": "osracer_real_car",
-  "measurement_rule": "Each required item passes only when value and source are both non-empty.",
+  "measurement_rule": "Each required item passes only when value/source are non-empty and value matches the expected_format.",
   "measurements": {
     "full_vehicle_mass_kg_with_battery_jetson_sensors": {
       "value": null,
       "unit": "kg",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "positive number in kg"
     },
     "front_track_m": {
       "value": null,
       "unit": "m",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "positive number in m"
     },
     "tire_width_m": {
       "value": null,
       "unit": "m",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "positive number in m"
     },
     "front_rear_weight_distribution": {
       "value": null,
       "unit": "kg or percent",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "{front_percent,rear_percent} or {front_kg,rear_kg}"
     },
     "true_max_steering_rad_left_right": {
       "value": null,
       "unit": "rad",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "[left_rad, right_rad] or {left_rad,right_rad}"
     },
     "steering_servo_pwm_min_center_max_or_protocol_units": {
       "value": null,
       "unit": "PWM us or firmware units",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "[min, center, max] increasing"
     },
     "steering_response_time_s": {
       "value": null,
       "unit": "s",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "non-negative seconds"
     },
     "motor_kv_or_rated_rpm": {
       "value": null,
       "unit": "KV or rpm",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "{kv} or {rated_rpm}"
     },
     "battery_voltage_s_count": {
       "value": null,
       "unit": "V and cell count",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "{s_count, nominal_v, charged_v, cutoff_v}"
     },
     "true_max_speed_mps": {
       "value": null,
       "unit": "m/s",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "non-negative m/s"
     },
     "minimum_stable_speed_mps": {
       "value": null,
       "unit": "m/s",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "non-negative m/s"
     },
     "throttle_deadband_and_response_delay_s": {
       "value": null,
       "unit": "command units and s",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "{deadband, response_delay_s}"
     },
     "encoder_ticks_per_revolution_and_mount_location": {
       "value": null,
       "unit": "ticks/rev and frame",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "{ticks_per_revolution, mount_location}"
     },
     "imu_model_rate_ranges_and_frame_alignment": {
       "value": null,
       "unit": "model, Hz, ranges, frame",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "{model, rate_hz, accel_range_g, gyro_range_dps, frame_alignment}"
     },
     "camera_extrinsic_xyz_rpy_in_base_link": {
       "value": null,
       "unit": "m, rad",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "[x, y, z, roll, pitch, yaw] in m/rad"
     },
     "lidar_extrinsic_xyz_rpy_in_base_link": {
       "value": null,
       "unit": "m, rad",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "[x, y, z, roll, pitch, yaw] in m/rad"
     },
     "imu_extrinsic_xyz_rpy_in_base_link": {
       "value": null,
       "unit": "m, rad",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "[x, y, z, roll, pitch, yaw] in m/rad"
     },
     "serial_baud_rate_and_command_latency_s": {
       "value": null,
       "unit": "baud and s",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "{baud_rate, command_latency_s}"
     },
     "sensor_timestamp_sync_method": {
       "value": null,
       "unit": "description",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "descriptive string"
     },
     "resolve_urdf_vs_static_tf_sensor_extrinsics": {
       "value": null,
       "unit": "description",
       "source": "",
       "measured_at": "",
-      "notes": ""
+      "notes": "",
+      "expected_format": "descriptive string"
+    }
+  },
+  "confirmed_sensor_specs": {
+    "camera": {
+      "model": "DCXG200",
+      "sensor": "AR0234",
+      "shutter": "global",
+      "lens_focal_length_mm": 2.7,
+      "advertised_fov_deg": 130.0,
+      "resolution_px": [
+        1920,
+        1200
+      ],
+      "frame_rate_fps": [
+        90,
+        120
+      ],
+      "interface": "USB2.0 UVC",
+      "formats": [
+        "MJPG",
+        "YUY2"
+      ],
+      "power_w": 2.0,
+      "source": "user-supplied DCXG200/AR0234 spec image"
+    },
+    "lidar": {
+      "scan_type": "mechanical_rotating",
+      "range_method": "pulse_tof",
+      "horizontal_fov_deg": 270.0,
+      "range_m_at_70pct_reflectivity": 25.0,
+      "range_m_at_10pct_reflectivity": 15.0,
+      "accuracy_m": 0.02,
+      "angular_resolution_deg": [
+        0.1,
+        0.25
+      ],
+      "scan_rate_hz": [
+        10,
+        20,
+        25,
+        30
+      ],
+      "sample_rate_hz": [
+        28800,
+        36000,
+        43200
+      ],
+      "transport": [
+        "UDP/IP",
+        "USB"
+      ],
+      "source": "user-supplied lidar spec image"
     }
   }
 }
