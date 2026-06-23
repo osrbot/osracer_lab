@@ -4,14 +4,14 @@ This repository keeps IsaacLab as the high-throughput training simulator. MuJoCo
 
 ## Current Scope
 
-The current MuJoCo support is a contract smoke test:
+The current MuJoCo support is a kinematic contract smoke test:
 
 - It reuses `osracer_lab_assets.hardware_params`.
 - It generates a minimal MJCF model with the same wheelbase, rear track, wheel radius, steering clamp, and speed envelope.
 - It keeps the action contract as `[target_speed_mps, target_steering_rad]`.
-- It can compile the MJCF when the `mujoco` Python package is installed.
+- It compiles the MJCF and can run a short planar Ackermann rollout when the `mujoco` Python package is installed.
 
-It is not yet a calibrated dynamics model. Mass, steering response, motor/ESC response, tire friction, and sensor extrinsics still need real measurements.
+It is not yet a calibrated contact dynamics model. Mass, steering response, motor/ESC response, tire friction, and sensor extrinsics still need real measurements before wheel-ground contact dynamics should be enabled.
 
 ## Commands
 
@@ -33,11 +33,28 @@ If MuJoCo is installed in the active Python environment:
 python3 scripts/mujoco_sim2sim_smoke.py --xml-out /tmp/osracer_minimal.xml --compile
 ```
 
+Run a one-second kinematic smoke rollout:
+
+```bash
+python3 scripts/mujoco_sim2sim_smoke.py \
+  --xml-out /tmp/osracer_rollout.xml \
+  --rollout-steps 100 \
+  --speed-mps 0.3 \
+  --steering-rad 0.1
+```
+
+Expected output includes compile dimensions and rollout metrics:
+
+```text
+compiled nq=3 nv=3 nu=3
+rollout steps=100 time_s=1 speed_mps=0.3 steering_rad=0.1 distance_m=...
+```
+
 ## Next Work
 
-1. Install MuJoCo in the sim2sim Python environment.
-2. Replace placeholder mass with measured full-vehicle mass.
-3. Add measured steering servo latency and motor/ESC speed response.
-4. Add camera, lidar, and IMU extrinsics from the real car.
-5. Run exported `policy.pt` in IsaacLab and MuJoCo with the same initial states.
+1. Replace placeholder mass with measured full-vehicle mass.
+2. Add measured steering servo latency and motor/ESC speed response.
+3. Add camera, lidar, and IMU extrinsics from the real car.
+4. Replay exported `policy.pt` through the MuJoCo kinematic model and compare against IsaacLab observations.
+5. Add calibrated wheel-ground contact dynamics after tire and mass data are measured.
 6. Compare speed, yaw rate, turn radius, steering saturation, and termination behavior before real-car replay.
