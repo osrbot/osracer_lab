@@ -134,3 +134,18 @@ These values are still required before the sim2real model should be considered c
 - MuJoCo: build the second simulator against the same action contract and hardware parameter source.
 - Jetson: deploy only exported TorchScript/ONNX/TensorRT policies; do not train on Jetson.
 - Real car: run passive logging and offline replay before enabling closed-loop `/ackermann_cmd`.
+
+Check that this parameter source still matches the upper-computer repo:
+
+```bash
+python3 scripts/check_runtime_contract.py --osracer-root /home/osrbot/Desktop/osracer/osracer
+```
+
+After the camera, lidar, and IMU extrinsics are measured and unified, make the
+extrinsic check strict:
+
+```bash
+python3 scripts/check_runtime_contract.py \
+  --osracer-root /home/osrbot/Desktop/osracer/osracer \
+  --strict-extrinsics
+```
