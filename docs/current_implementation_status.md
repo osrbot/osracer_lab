@@ -13,7 +13,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 76]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 77]` |
 | `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 40]` |
 
 ## Implemented In `osracer_lab`
@@ -58,6 +58,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Calibration review pack export: `scripts/create_calibration_review_pack.py`
   - Includes `sensor_extrinsics_review.json` for measured-vs-URDF/static-TF alignment.
   - Archives text evidence referenced by measurement-session collection metadata into `evidence/` plus `evidence_manifest.json`.
+- Calibration review pack verifier: `scripts/verify_calibration_review_pack.py`
+  - Rechecks required files, evidence hashes, summary consistency, and no-writeback flag.
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
   - Includes `source_authority_snapshot.json` when available.
 - Documentation:
@@ -127,6 +129,7 @@ MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osrac
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json scripts/validate_osracer_lab.sh measured-overlay
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json CALIBRATION_REVIEW_PACK_OUTPUT=/tmp/osracer_calibration_review_pack scripts/validate_osracer_lab.sh calibration-review-pack
 bash /tmp/osracer_run_review_pack_evidence_test.sh
+bash /tmp/osracer_test_review_pack_verifier.sh
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements
 MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
 MEASURED_OVERLAY_FILE=/tmp/osracer_measured_overlay.json scripts/validate_osracer_lab.sh camera-calibration-overlay

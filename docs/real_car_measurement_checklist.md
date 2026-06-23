@@ -104,13 +104,15 @@ Generate a review pack before writing measured values back into source files:
 ```bash
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh calibration-review-pack
+CALIBRATION_REVIEW_PACK=/tmp/osracer_calibration_review_pack \
+  scripts/validate_osracer_lab.sh calibration-review-pack-verify
 ```
 
 The review pack contains validation results, the calibration plan, a measured
 overlay for offline sim/replay, sim2real readiness gates, and copied text evidence
 from the combined measurement session when those files are referenced in the
-measurement JSON. Treat it as the handoff artifact for deciding whether any
-source write-back is approved.
+measurement JSON. Run `calibration-review-pack-verify` after copying the pack.
+Treat it as the handoff artifact for deciding whether any source write-back is approved.
 
 ## Must Measure Before Calibrated Sim2Real
 

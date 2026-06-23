@@ -51,6 +51,8 @@ Targets:
                   Plan repo updates from measured parameters without writing files.
   calibration-review-pack
                   Create a review pack from measurements, overlay, plan, and readiness gates.
+  calibration-review-pack-verify
+                  Verify a calibration review pack after handoff or copy.
   measured-overlay
                   Export measured parameter overlay JSON without mutating source files.
   camera-calibration-overlay
@@ -83,6 +85,7 @@ Environment overrides:
   MEASUREMENT_SESSION_FILE=/path/to/measurement_session.json
   MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack
   CALIBRATION_REVIEW_PACK_OUTPUT=/tmp/osracer_calibration_review_pack
+  CALIBRATION_REVIEW_PACK=/tmp/osracer_calibration_review_pack
   MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json
   MEASURED_OVERLAY_FILE=/tmp/osracer_measured_overlay.json
   DRIFT_BASELINE_ENVS=2048
@@ -267,6 +270,10 @@ case "$target" in
             --osracer-root "${OSRACER_ROOT:-$ROOT_DIR/../osracer}" \
             --output-dir "${CALIBRATION_REVIEW_PACK_OUTPUT:-/tmp/osracer_calibration_review_pack}" \
             --overwrite
+        ;;
+    calibration-review-pack-verify)
+        python3 "$ROOT_DIR/scripts/verify_calibration_review_pack.py" \
+            "${CALIBRATION_REVIEW_PACK:-${CALIBRATION_REVIEW_PACK_OUTPUT:-/tmp/osracer_calibration_review_pack}}"
         ;;
     measured-overlay)
         if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then

@@ -71,6 +71,7 @@ def copy_evidence_file(src, evidence_dir, label, copied_names):
     return {
         "source": str(src),
         "path": str(target),
+        "relative_path": str(target.relative_to(evidence_dir.parent)),
         "bytes": target.stat().st_size,
         "sha256": sha256(target),
     }
