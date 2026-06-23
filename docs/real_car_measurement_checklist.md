@@ -45,6 +45,18 @@ SENSOR_SUMMARY_FILE=/tmp/osracer_sensor_preflight/sensor_summary.json \
 required camera, lidar, IMU, and odom topics are present and have parsed rates.
 It does not fill IMU ranges, extrinsics, serial latency, or physical dynamics.
 
+After stopping any node that owns `/dev/osrbot_base`, measure serial query
+latency from the `osracer` repo and import it:
+
+```bash
+cd /home/osrbot/Desktop/osracer/osracer
+tools/serial_latency_probe.py --output /tmp/osracer_serial_latency.json
+cd /home/osrbot/Desktop/osracer/osracer_lab
+MEASUREMENTS_FILE=docs/real_car_measurements.json \
+SERIAL_LATENCY_FILE=/tmp/osracer_serial_latency.json \
+  scripts/validate_osracer_lab.sh import-serial-latency
+```
+
 `measurement-seed` writes only repo-confirmed facts and collection metadata. It
 does not invent mass, steering, speed, IMU range, latency, or extrinsic values.
 The seeded baud rate is intentionally not enough to pass the serial latency

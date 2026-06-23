@@ -27,6 +27,8 @@ Targets:
                   Create docs/real_car_measurements.json from template plus known repo facts.
   import-sensor-preflight
                   Import Jetson sensor_summary.json evidence into measurement JSON.
+  import-serial-latency
+                  Import serial_latency_probe.py JSON into measurement JSON.
   sim2real-readiness
                   Summarize sim2real gates without failing on incomplete gates.
   sim2real-ready-strict
@@ -52,6 +54,7 @@ Environment overrides:
   MEASUREMENTS_FILE=docs/real_car_measurements.json
   MEASUREMENT_SEED_OUTPUT=docs/real_car_measurements.json
   SENSOR_SUMMARY_FILE=/path/to/sensor_summary.json
+  SERIAL_LATENCY_FILE=/path/to/serial_latency.json
   DRIFT_BASELINE_ENVS=2048
   DRIFT_BASELINE_ITERS=2000
 EOF
@@ -133,6 +136,16 @@ case "$target" in
         python3 "$ROOT_DIR/scripts/import_sensor_preflight_measurements.py" \
             --measurements "$MEASUREMENTS_FILE" \
             --sensor-summary "$SENSOR_SUMMARY_FILE" \
+            --write
+        ;;
+    import-serial-latency)
+        if [[ -z "${MEASUREMENTS_FILE:-}" || -z "${SERIAL_LATENCY_FILE:-}" ]]; then
+            echo "MEASUREMENTS_FILE and SERIAL_LATENCY_FILE are required" >&2
+            exit 2
+        fi
+        python3 "$ROOT_DIR/scripts/import_serial_latency_measurement.py" \
+            --measurements "$MEASUREMENTS_FILE" \
+            --serial-report "$SERIAL_LATENCY_FILE" \
             --write
         ;;
     sim2real-readiness)
