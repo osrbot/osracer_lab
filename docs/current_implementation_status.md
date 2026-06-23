@@ -13,8 +13,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | `main...origin/main [ahead 52]` |
-| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 27]` |
+| `osracer_lab` | `main` | `main...origin/main [ahead 53]` |
+| `osracer` | `feat-demo` | `feat-demo based on public/feat-demo [ahead 28]` |
 
 ## Implemented In `osracer_lab`
 
@@ -69,6 +69,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - First-drive runbook: `docs/first_drive_runbook.md`
 - First-drive go/no-go gate: `tools/first_drive_gate.py`
 - First-drive evidence pack: `tools/first_drive_evidence_pack.py`
+- First-drive evidence pack verifier: `tools/verify_first_drive_evidence_pack.py`
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
 
 ## Verified Commands
