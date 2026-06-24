@@ -93,6 +93,7 @@ Values confirmed from `osracer` `feat-demo` upper-computer code and `osrcore` fi
 
 | Parameter | Value |
 |---|---|
+| ROS runtime | `ROS 2 Humble` on `JetPack 6.x / Ubuntu 22.04` |
 | Chassis launch | `osracer_bringup chassis_ackermann.launch.py` |
 | Serial device | `/dev/osrbot_base` |
 | Serial baud | `460800` |

@@ -140,6 +140,10 @@ def main():
     chassis_launch = read_text(osracer_root / "osracer_bringup/launch/chassis_ackermann.launch.py")
     camera_launch = read_text(osracer_root / "osracer_bringup/launch/usb_cam.launch.py")
     static_tf_launch = read_text(osracer_root / "osracer_description/launch/robot_description_tf.launch.py")
+    preflight_tool = read_text(osracer_root / "tools/jetson_preflight.sh")
+    sensor_preflight_tool = read_text(osracer_root / "tools/jetson_sensor_preflight.sh")
+    measurement_session_tool = read_text(osracer_root / "tools/jetson_measurement_session.sh")
+    readiness_tool = read_text(osracer_root / "tools/real_car_readiness_check.sh")
     urdf_path = osracer_root / "osracer_description/urdf/osracer.urdf"
 
     check_equal("serial_port", find_default_launch_value(chassis_launch, "port_name"), runtime["serial_port"], failures)
@@ -166,6 +170,14 @@ def main():
     )
     check_float("camera_fps", find_camera_param(camera_launch, "framerate"), camera["configured_fps"], failures)
     check_equal("camera_pixel_format", find_camera_param(camera_launch, "pixel_format"), camera["pixel_format"], failures)
+    ros_default = f'ROS_DISTRO_NAME="${{ROS_DISTRO:-{runtime["ros_distro"]}}}"'
+    for name, text in (
+        ("jetson_preflight_ros_distro", preflight_tool),
+        ("jetson_sensor_preflight_ros_distro", sensor_preflight_tool),
+        ("jetson_measurement_session_ros_distro", measurement_session_tool),
+        ("real_car_readiness_ros_distro", readiness_tool),
+    ):
+        check_equal(name, ros_default in text, True, failures)
 
     urdf = parse_urdf_extrinsics(urdf_path)
     static_tf = parse_static_tf_extrinsics(static_tf_launch)

@@ -14,8 +14,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 | Repository | Branch | State |
 |---|---|---|
 | `osracer_lab` | `main` | local-ahead push-prep state; run `git status --short --branch` before pushing |
-| `osracer` on server | `feat-demo` | synchronized to Mac/GitHub `feat-demo` at `6d96f52`; server is not used for `feat-demo` push |
-| `osracer` on Mac | `feat-demo` at `/Users/winter/.codex/worktrees/904a/osracer` | authoritative local push-prep worktree for `feat-demo`, currently `6d96f52` |
+| `osracer` on server | `feat-demo` | synchronized to Mac/GitHub `feat-demo` at `7b92682`; server is not used for `feat-demo` push |
+| `osracer` on Mac | `feat-demo` at `/Users/winter/.codex/worktrees/904a/osracer` | authoritative local push-prep worktree for `feat-demo`, currently `7b92682` |
 
 ## Implemented In `osracer_lab`
 
@@ -183,7 +183,7 @@ first-drive preparation, not calibrated closed-loop sim2real.
 2. Measure and record the 21 required real-car parameters in `docs/real_car_measurements.json`, copied from `docs/real_car_measurements.template.json`, and pass `scripts/validate_osracer_lab.sh real-measurements`.
 3. Put an authenticated `osrbot/osrcore` checkout at `/home/osrbot/Desktop/osracer/osrcore`, then pass `python3 scripts/check_source_authority.py --strict-osrcore`.
 4. Install/check Jetson runtime dependencies on the actual Orin Nano Super 8GB:
-   - ROS 2 Jazzy runtime packages
+   - ROS 2 Humble runtime packages
    - `ackermann_msgs`
    - Torch or ONNX/TensorRT runtime for the deployment format
 5. Run passive real-car observation recording.

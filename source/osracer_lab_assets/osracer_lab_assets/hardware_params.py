@@ -120,6 +120,8 @@ OSRACER_SOURCE_AUTHORITY = {
 }
 
 OSRACER_REAL_RUNTIME = {
+    "ros_distro": "humble",
+    "jetson_os": "JetPack 6.x / Ubuntu 22.04",
     "chassis_launch": "osracer_bringup chassis_ackermann.launch.py",
     "serial_port": "/dev/osrbot_base",
     "serial_baud": 460800,

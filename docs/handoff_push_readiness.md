@@ -3,7 +3,7 @@
 Date: 2026-06-24
 
 This document is the operating checklist for continuing OSRacer Isaac,
-Jetson Orin Nano Super 8GB runtime work, sim2sim, and sim2real preparation.
+Jetson Orin Nano Super 8GB runtime work on JetPack 6.x / ROS 2 Humble, sim2sim, and sim2real preparation.
 It is not push approval.
 
 ## Repository Map

@@ -27,7 +27,7 @@
   "sources": {
     "osracer_feat_demo": {
       "branch": "feat-demo",
-      "head": "660fea8",
+      "head": "7b92682",
       "remote": "https://github.com/osrbot/osracer.git",
       "status_short": ""
     },
