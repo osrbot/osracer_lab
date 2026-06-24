@@ -95,9 +95,10 @@ EOF
 
 run_static() {
     cd "$ROOT_DIR"
-    mapfile -t python_files < <(
-        find scripts source -type f -name '*.py' ! -path '*/__pycache__/*' | sort
-    )
+    python_files=()
+    while IFS= read -r path; do
+        python_files+=("$path")
+    done < <(find scripts source -type f -name '*.py' ! -path '*/__pycache__/*' | sort)
     python3 -m py_compile "${python_files[@]}"
 }
 

@@ -127,6 +127,7 @@ OSRACER_REAL_RUNTIME = {
     "serial_baud": 460800,
     "command_protocol": "v <speed_mps> <steering_deg>",
     "command_watchdog_timeout_s": 0.5,
+    "firmware_version_timeout_s": 0.8,
     "cmd_vel_topic": "/cmd_vel",
     "ackermann_cmd_topic": "/ackermann_cmd",
     "imu_topic": "/imu_filter",
@@ -136,11 +137,12 @@ OSRACER_REAL_RUNTIME = {
     "imu_serial_frame": "i qx qy qz qw ax ay az gx gy gz",
     "odom_serial_frame": "o px py pz vx vy vz yaw",
     "safety_note": "ESP32 firmware handles serial timeout and SBUS fallback; ROS also clamps steering.",
+    "firmware_version_note": "ROS chassis startup queries fw version and logs OSRCORE ProjectVer when supported.",
 }
 
 OSRACER_FIRMWARE_CONTROL = {
     "source": "osrcore main/config.h, sdkconfig.defaults, docs/serial_protocol.md",
-    "firmware_head_read": "9742339",
+    "firmware_head_read": "729a6c2",
     "encoder": {
         "gpio_a": 3,
         "gpio_b": 9,

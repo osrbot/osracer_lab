@@ -51,6 +51,19 @@ def find_default_launch_value(text, argument_name):
     return ast.literal_eval(expr)
 
 
+def find_declared_parameter_default(text, parameter_name):
+    pattern = re.compile(
+        r"declare_parameter\(\s*['\"]"
+        + re.escape(parameter_name)
+        + r"['\"]\s*,\s*([^)]+)\)",
+        re.DOTALL,
+    )
+    match = pattern.search(text)
+    if not match:
+        raise ValueError(f"Declared parameter not found: {parameter_name}")
+    return ast.literal_eval(match.group(1).strip())
+
+
 def find_camera_param(text, key):
     pattern = re.compile(r"['\"]" + re.escape(key) + r"['\"]\s*:\s*([^,\n}]+)")
     match = pattern.search(text)
@@ -138,6 +151,7 @@ def main():
     warnings = []
 
     chassis_launch = read_text(osracer_root / "osracer_bringup/launch/chassis_ackermann.launch.py")
+    chassis_bridge = read_text(osracer_root / "osracer_bringup/script/chassis_ackermann.py")
     camera_launch = read_text(osracer_root / "osracer_bringup/launch/usb_cam.launch.py")
     static_tf_launch = read_text(osracer_root / "osracer_description/launch/robot_description_tf.launch.py")
     preflight_tool = read_text(osracer_root / "tools/jetson_preflight.sh")
@@ -161,6 +175,16 @@ def main():
         runtime["command_watchdog_timeout_s"],
         failures,
     )
+    check_float(
+        "firmware_version_timeout_s",
+        find_declared_parameter_default(chassis_bridge, "firmware_version_timeout_s"),
+        runtime["firmware_version_timeout_s"],
+        failures,
+    )
+    check_equal("queries_fw_version_on_startup", 'serial_conn.write(b"fw version\\n")' in chassis_bridge, True, failures)
+    check_equal("logs_projectver_on_startup", "OSRCORE ProjectVer:" in chassis_bridge, True, failures)
+    check_equal("forces_stream_sync_on_startup", 'self.write_serial("stream sync\\n")' in chassis_bridge, True, failures)
+    check_equal("requests_initial_sync_frame", 'self.write_serial("s\\n")' in chassis_bridge, True, failures)
     check_equal("camera_device", find_camera_param(camera_launch, "video_device"), camera["device"], failures)
     check_equal(
         "camera_resolution",

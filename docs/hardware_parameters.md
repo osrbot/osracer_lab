@@ -99,6 +99,8 @@ Values confirmed from `osracer` `feat-demo` upper-computer code and `osrcore` fi
 | Serial baud | `460800` |
 | Command protocol | `v <speed_mps> <steering_deg>` |
 | Command watchdog | `0.5 s` |
+| Firmware version query timeout | `0.8 s` |
+| Firmware version query | `fw version`, logs `OSRCORE ProjectVer` on ROS startup |
 | Ackermann command topic | `/ackermann_cmd` |
 | Twist command topic | `/cmd_vel` |
 | Runtime odom topic | `/odometry/filtered` |
@@ -110,10 +112,13 @@ Values confirmed from `osracer` `feat-demo` upper-computer code and `osrcore` fi
 
 The bridge accepts `AckermannDrive.steering_angle` in radians, clamps it by
 `max_steering_angle_deg=30.0`, then sends steering to firmware in degrees.
+During serial startup it temporarily queries `fw version`, logs the returned
+`ProjectVer` when supported by the firmware, restores `stream sync`, and
+requests one `s` frame.
 
 ## Firmware Control Parameters
 
-Additional values read from local read-only `osrcore` at `9742339`:
+Additional values read from local read-only `osrcore` at `729a6c2`:
 
 | Area | Parameter | Value |
 |---|---|---:|
@@ -141,6 +146,13 @@ Additional values read from local read-only `osrcore` at `9742339`:
 | Battery | Low voltage / recover | `10.8 V / 11.1 V` |
 | Telemetry | sync / IMU / odom / mag / RC / battery | `5 / 5 / 20 / 50 / 100 / 2000 ms` |
 | Safety | Serial command timeout | `500 ms` |
+
+Firmware version reporting:
+
+| Command / source | Output contract |
+|---|---|
+| `fw version` | `FW_VERSION: Product=..., Firmware=..., Hardware=..., ProjectVer=..., Release=..., Git=..., Dirty=..., Build=..., IDF=...` |
+| `status` | includes `FW: Product=..., Firmware=..., Hardware=..., Version=..., Git=..., Dirty=..., Build=..., ProjectVer=...` |
 
 Do not directly replace the IsaacLab `wheel_radius_m=0.050` with the firmware encoder radius yet. The firmware and `osracer_sim` currently use `0.0425 m`, while the lab visual/physics source uses `0.050 m`; this must be resolved by measuring the loaded tire radius and deciding whether the value represents encoder odometry, collision geometry, or both.
 

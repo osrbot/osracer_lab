@@ -11,12 +11,10 @@ This document is the single fill-in sheet for aligning `osracer_lab`, `osracer`
 |---|---|
 | Firmware | `osrbot/osrcore` `main` |
 | Firmware local source read | `/Users/winter/Documents/osracer/osrcore` |
-| Firmware HEAD read | `9742339` |
+| Firmware HEAD read | `729a6c2` |
 | ROS upper computer | `osrbot/osracer` `feat-demo` |
-| Mac `feat-demo` path | `/Users/winter/.codex/worktrees/904a/osracer` |
-| Server `feat-demo` mirror | `/home/osrbot/Desktop/osracer/osracer` |
-| `feat-demo` HEAD checked | `7b92682` |
-| IsaacLab repo | `/home/osrbot/Desktop/osracer/osracer_lab` |
+| `feat-demo` HEAD checked | `a901398` |
+| IsaacLab repo | `https://github.com/osrbot/osracer_lab` |
 
 ## Already Filled Parameters
 
@@ -47,6 +45,8 @@ radius before changing either value.
 | Serial baud | `460800` |
 | Command protocol | `v <speed_mps> <steering_deg>` |
 | Command watchdog | `0.5 s` |
+| Firmware version query timeout | `0.8 s` |
+| Firmware version query | `fw version`, logs `OSRCORE ProjectVer` on ROS startup |
 | Ackermann command topic | `/ackermann_cmd` |
 | Twist command topic | `/cmd_vel` |
 | Runtime odom topic | `/odometry/filtered` |
@@ -323,4 +323,3 @@ Fill these first:
 | 10 | Camera/lidar/IMU measured extrinsics |
 | 11 | Serial command latency |
 | 12 | Sensor timestamp sync method |
-

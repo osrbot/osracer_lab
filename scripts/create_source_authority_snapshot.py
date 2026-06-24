@@ -62,6 +62,19 @@ def find_launch_default(text, argument_name):
     return ast.literal_eval(match.group(1).strip())
 
 
+def find_declared_parameter_default(text, parameter_name):
+    pattern = re.compile(
+        r"declare_parameter\(\s*['\"]"
+        + re.escape(parameter_name)
+        + r"['\"]\s*,\s*([^)]+)\)",
+        re.DOTALL,
+    )
+    match = pattern.search(text)
+    if not match:
+        raise ValueError(f"Declared parameter not found: {parameter_name}")
+    return ast.literal_eval(match.group(1).strip())
+
+
 def source_meta(repo):
     return {
         "branch": git(repo, "branch", "--show-current"),
@@ -75,6 +88,7 @@ def build_snapshot(osrcore_root, osracer_root):
     osrcore_config = read_text(osrcore_root / "main/config.h")
     osrcore_protocol = read_text(osrcore_root / "docs/serial_protocol.md")
     osrcore_serial = read_text(osrcore_root / "main/serial_cmd.cpp")
+    osrcore_fw_update = read_text(osrcore_root / "main/fw_update.cpp")
     osrcore_frames = read_text(osrcore_root / "main/serial_frames.cpp")
     osracer_launch = read_text(osracer_root / "osracer_bringup/launch/chassis_ackermann.launch.py")
     osracer_bridge = read_text(osracer_root / "osracer_bringup/script/chassis_ackermann.py")
@@ -96,6 +110,10 @@ def build_snapshot(osrcore_root, osracer_root):
             "stream_modes_documented": "stream sync|legacy|off" in (osrcore_protocol + osrcore_serial),
             "sync_frame_documented": "s px py pz vx vy vz yaw qx qy qz qw ax ay az gx gy gz" in osrcore_protocol,
             "sn_get_supported": "sn get" in (osrcore_protocol + osrcore_serial),
+            "fw_version_supported": "fw version" in (osrcore_protocol + osrcore_serial + osrcore_fw_update),
+            "projectver_documented": "ProjectVer" in osrcore_protocol,
+            "fw_version_projectver_output": "FW_VERSION:" in osrcore_fw_update and "ProjectVer=%s" in osrcore_fw_update,
+            "status_projectver_output": "FW: Product=%s" in osrcore_serial and "ProjectVer=%s" in osrcore_serial,
             "sync_frame_sender_present": "serial_frame_send_sync" in osrcore_frames,
         },
         "osracer_contract": {
@@ -104,9 +122,15 @@ def build_snapshot(osrcore_root, osracer_root):
             "launch_wheelbase_m": float(find_launch_default(osracer_launch, "wheelbase")),
             "launch_max_steering_angle_deg": float(find_launch_default(osracer_launch, "max_steering_angle_deg")),
             "launch_cmd_watchdog_timeout_s": float(find_launch_default(osracer_launch, "cmd_watchdog_timeout_s")),
+            "bridge_firmware_version_timeout_s": float(find_declared_parameter_default(osracer_bridge, "firmware_version_timeout_s")),
             "writes_v_command_speed_steering_deg": 'command = f"v {speed:.3f} {steering_angle_deg:.2f}' in osracer_bridge,
             "cmd_vel_writes_v_command": 'command = f"v {linear_x:.3f} {steering_angle_deg:.2f}' in osracer_bridge,
             "converts_ackermann_rad_to_deg": "steering_angle_deg = math.degrees(steering_angle_rad)" in osracer_bridge,
+            "queries_fw_version_on_startup": 'serial_conn.write(b"fw version\\n")' in osracer_bridge,
+            "logs_projectver_on_startup": "OSRCORE ProjectVer:" in osracer_bridge,
+            "forces_stream_sync_on_startup": 'self.write_serial("stream sync\\n")' in osracer_bridge,
+            "requests_initial_sync_frame": 'self.write_serial("s\\n")' in osracer_bridge,
+            "readme_documents_fw_version": "fw version" in osracer_readme and "ProjectVer" in osracer_readme,
             "readme_documents_stream_sync": "stream sync" in osracer_readme,
             "readme_documents_sync_frames": "s/m/r/b" in osracer_readme,
         },

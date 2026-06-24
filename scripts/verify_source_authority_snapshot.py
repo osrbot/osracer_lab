@@ -20,10 +20,19 @@ EXPECTED_TRUE = (
     ("osrcore_contract", "stream_modes_documented"),
     ("osrcore_contract", "sync_frame_documented"),
     ("osrcore_contract", "sn_get_supported"),
+    ("osrcore_contract", "fw_version_supported"),
+    ("osrcore_contract", "projectver_documented"),
+    ("osrcore_contract", "fw_version_projectver_output"),
+    ("osrcore_contract", "status_projectver_output"),
     ("osrcore_contract", "sync_frame_sender_present"),
     ("osracer_contract", "writes_v_command_speed_steering_deg"),
     ("osracer_contract", "cmd_vel_writes_v_command"),
     ("osracer_contract", "converts_ackermann_rad_to_deg"),
+    ("osracer_contract", "queries_fw_version_on_startup"),
+    ("osracer_contract", "logs_projectver_on_startup"),
+    ("osracer_contract", "forces_stream_sync_on_startup"),
+    ("osracer_contract", "requests_initial_sync_frame"),
+    ("osracer_contract", "readme_documents_fw_version"),
     ("osracer_contract", "readme_documents_stream_sync"),
     ("osracer_contract", "readme_documents_sync_frames"),
 )
@@ -60,6 +69,19 @@ def find_default_launch_value(text, argument_name):
     match = pattern.search(text)
     if not match:
         raise ValueError(f"Launch argument not found: {argument_name}")
+    return ast.literal_eval(match.group(1).strip())
+
+
+def find_declared_parameter_default(text, parameter_name):
+    pattern = re.compile(
+        r"declare_parameter\(\s*['\"]"
+        + re.escape(parameter_name)
+        + r"['\"]\s*,\s*([^)]+)\)",
+        re.DOTALL,
+    )
+    match = pattern.search(text)
+    if not match:
+        raise ValueError(f"Declared parameter not found: {parameter_name}")
     return ast.literal_eval(match.group(1).strip())
 
 
@@ -122,14 +144,22 @@ def main():
     expect_float("snapshot.launch_wheelbase_m", osracer.get("launch_wheelbase_m"), chassis["wheelbase_m"], failures)
     expect_float("snapshot.launch_max_steering_angle_deg", osracer.get("launch_max_steering_angle_deg"), 30.0, failures)
     expect_float("snapshot.launch_cmd_watchdog_timeout_s", osracer.get("launch_cmd_watchdog_timeout_s"), runtime["command_watchdog_timeout_s"], failures)
+    expect_float("snapshot.bridge_firmware_version_timeout_s", osracer.get("bridge_firmware_version_timeout_s"), runtime["firmware_version_timeout_s"], failures)
 
     osracer_root = Path(args.osracer_root)
     launch_text = read_text(osracer_root / "osracer_bringup/launch/chassis_ackermann.launch.py")
+    bridge_text = read_text(osracer_root / "osracer_bringup/script/chassis_ackermann.py")
     expect_equal("current.launch_port_name", find_default_launch_value(launch_text, "port_name"), osracer.get("launch_port_name"), failures)
     expect_equal("current.launch_baud_rate", int(find_default_launch_value(launch_text, "baud_rate")), osracer.get("launch_baud_rate"), failures)
     expect_float("current.launch_wheelbase_m", find_default_launch_value(launch_text, "wheelbase"), osracer.get("launch_wheelbase_m"), failures)
     expect_float("current.launch_max_steering_angle_deg", find_default_launch_value(launch_text, "max_steering_angle_deg"), osracer.get("launch_max_steering_angle_deg"), failures)
     expect_float("current.launch_cmd_watchdog_timeout_s", find_default_launch_value(launch_text, "cmd_watchdog_timeout_s"), osracer.get("launch_cmd_watchdog_timeout_s"), failures)
+    expect_float(
+        "current.bridge_firmware_version_timeout_s",
+        find_declared_parameter_default(bridge_text, "firmware_version_timeout_s"),
+        osracer.get("bridge_firmware_version_timeout_s"),
+        failures,
+    )
 
     if failures:
         print(f"[FAIL] source authority snapshot verification failed: {len(failures)} issue(s)")

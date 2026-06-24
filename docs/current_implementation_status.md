@@ -4,18 +4,20 @@ Date: 2026-06-24
 
 This document summarizes the current local implementation state across:
 
-- `/home/osrbot/Desktop/osracer/osracer_lab`
-- `/home/osrbot/Desktop/osracer/osracer`
+- `https://github.com/osrbot/osracer_lab`
+- `https://github.com/osrbot/osracer/tree/feat-demo`
+- `https://github.com/osrbot/osrcore`
 
-Do not treat this as push approval. Both repositories are still local-ahead only.
+`osracer_lab` is now a public repository. Do not treat this document as push
+approval; always check local git state before pushing.
 
 ## Current Git State
 
 | Repository | Branch | State |
 |---|---|---|
-| `osracer_lab` | `main` | local-ahead push-prep state; run `git status --short --branch` before pushing |
-| `osracer` on server | `feat-demo` | synchronized to Mac/GitHub `feat-demo` at `7b92682`; server is not used for `feat-demo` push |
-| `osracer` on Mac | `feat-demo` at `/Users/winter/.codex/worktrees/904a/osracer` | authoritative local push-prep worktree for `feat-demo`, currently `7b92682` |
+| `osracer_lab` | `main` | public GitHub repo; source snapshot updated against current authority repos |
+| `osrcore` | `main` | source authority snapshot at `729a6c2` |
+| `osracer` | `feat-demo` | source authority snapshot at `a901398` |
 
 ## Implemented In `osracer_lab`
 
@@ -32,6 +34,8 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Read-only local source authority snapshot: `docs/source_authority_snapshot.json`
 - Source authority snapshot generator: `scripts/create_source_authority_snapshot.py`
 - Source authority snapshot verifier: `scripts/verify_source_authority_snapshot.py`
+  - Verifies `fw version` / `ProjectVer` support in `osrcore`.
+  - Verifies `osracer feat-demo` logs `OSRCORE ProjectVer` and restores `stream sync` on serial startup.
 - Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
   - Reports measured sensor extrinsics application as an explicit gate.
@@ -64,6 +68,15 @@ Do not treat this as push approval. Both repositories are still local-ahead only
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
   - Includes `source_authority_snapshot.json` when available.
 - Documentation:
+  - MkDocs site: `mkdocs.yml`, `docs/index.md`
+  - `docs/getting-started.md`
+  - `docs/installation.md`
+  - `docs/training.md`
+  - `docs/real-car.md`
+  - `docs/sim2real.md`
+  - `docs/sim2sim.md`
+  - `docs/calibration.md`
+  - `docs/troubleshooting.md`
   - `docs/deployment.md`
   - `docs/hardware_parameters.md`
   - `docs/mujoco_sim2sim.md`
@@ -109,7 +122,7 @@ Do not treat this as push approval. Both repositories are still local-ahead only
   - Rechecks archived visual deployment packages for camera calibration evidence.
   - Rechecks archived Jetson performance profile and TensorRT build report semantics.
 - Jetson runtime plan: `docs/jetson_orin_runtime.md`
-  - Jetson documentation changes are merged into Mac `feat-demo` at `/Users/winter/.codex/worktrees/904a/osracer`; the server `feat-demo` is kept synchronized but is not used for pushing.
+  - Jetson documentation lives in `osracer` `feat-demo`; use a current clean checkout before preparing host-side changes.
 
 ## Verified Commands
 

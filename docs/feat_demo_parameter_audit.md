@@ -4,9 +4,8 @@ Date: 2026-06-24
 
 Authority checked:
 
-- Mac `feat-demo`: `/Users/winter/.codex/worktrees/904a/osracer` at `7b92682`
-- Server `feat-demo` mirror: `/home/osrbot/Desktop/osracer/osracer` at `7b92682`
-- Firmware authority snapshot source: local read-only `osrcore` at `9742339`
+- `feat-demo`: `osrbot/osracer` at `a901398`
+- Firmware authority snapshot source: local read-only `osrcore` at `729a6c2`
 - Isaac/tooling repo: `/home/osrbot/Desktop/osracer/osracer_lab`
 
 ## Matched Runtime Parameters
@@ -19,6 +18,7 @@ Authority checked:
 | Serial baud | `460800` | `460800` |
 | Command protocol | `v <speed_mps> <steering_deg>` | same |
 | Command watchdog | `0.5 s` | `0.5 s` |
+| Firmware version startup query | `fw version`, logs `OSRCORE ProjectVer` | same |
 | Wheelbase | `0.285 m` | `0.285 m` |
 | Bridge steering clamp | `30 deg` | `30 deg` |
 | Policy steering envelope | `0.488 rad` | `0.488 rad` |
@@ -36,7 +36,7 @@ Authority checked:
 |---|---|---|
 | AR0234 camera | model `DCXG200`, global shutter, `1920x1200`, `2.7 mm`, advertised `130 deg`, UVC, MJPG/YUY2, runtime `640x480@120` | Calibration still required at deployed resolution. |
 | 25m lidar | `270 deg`, `0.1/0.25 deg`, `10/20/25/30 Hz`, `25 m @ 70%`, `15 m @ 10%`, Class 1, IP65 | Lab conservative scan model uses `0.25 deg`, `10 Hz`, `25 m`, `1081` rays. |
-| Chassis/firmware | `SERIAL_TIMEOUT=500 ms`, steering PWM `1000/1500/2000`, trim `0 deg`, encoder `1024 PPR`, gear ratio `10.55`, firmware wheel radius `0.0425 m`, PID `425.0/8.4/20.6`, QMI8658 IMU | Snapshot derived from `osrcore`. |
+| Chassis/firmware | `SERIAL_TIMEOUT=500 ms`, steering PWM `1000/1500/2000`, trim `0 deg`, encoder `1024 PPR`, gear ratio `10.55`, firmware wheel radius `0.0425 m`, PID `425.0/8.4/20.6`, QMI8658 IMU, `fw version` / `ProjectVer` | Snapshot derived from `osrcore`. |
 
 ## Known Mismatches
 

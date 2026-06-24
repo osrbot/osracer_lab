@@ -1,0 +1,42 @@
+site_name: OSRacer Isaac Lab
+site_description: Isaac Lab training, sim2sim, and sim2real workflow for OSRacer Ackermann vehicles.
+site_url: https://osrbot.github.io/osracer_lab/
+repo_name: osrbot/osracer_lab
+repo_url: https://github.com/osrbot/osracer_lab
+edit_uri: edit/main/docs/
+
+theme:
+  name: mkdocs
+  language: zh
+
+nav:
+  - 首页: index.md
+  - 快速开始: getting-started.md
+  - 安装环境: installation.md
+  - 训练与导出: training.md
+  - 实车参数: real-car.md
+  - Sim2Sim: sim2sim.md
+  - Sim2Real / Jetson: sim2real.md
+  - 标定流程: calibration.md
+  - 常见问题: troubleshooting.md
+  - 参考文档:
+      - 当前状态: current_implementation_status.md
+      - 硬件参数: hardware_parameters.md
+      - feat-demo 参数审计: feat_demo_parameter_audit.md
+      - 部署合同: deployment.md
+      - MuJoCo Sim2Sim: mujoco_sim2sim.md
+      - 外参对齐: extrinsics_alignment.md
+      - 实车测量清单: real_car_measurement_checklist.md
+      - 参数填写表: real_car_parameter_fill_sheet.md
+      - 推送准备: handoff_push_readiness.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - fenced_code
+  - toc:
+      permalink: true
+
+extra_css:
+  - stylesheets/extra.css

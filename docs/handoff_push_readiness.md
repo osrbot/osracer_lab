@@ -10,21 +10,19 @@ It is not push approval.
 
 | Area | Path | Branch | Role |
 |---|---|---|---|
-| Isaac / sim / deployment tooling | `/home/osrbot/Desktop/osracer/osracer_lab` | `main` | Primary development tree for OSRacer Isaac tooling |
-| ROS upper computer on server | `/home/osrbot/Desktop/osracer/osracer` | `feat-demo` | Server mirror for vehicle ROS bringup, Jetson tools, first-drive gates; do not push `feat-demo` from here |
-| ROS upper computer on Mac | `/Users/winter/.codex/worktrees/904a/osracer` | `feat-demo` | Authoritative local push-prep worktree for `feat-demo` |
-| Firmware source authority | `/home/osrbot/Desktop/osracer/osrcore` | source checkout | Read-only authority for firmware protocol and steering units |
+| Isaac / sim / deployment tooling | `https://github.com/osrbot/osracer_lab` | `main` | Primary public repository for OSRacer Isaac tooling |
+| ROS upper computer | `https://github.com/osrbot/osracer/tree/feat-demo` | `feat-demo` | Vehicle ROS bringup, Jetson tools, first-drive gates |
+| Firmware source authority | `https://github.com/osrbot/osrcore` | `main` | Read-only authority for firmware protocol and steering units |
 
 `osracer` must stay on `feat-demo`. Do not use another ROS branch as the vehicle
 source of truth for this work.
 
 ## Current State
 
-- `osracer_lab` is locally ahead of origin and contains the IsaacLab, measurement,
-  deployment, calibration review, MuJoCo sim2sim, and source-authority tooling.
-- `osracer` `feat-demo` is locally ahead of its public baseline and contains the
-  Jetson runtime, deployment verification, TensorRT, benchmark, and first-drive
-  evidence tooling.
+- `osracer_lab` is public and contains the IsaacLab, measurement, deployment,
+  calibration review, MuJoCo sim2sim, and source-authority tooling.
+- `osracer` `feat-demo` contains the Jetson runtime, deployment verification,
+  TensorRT, benchmark, and first-drive evidence tooling.
 - The current readiness target is offline replay, evidence collection, and
   conservative first-drive preparation.
 - Calibrated closed-loop sim2real is still blocked until real measurements,
