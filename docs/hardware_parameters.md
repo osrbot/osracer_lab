@@ -111,6 +111,39 @@ Values confirmed from `osracer` `feat-demo` upper-computer code and `osrcore` fi
 The bridge accepts `AckermannDrive.steering_angle` in radians, clamps it by
 `max_steering_angle_deg=30.0`, then sends steering to firmware in degrees.
 
+## Firmware Control Parameters
+
+Additional values read from local read-only `osrcore` at `9742339`:
+
+| Area | Parameter | Value |
+|---|---|---:|
+| Encoder | A/B GPIO | `3 / 9` |
+| Encoder | PPR | `1024` |
+| Encoder | Gear ratio | `10.55` |
+| Encoder | Firmware wheel radius | `0.0425 m` |
+| Encoder | Speed calculation interval | `20 ms` |
+| Speed PID | `kp / ki / kd` | `425.0 / 8.4 / 20.6` |
+| Speed PID | Control interval | `20 ms` |
+| Speed PID | PID deadband | `0.05 m/s` |
+| Speed limit | Firmware forward / reverse clamp | `+6.0 / -6.0 m/s` |
+| Throttle PWM | `min / neutral / max` | `1000 / 1500 / 2000 us` |
+| Steering PWM | `min / center / max` | `1000 / 1500 / 2000 us` |
+| Steering | Firmware max steering | `30 deg` |
+| Steering | Trim default / range | `0 deg`, `-5..5 deg` |
+| SBUS | Baud / format | `100000`, `8E2 inverted Futaba SBUS` |
+| SBUS | Range | `240..1810` |
+| SBUS | CH0 / CH2 / CH6 / CH7 | steering / throttle / control mode / speed mode |
+| SBUS | Reduced speed mode | `15%` scale |
+| IMU | Model / address | `QMI8658`, `0x6B` |
+| IMU | Accel / gyro range | `+-4 g`, `+-1024 dps` |
+| IMU | ODR / average samples | `1000 Hz`, `5 samples` |
+| IMU heater | target / warm / stable | `56 C / 38 C / 54 C` |
+| Battery | Low voltage / recover | `10.8 V / 11.1 V` |
+| Telemetry | sync / IMU / odom / mag / RC / battery | `5 / 5 / 20 / 50 / 100 / 2000 ms` |
+| Safety | Serial command timeout | `500 ms` |
+
+Do not directly replace the IsaacLab `wheel_radius_m=0.050` with the firmware encoder radius yet. The firmware and `osracer_sim` currently use `0.0425 m`, while the lab visual/physics source uses `0.050 m`; this must be resolved by measuring the loaded tire radius and deciding whether the value represents encoder odometry, collision geometry, or both.
+
 ## Sensor Extrinsics
 
 There is a current source-of-truth conflict that must be resolved before

@@ -36,12 +36,12 @@ Authority checked:
 |---|---|---|
 | AR0234 camera | model `DCXG200`, global shutter, `1920x1200`, `2.7 mm`, advertised `130 deg`, UVC, MJPG/YUY2, runtime `640x480@120` | Calibration still required at deployed resolution. |
 | 25m lidar | `270 deg`, `0.1/0.25 deg`, `10/20/25/30 Hz`, `25 m @ 70%`, `15 m @ 10%`, Class 1, IP65 | Lab conservative scan model uses `0.25 deg`, `10 Hz`, `25 m`, `1081` rays. |
-| Chassis/firmware | `SERIAL_TIMEOUT=500 ms`, steering PWM `1000/1500/2000`, trim `0 deg` | Snapshot derived from `osrcore`. |
+| Chassis/firmware | `SERIAL_TIMEOUT=500 ms`, steering PWM `1000/1500/2000`, trim `0 deg`, encoder `1024 PPR`, gear ratio `10.55`, firmware wheel radius `0.0425 m`, PID `425.0/8.4/20.6`, QMI8658 IMU | Snapshot derived from `osrcore`. |
 
 ## Known Mismatches
 
-- `osracer_sim` kinematic simulator still uses `track_width=0.215 m` and `wheel_radius=0.0425 m`.
-- `osracer_lab` chassis parameters use `rear_track_m=0.235 m` and `wheel_radius_m=0.050 m`.
+- `osracer_sim` kinematic simulator and `osrcore` encoder odometry use `wheel_radius=0.0425 m`; `osracer_sim` also uses `track_width=0.215 m`.
+- `osracer_lab` chassis parameters use `rear_track_m=0.235 m` and `wheel_radius_m=0.050 m` for the current Isaac/URDF model.
 - This is not a source-code conflict yet because the kinematic simulator is a lightweight ROS sim, but it should not be treated as calibrated sim2real until real measurements choose the authoritative values.
 - Sensor extrinsics still conflict between URDF and static TF:
   - `base_link -> camera_link`
@@ -63,7 +63,7 @@ These items are still required before calibrated closed-loop sim2real:
 9. True max speed and minimum stable speed on ground.
 10. Throttle deadband and response delay.
 11. Encoder ticks per revolution and mount location.
-12. IMU model, rate, accel/gyro ranges, and frame alignment.
+12. IMU physical frame alignment and measured timing. Firmware reports QMI8658, 1000 Hz ODR, +-4 g accel, +-1024 dps gyro.
 13. Camera calibration at runtime resolution: `fx`, `fy`, `cx`, `cy`, distortion model, coefficients.
 14. Measured camera/lidar/IMU extrinsics in `base_link`.
 15. Serial command latency report from the actual firmware.
