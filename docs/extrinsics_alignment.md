@@ -27,7 +27,7 @@ Recommended order:
 2. Decide the sign convention and axes using ROS REP-103 frames.
 3. Update the OSRacer ROS description and static TF path so they agree.
 4. Update `osracer_lab_assets.hardware_params.OSRACER_SENSOR_EXTRINSICS`.
-5. Run the strict runtime contract check.
+5. Run the strict runtime interface check.
 
 ## Measurement Notes
 
@@ -118,7 +118,7 @@ python3 scripts/check_runtime_contract.py \
 
 Pass condition:
 
-- Normal runtime contract check passes.
+- Normal runtime interface check passes.
 - Strict extrinsics check passes.
 - `docs/hardware_parameters.md` no longer lists conflicting values for the
   active source of truth.

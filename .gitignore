@@ -9,6 +9,9 @@ logs/
 outputs/
 wandb/
 *.usd.tmp
+node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
 
 # IsaacLab URDF->USD conversion cache (runtime generated)
 source/osracer_lab_assets/data/Robots/OSRacer/usd/

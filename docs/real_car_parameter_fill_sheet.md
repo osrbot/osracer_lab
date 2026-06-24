@@ -34,7 +34,7 @@ Wheel radius is not resolved yet. `osrcore` encoder odometry and `osracer_sim`
 use `0.0425 m`; IsaacLab currently uses `0.050 m`. Measure the loaded tire
 radius before changing either value.
 
-### Runtime Contract
+### Runtime Interface
 
 | Parameter | Value |
 |---|---|

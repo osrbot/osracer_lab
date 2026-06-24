@@ -12,7 +12,7 @@ This repository is the training and validation layer. It is designed to work wit
 
 ## Documentation
 
-The beginner documentation is built with MkDocs:
+The beginner documentation is built with VitePress:
 
 - Online site target: `https://osrbot.github.io/osracer_lab/`
 - Local source: [`docs/index.md`](docs/index.md)
@@ -21,8 +21,8 @@ The beginner documentation is built with MkDocs:
 Build locally:
 
 ```bash
-pip install mkdocs
-mkdocs serve
+npm install
+npm run docs:dev
 ```
 
 ## Quick Start
@@ -76,9 +76,9 @@ Export a checkpoint:
   --headless --checkpoint logs/rsl_rl/osracer_drift/<run>/model_1999.pt
 ```
 
-## Real-Car Contract
+## Real-Car Runtime Interface
 
-Current runtime contract:
+Current runtime interface:
 
 | Item | Value |
 |---|---|
@@ -101,7 +101,7 @@ source/osracer_lab_assets/      Robot URDF, meshes, USD, ArticulationCfg
 source/osracer_lab_tasks/       Task environments, MDP modules
 source/osracer_lab_rl/          RSL-RL startup helpers
 scripts/                        Training, export, validation, sim2real tools
-docs/                           MkDocs site and reference docs
+docs/                           VitePress site and reference docs
 ```
 
 ## Validation

@@ -1,14 +1,14 @@
 # MuJoCo Sim2Sim Plan
 
-This repository keeps IsaacLab as the high-throughput training simulator. MuJoCo is used as a second simulator to catch action-contract, geometry, and dynamics mistakes before real-car tests.
+This repository keeps IsaacLab as the high-throughput training simulator. MuJoCo is used as a second simulator to catch action-interface, geometry, and dynamics mistakes before real-car tests.
 
 ## Current Scope
 
-The current MuJoCo support is a kinematic contract smoke test:
+The current MuJoCo support is a kinematic interface smoke test:
 
 - It reuses `osracer_lab_assets.hardware_params`.
 - It generates a minimal MJCF model with the same wheelbase, rear track, wheel radius, steering clamp, and speed envelope.
-- It keeps the action contract as `[target_speed_mps, target_steering_rad]`.
+- It keeps the action interface as `[target_speed_mps, target_steering_rad]`.
 - It compiles the MJCF and can run a short planar Ackermann rollout when the `mujoco` Python package is installed.
 
 It is not yet a calibrated contact dynamics model. Mass, steering response, motor/ESC response, tire friction, and sensor extrinsics still need real measurements before wheel-ground contact dynamics should be enabled.

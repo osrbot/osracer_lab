@@ -13,8 +13,9 @@
 | ROS 实车仓库 | `osrbot/osracer` 的 `feat-demo` 分支 |
 | 固件仓库 | `osrbot/osrcore` 的 `main` 分支 |
 
-!!! note
-    训练在服务器上做，Jetson 负责部署推理和实车传感器。不要在 Jetson Orin Nano Super 8G 上跑大规模 Isaac Lab 训练。
+::: info
+训练在服务器上做，Jetson 负责部署推理和实车传感器。不要在 Jetson Orin Nano Super 8G 上跑大规模 Isaac Lab 训练。
+:::
 
 ## 1. 克隆仓库
 
@@ -71,8 +72,8 @@ scripts/validate_osracer_lab.sh runtime-contract
 这三步用于确认：
 
 - Python 文件和包结构基本正确
-- `osrcore` / `osracer feat-demo` 的协议合同还一致
-- ROS 实车合同与 lab 参数还一致
+- `osrcore` / `osracer feat-demo` 的协议接口约定还一致
+- ROS 实车接口约定与 lab 参数还一致
 
 ## 6. 跑 drift smoke
 

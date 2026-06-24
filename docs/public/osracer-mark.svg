@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="OSRacer">
+  <defs>
+    <linearGradient id="g" x1="20" y1="20" x2="140" y2="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff3b30"/>
+      <stop offset="0.55" stop-color="#ffd166"/>
+      <stop offset="1" stop-color="#2ec4ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="34" fill="#080b10"/>
+  <path d="M31 96c6-30 24-48 54-54 20-4 36 0 49 11-19-2-35 1-49 9-18 10-30 25-37 45H31Z" fill="url(#g)"/>
+  <path d="M37 104h86c8 0 14 6 14 14H23c0-8 6-14 14-14Z" fill="#f7fbff"/>
+  <circle cx="55" cy="119" r="12" fill="#080b10" stroke="#2ec4ff" stroke-width="5"/>
+  <circle cx="113" cy="119" r="12" fill="#080b10" stroke="#ff3b30" stroke-width="5"/>
+  <path d="M72 80h48" stroke="#f7fbff" stroke-width="9" stroke-linecap="round"/>
+</svg>

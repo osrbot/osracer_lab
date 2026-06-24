@@ -30,7 +30,7 @@ source of truth for this work.
 
 ## Recommended Execution Order
 
-1. Confirm source authority and runtime contract in `osracer_lab`:
+1. Confirm source authority and runtime interface in `osracer_lab`:
 
    ```bash
    cd /home/osrbot/Desktop/osracer/osracer_lab

@@ -62,7 +62,7 @@ review pack 用来在真正写回 URDF/static TF 前检查：
 
 `sim2real-readiness` 里至少这些项必须通过：
 
-- runtime contract
+- runtime interface
 - required real measurements
 - measured sensor extrinsics applied
 - strict extrinsics

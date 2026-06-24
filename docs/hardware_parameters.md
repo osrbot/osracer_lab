@@ -9,7 +9,7 @@ Use `docs/extrinsics_alignment.md` to resolve the current camera, lidar, and IMU
 - Firmware source of truth: `https://github.com/osrbot/osrcore` on `main`.
 - ROS upper-computer source of truth: `https://github.com/osrbot/osracer/tree/feat-demo`.
 - Do not derive vehicle protocol or runtime parameters from `osracer dev` or another branch.
-- The current firmware serial contract is `v <vx_m/s> <steer_deg>`, `stream sync|legacy|off`, `s/m/r/b` telemetry, and `460800` baud on `/dev/osrbot_base` from the ROS side.
+- The current firmware serial interface is `v <vx_m/s> <steer_deg>`, `stream sync|legacy|off`, `s/m/r/b` telemetry, and `460800` baud on `/dev/osrbot_base` from the ROS side.
 
 
 ## Chassis Parameters
@@ -87,7 +87,7 @@ alignment issues before closed-loop tests; switch the scan config to `0.1 deg`
 or a faster rate only after the physical unit is configured and measured that
 way.
 
-## Real Runtime Contract
+## Real Runtime Interface
 
 Values confirmed from `osracer` `feat-demo` upper-computer code and `osrcore` firmware protocol:
 
@@ -149,7 +149,7 @@ Additional values read from local read-only `osrcore` at `729a6c2`:
 
 Firmware version reporting:
 
-| Command / source | Output contract |
+| Command / source | Output interface |
 |---|---|
 | `fw version` | `FW_VERSION: Product=..., Firmware=..., Hardware=..., ProjectVer=..., Release=..., Git=..., Dirty=..., Build=..., IDF=...` |
 | `status` | includes `FW: Product=..., Firmware=..., Hardware=..., Version=..., Git=..., Dirty=..., Build=..., ProjectVer=...` |
@@ -192,7 +192,7 @@ These values are still required before the sim2real model should be considered c
 ## Use In The Pipeline
 
 - IsaacLab: keep high-throughput training on the RTX 4080 SUPER and keep these parameters as the reference for task updates.
-- MuJoCo: build the second simulator against the same action contract and hardware parameter source.
+- MuJoCo: build the second simulator against the same action interface and hardware parameter source.
 - Jetson: deploy only exported TorchScript/ONNX/TensorRT policies; do not train on Jetson.
 - Real car: run passive logging and offline replay before enabling closed-loop `/ackermann_cmd`.
 

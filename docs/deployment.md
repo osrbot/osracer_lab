@@ -1,10 +1,10 @@
-# OSRacer Policy Deployment Notes
+# OSRacer 策略部署接口约定
 
-This repository currently verifies training and simulation and ships a checkpoint export script.
-The sibling ROS 2 workspace `/home/osrbot/Desktop/osracer/osracer` ships the runtime inference node and CSV replay tool.
-Use this document as the deployment contract between training, export, replay, and real-car bringup.
+本文档说明训练、导出、离线 replay 和实车 bringup 之间的接口约定。
+当前仓库负责训练与仿真验证，并提供 checkpoint 导出脚本。
+ROS 2 上位机工作区 `/home/osrbot/Desktop/osracer/osracer` 负责运行时推理节点和 CSV replay 工具。
 
-## Current Verified Artifacts
+## 当前已验证产物
 
 - Drift baseline: `logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt`
   - Command: `scripts/train_osracer_drift.py --headless --num_envs 2048 --max_iterations 2000`
@@ -16,15 +16,15 @@ Use this document as the deployment contract between training, export, replay, a
   - Command: `scripts/train_osracer_drift.py --task Isaac-OSRacerVisualRL-v0 --headless --num_envs 512 --max_iterations 10`
   - Result: completed successfully; this is a throughput probe, not a trained policy.
 
-## Action Contract
+## 动作接口
 
-The IsaacLab action is two-dimensional:
+Isaac Lab 策略输出是二维动作：
 
 ```text
 [target_speed_mps, target_steering_rad]
 ```
 
-Current simulation limits are defined in `source/osracer_lab_tasks/osracer_lab_tasks/common/actions.py`:
+当前仿真限制定义在 `source/osracer_lab_tasks/osracer_lab_tasks/common/actions.py`：
 
 ```text
 max speed:    3.0 m/s
@@ -34,25 +34,25 @@ rear track:   0.235 m
 wheel radius: 0.050 m
 ```
 
-The real OSRacer ROS 2 bridge in `/home/osrbot/Desktop/osracer/osracer` accepts both:
+实车 ROS 2 bridge 在 `/home/osrbot/Desktop/osracer/osracer` 中，当前接受两种输入：
 
 - `ackermann_msgs/msg/AckermannDrive` on `ackermann_cmd`
 - `geometry_msgs/msg/Twist` on `cmd_vel`
 
-Preferred deployment path for a learned policy is direct `AckermannDrive`:
+学习策略的推荐部署路径是直接发布 `AckermannDrive`：
 
 ```text
 policy action[0] -> AckermannDrive.speed
 policy action[1] -> AckermannDrive.steering_angle
 ```
 
-The chassis bridge converts `AckermannDrive` to the firmware serial command:
+底盘 bridge 会把 `AckermannDrive` 转成固件串口命令：
 
 ```text
 v <speed_mps> <steering_deg>
 ```
 
-The launch defaults in `osracer_bringup/launch/chassis_ackermann.launch.py` are:
+`osracer_bringup/launch/chassis_ackermann.launch.py` 的默认参数是：
 
 ```text
 port_name: /dev/osrbot_base
@@ -62,9 +62,9 @@ max_steering_angle_deg: 30.0
 cmd_watchdog_timeout_s: 0.5
 ```
 
-Note: the simulation steering limit `0.488 rad` is about 27.96 deg, slightly below the bridge clamp of 30 deg.
+注意：仿真转向限制 `0.488 rad` 约等于 `27.96 deg`，略低于 bridge 中 `30 deg` 的限幅。
 
-## Recommended ROS 2 Integration Shape
+## 推荐 ROS 2 接入方式
 
 Export a checkpoint before integrating with ROS 2:
 
@@ -190,6 +190,6 @@ scripts/validate_osracer_lab.sh sim2real-readiness
 The ROS 2 runtime path now exists in the sibling OSRacer workspace. Remaining work is validation and model fidelity:
 
 1. Fill the missing real-car mass, steering, motor, encoder, IMU, extrinsic, and timing parameters.
-2. Extend the MuJoCo sim2sim smoke model in `docs/mujoco_sim2sim.md` into calibrated rollouts with the same action and observation contract.
+2. Extend the MuJoCo sim2sim smoke model in `docs/mujoco_sim2sim.md` into calibrated rollouts with the same action and observation interface.
 3. Replay recorded real-car observations through exported `policy.pt` before closed-loop driving.
 4. Add a low-speed real-car checklist tied to `/ackermann_cmd`.

@@ -26,7 +26,7 @@ approval; always check local git state before pushing.
 - Hardware parameter JSON export: `scripts/export_hardware_params.py`
 - AR0234-derived IsaacLab pinhole camera helper: `ar0234_pinhole_camera_cfg()`
 - 25m lidar planar scan helper: `lidar_25m_planar_scan_cfg()`
-- Simulation sensor contract check: `scripts/check_sim_sensor_contract.py`
+- Simulation sensor interface consistency check: `scripts/check_sim_sensor_contract.py`
 - MuJoCo kinematic sim2sim smoke with measured overlay support: `scripts/mujoco_sim2sim_smoke.py`
 - Observation replay to MuJoCo pipeline: `scripts/run_sim2real_replay_pipeline.py`
 - Source authority check for `osrcore` and `osracer feat-demo`: `scripts/check_source_authority.py`
@@ -36,7 +36,7 @@ approval; always check local git state before pushing.
 - Source authority snapshot verifier: `scripts/verify_source_authority_snapshot.py`
   - Verifies `fw version` / `ProjectVer` support in `osrcore`.
   - Verifies `osracer feat-demo` logs `OSRCORE ProjectVer` and restores `stream sync` on serial startup.
-- Runtime contract check against the upper-computer repo: `scripts/check_runtime_contract.py`
+- Runtime interface consistency check against the upper-computer repo: `scripts/check_runtime_contract.py`
 - Sim2real readiness summary: `scripts/sim2real_readiness.py`
   - Reports measured sensor extrinsics application as an explicit gate.
 - Hardware params loader for non-Isaac CLI tools: `scripts/hardware_params_loader.py`
@@ -68,7 +68,7 @@ approval; always check local git state before pushing.
 - Jetson deployment package creation: `scripts/package_jetson_deployment.py`
   - Includes `source_authority_snapshot.json` when available.
 - Documentation:
-  - MkDocs site: `mkdocs.yml`, `docs/index.md`
+  - VitePress site: `package.json`, `docs/.vitepress/config.mts`, `docs/index.md`
   - `docs/getting-started.md`
   - `docs/installation.md`
   - `docs/training.md`
