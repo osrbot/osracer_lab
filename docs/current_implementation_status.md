@@ -1,183 +1,104 @@
-# OSRacer Isaac / Jetson Implementation Status
+# OSRacer Isaac / Jetson 当前实现状态
 
-Date: 2026-06-24
+日期：2026-06-24
 
-This document summarizes the current local implementation state across:
+本文记录 `osracer_lab`、`osracer feat-demo` 和 `osrcore` 当前已经实现和验证的内容。它不是推送授权；每次推送前仍必须重新检查本地 git 状态。
 
-- `https://github.com/osrbot/osracer_lab`
-- `https://github.com/osrbot/osracer/tree/feat-demo`
-- `https://github.com/osrbot/osrcore`
+## 当前仓库状态
 
-`osracer_lab` is now a public repository. Do not treat this document as push
-approval; always check local git state before pushing.
-
-## Current Git State
-
-| Repository | Branch | State |
+| 仓库 | 分支 | 状态 |
 |---|---|---|
-| `osracer_lab` | `main` | public GitHub repo; source snapshot updated against current authority repos |
-| `osrcore` | `main` | source authority snapshot at `729a6c2` |
-| `osracer` | `feat-demo` | source authority snapshot at `a901398` |
+| `osracer_lab` | `main` | 公开仓库，已接入 VitePress 文档站 |
+| `osrcore` | `main` | 参数快照基于 `729a6c2` |
+| `osracer` | `feat-demo` | 参数快照基于 `a901398` |
 
-## Implemented In `osracer_lab`
+## `osracer_lab` 已实现
 
-- TorchScript policy export: `scripts/export_osracer_policy.py`
-- Hardware parameter source: `source/osracer_lab_assets/osracer_lab_assets/hardware_params.py`
-- Hardware parameter JSON export: `scripts/export_hardware_params.py`
-- AR0234-derived IsaacLab pinhole camera helper: `ar0234_pinhole_camera_cfg()`
-- 25m lidar planar scan helper: `lidar_25m_planar_scan_cfg()`
-- Simulation sensor interface consistency check: `scripts/check_sim_sensor_contract.py`
-- MuJoCo kinematic sim2sim smoke with measured overlay support: `scripts/mujoco_sim2sim_smoke.py`
-- Observation replay to MuJoCo pipeline: `scripts/run_sim2real_replay_pipeline.py`
-- Source authority check for `osrcore` and `osracer feat-demo`: `scripts/check_source_authority.py`
-  - Defaults to sibling `/home/osrbot/Desktop/osracer/osrcore` for direct firmware checks when present.
-- Read-only local source authority snapshot: `docs/source_authority_snapshot.json`
-- Source authority snapshot generator: `scripts/create_source_authority_snapshot.py`
-- Source authority snapshot verifier: `scripts/verify_source_authority_snapshot.py`
-  - Verifies `fw version` / `ProjectVer` support in `osrcore`.
-  - Verifies `osracer feat-demo` logs `OSRCORE ProjectVer` and restores `stream sync` on serial startup.
-- Runtime interface consistency check against the upper-computer repo: `scripts/check_runtime_contract.py`
-- Sim2real readiness summary: `scripts/sim2real_readiness.py`
-  - Reports measured sensor extrinsics application as an explicit gate.
-- Hardware params loader for non-Isaac CLI tools: `scripts/hardware_params_loader.py`
-- Real-car measurement value validator: `scripts/validate_real_measurements.py`
-  - Checks cross-field consistency for speed envelope, steering symmetry, battery voltage order, camera runtime resolution, and serial latency/baud.
-- Measurement consistency self-check: `scripts/check_measurement_consistency.py`
-- Grouped real-car measurement gap report: `scripts/measurement_gap_report.py`
-- Real-car measurement seed generator: `scripts/collect_real_measurement_seed.py`
-  - Seeds firmware-derived steering protocol units from `docs/source_authority_snapshot.json` when available.
-- Field measurement pack generator: `scripts/create_measurement_pack.py`
-- Jetson sensor preflight measurement importer: `scripts/import_sensor_preflight_measurements.py`
-- Serial latency measurement importer: `scripts/import_serial_latency_measurement.py`
-- ROS CameraInfo calibration importer: `scripts/import_camera_info_calibration.py`
-- Combined measurement session importer: `scripts/import_measurement_session.py`
-  - Imports CameraInfo calibration when `tools.jetson_measurement_session.sh` captured it.
-  - Field measurement pack now shows explicit camera/lidar/IMU/odom topic arguments for the combined session.
-- Jetson environment evidence importer: `scripts/import_measurement_session.py` records `collection.jetson_environment`
-- Real-car measurement template: `docs/real_car_measurements.template.json`
-  - Includes camera intrinsics/distortion as a required visual sim2real measurement.
-- Sensor extrinsics measured-value checker/writer: `scripts/apply_sensor_extrinsics.py`
-- Calibration update dry-run planner: `scripts/plan_calibration_updates.py`
-- Measured parameter overlay export: `scripts/export_measured_overlay.py`
-- Camera calibration overlay gate: `scripts/check_camera_calibration_overlay.py`
-- Calibration review pack export: `scripts/create_calibration_review_pack.py`
-  - Includes `sensor_extrinsics_review.json` for measured-vs-URDF/static-TF alignment.
-  - Archives text evidence referenced by measurement-session collection metadata into `evidence/` plus `evidence_manifest.json`.
-- Calibration review pack verifier: `scripts/verify_calibration_review_pack.py`
-  - Rechecks required files, evidence hashes, summary consistency, and no-writeback flag.
-- Jetson deployment package creation: `scripts/package_jetson_deployment.py`
-  - Includes `source_authority_snapshot.json` when available.
-- Documentation:
-  - VitePress site: `package.json`, `docs/.vitepress/config.mts`, `docs/index.md`
-  - `docs/getting-started.md`
-  - `docs/installation.md`
-  - `docs/training.md`
-  - `docs/real-car.md`
-  - `docs/sim2real.md`
-  - `docs/sim2sim.md`
-  - `docs/calibration.md`
-  - `docs/troubleshooting.md`
-  - `docs/deployment.md`
-  - `docs/hardware_parameters.md`
-  - `docs/mujoco_sim2sim.md`
-  - `docs/real_car_measurement_checklist.md`
-  - `docs/extrinsics_alignment.md`
-  - `docs/handoff_push_readiness.md`
+- 策略导出：`scripts/export_osracer_policy.py`
+- 硬件参数源：`source/osracer_lab_assets/osracer_lab_assets/hardware_params.py`
+- 硬件参数 JSON 导出：`scripts/export_hardware_params.py`
+- AR0234 相机配置辅助函数：`ar0234_pinhole_camera_cfg()`
+- 25m 雷达平面扫描配置：`lidar_25m_planar_scan_cfg()`
+- 仿真传感器接口一致性检查：`scripts/check_sim_sensor_contract.py`
+- MuJoCo 运动学 sim2sim smoke：`scripts/mujoco_sim2sim_smoke.py`
+- observation replay 到 MuJoCo：`scripts/run_sim2real_replay_pipeline.py`
+- `osrcore` 和 `osracer feat-demo` 来源检查：`scripts/check_source_authority.py`
+- 来源快照：`docs/source_authority_snapshot.json`
+- 来源快照生成与校验：
+  - `scripts/create_source_authority_snapshot.py`
+  - `scripts/verify_source_authority_snapshot.py`
+- 运行时接口一致性检查：`scripts/check_runtime_contract.py`
+- sim2real readiness 汇总：`scripts/sim2real_readiness.py`
+- 实车测量模板和校验：
+  - `docs/real_car_measurements.template.json`
+  - `scripts/validate_real_measurements.py`
+  - `scripts/measurement_gap_report.py`
+  - `scripts/check_measurement_consistency.py`
+- 实车测量包和导入工具：
+  - `scripts/create_measurement_pack.py`
+  - `scripts/import_sensor_preflight_measurements.py`
+  - `scripts/import_serial_latency_measurement.py`
+  - `scripts/import_camera_info_calibration.py`
+  - `scripts/import_measurement_session.py`
+- 标定与 review pack：
+  - `scripts/apply_sensor_extrinsics.py`
+  - `scripts/plan_calibration_updates.py`
+  - `scripts/export_measured_overlay.py`
+  - `scripts/check_camera_calibration_overlay.py`
+  - `scripts/create_calibration_review_pack.py`
+  - `scripts/verify_calibration_review_pack.py`
+- Jetson 部署包生成：`scripts/package_jetson_deployment.py`
+- VitePress 文档站：
+  - `package.json`
+  - `docs/.vitepress/config.mts`
+  - `docs/index.md`
+  - `docs/en/index.md`
 
-## Implemented In `osracer`
+## `osracer feat-demo` 已实现
 
-- TorchScript inference node and launch path for `/ackermann_cmd`
-- Policy observation recorder for real-car passive logs
-- CSV policy replay: `tools/policy_replay_csv.py`
-- Replay summary gate: `tools/policy_replay_summary.py`
-- Jetson preflight: `tools/jetson_preflight.sh --environment-output /tmp/osracer_jetson_environment.json`
-- Jetson environment report: `tools/jetson_environment_report.py`
-- Jetson measurement session now includes environment and CameraInfo evidence: `tools/jetson_measurement_session.sh`
-  - Accepts camera/lidar/IMU/odom topic overrides and records them in `measurement_session.json`.
-- Read-only real-car readiness check: `tools/real_car_readiness_check.sh`
-- Jetson runtime monitor and summary:
-  - `tools/jetson_runtime_monitor.sh`
-  - `tools/jetson_runtime_summary.py`
-- Jetson deployment package verifier: `tools/verify_jetson_deployment.py`
-  - Verifies packaged source authority snapshot when included.
-  - Requires CameraInfo-derived camera calibration for visual deployment packages.
-- Jetson performance profile helper: `tools/jetson_performance_profile.sh`
-  - Can write machine-readable JSON evidence with `--json-output`.
-- TensorRT engine build helper: `tools/build_tensorrt_engine.sh`
-  - Can write machine-readable build reports with `--report`.
-- Policy inference benchmark and trtexec log parser: `tools/benchmark_policy_inference.py`
-- First-drive runbook: `docs/first_drive_runbook.md`
-- First-drive go/no-go gate: `tools/first_drive_gate.py`
-  - Reports deployment package source authority snapshot as an explicit gate check.
-  - Reports visual camera calibration overlay as an explicit gate check.
-  - Reports policy inference p95 latency as an explicit gate check when supplied.
-  - Requires Jetson performance profile JSON evidence before first drive.
-  - Requires TensorRT build report evidence for ONNX deployment packages.
-- First-drive evidence pack: `tools/first_drive_evidence_pack.py`
-  - Archives deployment package `source_authority_snapshot.json` when supplied.
-  - Archives `policy_benchmark.json` when supplied by the first-drive gate.
-  - Archives `performance_profile.json` when supplied by the first-drive gate.
-  - Archives `tensorrt_build_report.json` when supplied by the first-drive gate.
-- First-drive evidence pack verifier: `tools/verify_first_drive_evidence_pack.py`
-  - Rechecks archived visual deployment packages for camera calibration evidence.
-  - Rechecks archived Jetson performance profile and TensorRT build report semantics.
-- Jetson runtime plan: `docs/jetson_orin_runtime.md`
-  - Jetson documentation lives in `osracer` `feat-demo`; use a current clean checkout before preparing host-side changes.
+这些功能在 ROS 上位机仓库中维护，`osracer_lab` 只做接口和参数核对：
 
-## Verified Commands
+- TorchScript 推理节点和 `/ackermann_cmd` launch 路径
+- 实车 observation 记录器
+- CSV 策略 replay：`tools/policy_replay_csv.py`
+- replay summary gate：`tools/policy_replay_summary.py`
+- Jetson 预检查：`tools/jetson_preflight.sh`
+- Jetson 环境报告：`tools/jetson_environment_report.py`
+- Jetson measurement session：`tools/jetson_measurement_session.sh`
+- 实车 readiness 检查：`tools/real_car_readiness_check.sh`
+- Jetson runtime monitor 和 summary
+- 部署包校验：`tools/verify_jetson_deployment.py`
+- TensorRT 构建和性能 profiling 辅助工具
+- 首车 runbook、go/no-go gate 和 evidence pack
 
-Run from `osracer_lab`:
+## 已验证命令
+
+`osracer_lab` 侧常用验证：
 
 ```bash
 scripts/validate_osracer_lab.sh source-authority
 scripts/validate_osracer_lab.sh source-authority-snapshot
 scripts/validate_osracer_lab.sh runtime-contract
-MEASUREMENT_SEED_OUTPUT=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh measurement-seed
-MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack scripts/validate_osracer_lab.sh measurement-pack
-MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SENSOR_SUMMARY_FILE=/tmp/osracer_sensor_summary_valid.json scripts/validate_osracer_lab.sh import-sensor-preflight
-MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json SERIAL_LATENCY_FILE=/tmp/osracer_serial_latency_valid.json scripts/validate_osracer_lab.sh import-serial-latency
-MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json CAMERA_INFO_FILE=/tmp/osracer_camera_info_valid.json scripts/validate_osracer_lab.sh import-camera-info
-MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json MEASUREMENT_SESSION_FILE=/tmp/osracer_measurement_session_valid/measurement_session.json scripts/validate_osracer_lab.sh import-measurement-session
-MEASUREMENTS_FILE=docs/real_car_measurements.template.json scripts/validate_osracer_lab.sh measurement-gap
+scripts/validate_osracer_lab.sh measurement-gap
 scripts/validate_osracer_lab.sh measurement-consistency
-MEASUREMENTS_FILE=/tmp/osracer_measurements_seed.json scripts/validate_osracer_lab.sh sim2real-readiness
-MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh calibration-plan
-MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json scripts/validate_osracer_lab.sh measured-overlay
-MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json CALIBRATION_REVIEW_PACK_OUTPUT=/tmp/osracer_calibration_review_pack scripts/validate_osracer_lab.sh calibration-review-pack
-bash /tmp/osracer_run_review_pack_evidence_test.sh
-bash /tmp/osracer_test_review_pack_verifier.sh
-MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh real-measurements
-MEASUREMENTS_FILE=/tmp/osracer_measurements_complete.json scripts/validate_osracer_lab.sh sim2real-readiness
-MEASURED_OVERLAY_FILE=/tmp/osracer_measured_overlay.json scripts/validate_osracer_lab.sh camera-calibration-overlay
+scripts/validate_osracer_lab.sh sim2real-readiness
+scripts/validate_osracer_lab.sh calibration-plan
+scripts/validate_osracer_lab.sh measured-overlay
+scripts/validate_osracer_lab.sh camera-calibration-overlay
 python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json
-python3 scripts/mujoco_sim2sim_smoke.py --xml-out /tmp/osracer_overlay_smoke.xml --measured-overlay /tmp/osracer_measured_overlay.json
-python3 scripts/package_jetson_deployment.py \
-  --policy /tmp/osracer_dummy_policy.pt \
-  --measured-overlay /tmp/osracer_measured_overlay.json \
-  --output-dir /tmp/osracer_deploy_pkg_readme_clean
+python3 scripts/mujoco_sim2sim_smoke.py --xml-out /tmp/osracer_overlay_smoke.xml
 ```
 
-Run from `osracer`:
+VitePress 文档验证：
 
 ```bash
-tools/jetson_performance_profile.sh --json-output /tmp/osracer_perf_profile_compat.json
-tools/build_tensorrt_engine.sh --onnx /tmp/osracer_trt_test/policy.onnx --engine /tmp/osracer_trt_test/policy.engine --fp16 --workspace-mb 1024 --log /tmp/osracer_trt_test/build.log --report /tmp/osracer_trt_test/build_report.json --dry-run
-bash /tmp/osracer_session_topic_smoke.sh
-tools/jetson_preflight.sh
-tools/jetson_environment_report.py --output /tmp/osracer_jetson_environment.json
-tools/jetson_runtime_monitor.sh --duration 1 --output-dir /tmp/osracer_runtime_monitor_smoke
-tools/jetson_runtime_summary.py /tmp/osracer_runtime_monitor_smoke
-tools/verify_jetson_deployment.py /tmp/osracer_deploy_pkg_readme_clean --skip-policy-load
-python3 /tmp/osracer_test_perf.py
-bash /tmp/osracer_test_evidence_perf.sh
-python3 /tmp/osracer_test_trt_report.py
-bash /tmp/osracer_test_trt_evidence.sh
-python3 /tmp/osracer_test_first_drive_verifier_reports.py
+npm ci
+npm run docs:build
 ```
 
-## Current Readiness Result
+## 当前 readiness 结果
 
-`scripts/validate_osracer_lab.sh sim2real-readiness` currently returns:
+`scripts/validate_osracer_lab.sh sim2real-readiness` 当前预期仍会失败：
 
 ```text
 sim2real_readiness: fail
@@ -187,31 +108,26 @@ sim2real_readiness: fail
 [FAIL] required_real_measurements
 ```
 
-This is expected. The current code is ready for offline replay and conservative
-first-drive preparation, not calibrated closed-loop sim2real.
+这是正常状态。当前代码适合离线 replay 和保守首车准备，还不能视为完成标定的闭环 sim2real。
 
-## Blocking Items Before Calibrated Closed Loop
+## 标定闭环前阻塞项
 
-1. Resolve `base_link -> camera_link`, `base_link -> laser`, and `base_link -> imu_link` source-of-truth conflict between URDF and static TF.
-2. Measure and record the 21 required real-car parameters in `docs/real_car_measurements.json`, copied from `docs/real_car_measurements.template.json`, and pass `scripts/validate_osracer_lab.sh real-measurements`.
-3. Put an authenticated `osrbot/osrcore` checkout at `/home/osrbot/Desktop/osracer/osrcore`, then pass `python3 scripts/check_source_authority.py --strict-osrcore`.
-4. Install/check Jetson runtime dependencies on the actual Orin Nano Super 8GB:
-   - ROS 2 Humble runtime packages
-   - `ackermann_msgs`
-   - Torch or ONNX/TensorRT runtime for the deployment format
-5. Run passive real-car observation recording.
-6. Replay recorded observations through the packaged policy.
-7. Run MuJoCo action replay from the same observations.
-8. Only then enable low-speed closed loop on blocks, then floor.
+1. 统一 `base_link -> camera_link`、`base_link -> laser`、`base_link -> imu_link` 的来源。
+2. 从 `docs/real_car_measurements.template.json` 复制并填写 `docs/real_car_measurements.json`。
+3. 通过 `scripts/validate_osracer_lab.sh real-measurements`。
+4. 在实际 Orin Nano Super 8GB 上确认 ROS 2、`ackermann_msgs`、Torch / ONNX / TensorRT 运行时。
+5. 采集实车被动 observation。
+6. 用导出的策略 replay 实车 observation。
+7. 用同一 observation 跑 MuJoCo action replay。
+8. 先架空低速闭环，再落地低速测试。
 
-## Push-Readiness Notes
-
-Before any push:
+## 推送前提醒
 
 ```bash
 git status --short --branch
 git diff --check
 rg -n "<team-sensitive-patterns>" .
+npm run docs:build
 ```
 
-Do not push either repository until the push target and branch are explicitly confirmed.
+没有用户明确确认，不要推送任何仓库。

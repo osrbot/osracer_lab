@@ -1,195 +1,100 @@
-# OSRacer Real-Car Measurement Checklist
+# OSRacer 实车测量清单
 
-Use this checklist to turn real hardware facts into calibrated sim2sim and
-sim2real parameters. Keep raw notes, photos, and logs with each measurement.
-Use `docs/extrinsics_alignment.md` for the camera, lidar, and IMU frame
-alignment procedure.
+本清单用于把真实硬件参数转成可用于 sim2sim、sim2real 和 Jetson 部署的测量数据。每项测量都应保留原始记录、照片、日志和测量日期。
 
-## Confirmed From Current Repos
+## 当前仓库已确认
 
-| Item | Value | Source |
+| 项 | 当前值 | 来源 |
 |---|---|---|
-| Wheelbase | `0.285 m` | IsaacLab action config and `chassis_ackermann.launch.py` |
-| Rear track | `0.235 m` | IsaacLab hardware parameter source |
-| Wheel radius | `0.050 m` | IsaacLab action config |
-| Simulation max steering | `0.488 rad` | IsaacLab action envelope |
-| ROS bridge max steering | `30 deg` | `chassis_ackermann.launch.py` |
-| First real-car speed clamp | `0.3 m/s` | deployment/runbook convention |
-| Chassis serial | `/dev/osrbot_base @ 460800` | `chassis_ackermann.launch.py` |
-| Command protocol | `v <speed_mps> <steering_deg>` | `chassis_ackermann.py` |
-| Camera | AR0234, global shutter, `2.7 mm`, advertised `130 deg` | user-supplied camera spec |
-| Lidar | 270 deg mechanical pulse-TOF, `>=25 m`, Class 1 | user-supplied lidar spec |
+| 轴距 | `0.285 m` | Isaac Lab action config / `chassis_ackermann.launch.py` |
+| 后轮距 | `0.235 m` | Isaac Lab 硬件参数源 |
+| 仿真轮半径 | `0.050 m` | Isaac Lab action config |
+| 固件编码器轮半径 | `0.0425 m` | `osrcore` |
+| 仿真最大转向 | `0.488 rad` | Isaac Lab action envelope |
+| ROS 转向限幅 | `30 deg` | `chassis_ackermann.launch.py` |
+| 串口 | `/dev/osrbot_base @ 460800` | `chassis_ackermann.launch.py` |
+| 初始实车限速 | `0.3 m/s` | sim2real 安全策略 |
 
+## 推荐采集流程
 
-Create the machine-readable measurement file before updating calibrated sim parameters:
+1. 在 Jetson 上停止占用底盘串口的节点。
+2. 采集 Jetson 环境、串口延迟、CameraInfo 和传感器 topic。
+3. 用 `scripts/create_measurement_pack.py` 生成字段包。
+4. 把实测值写入 `docs/real_car_measurements.json`。
+5. 运行校验和 gap report。
 
-Generate a field pack for manual measurements and evidence files:
-
-```bash
-MEASUREMENT_PACK_OUTPUT=/tmp/osracer_real_measurement_pack \
-  scripts/validate_osracer_lab.sh measurement-pack
-```
-
-A combined Jetson evidence session can collect sensor topic rates and serial query latency in one directory:
+示例：
 
 ```bash
-cd /home/osrbot/Desktop/osracer/osracer
-tools/jetson_measurement_session.sh \
-  --output-dir /tmp/osracer_measurement_session \
-  --camera-topic /rgb/image_raw \
-  --lidar-topic /scan \
-  --imu-topic /imu_filter \
-  --odom-topic /odometry/filtered \
-  --camera-info-topic /camera_info
-# The session includes sensor preflight, Jetson environment, serial latency,
-# and one CameraInfo sample when /camera_info is available.
 cd /home/osrbot/Desktop/osracer/osracer_lab
-scripts/validate_osracer_lab.sh measurement-seed
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-MEASUREMENT_SESSION_FILE=/tmp/osracer_measurement_session/measurement_session.json \
-  scripts/validate_osracer_lab.sh import-measurement-session
+python3 scripts/create_measurement_pack.py \
+  --template docs/real_car_measurements.template.json \
+  --output-dir /tmp/osracer_real_measurement_pack
 ```
 
-Or run the individual import steps:
+校验：
 
 ```bash
-scripts/validate_osracer_lab.sh measurement-seed
-  # Seeds repo-confirmed baud rate and firmware steering protocol units only.
-# Fill every required value and source field with real measurements.
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-  scripts/validate_osracer_lab.sh measurement-gap
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh real-measurements
+
 MEASUREMENTS_FILE=docs/real_car_measurements.json \
   scripts/validate_osracer_lab.sh sim2real-readiness
 ```
 
-After running `tools/jetson_sensor_preflight.sh` in the `osracer` repo on the
-Jetson, attach its topic-rate evidence to the measurement file:
+## 标定 sim2real 前必须测量
 
-```bash
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-SENSOR_SUMMARY_FILE=/tmp/osracer_sensor_preflight/sensor_summary.json \
-  scripts/validate_osracer_lab.sh import-sensor-preflight
-```
+| 类别 | 必填内容 |
+|---|---|
+| 整车质量 | 带电池、Jetson、相机、雷达、线束的总质量 |
+| 轮胎 | 带负载轮半径、轮胎宽度、是否打滑 |
+| 几何 | 前轮距、后轮距确认、轴距复测 |
+| 转向 | 左右最大转向角、零点、死区、响应时间 |
+| 电机 / ESC | 最大速度、最小稳定速度、加减速延迟、刹车延迟 |
+| 编码器 | 每圈 tick、安装位置、实际速度换算误差 |
+| IMU | 型号、频率、量程、坐标系、磁力计可用性 |
+| 相机 | CameraInfo 内参、畸变、真实运行分辨率和帧率 |
+| 雷达 | 真实扫描频率、角分辨率、时间戳来源 |
+| 外参 | camera / lidar / IMU 相对 `base_link` 的 `xyz + rpy` |
+| 时序 | 串口往返延迟、命令到执行延迟、传感器时间同步 |
 
-`import-sensor-preflight` only completes `sensor_timestamp_sync_method` when the
-required camera, lidar, IMU, and odom topics are present and have parsed rates.
-It does not fill IMU ranges, extrinsics, serial latency, or physical dynamics.
+## 最小首轮命令
 
-After stopping any node that owns `/dev/osrbot_base`, measure serial query
-latency from the `osracer` repo and import it:
+Jetson 环境：
 
 ```bash
 cd /home/osrbot/Desktop/osracer/osracer
-tools/serial_latency_probe.py --output /tmp/osracer_serial_latency.json
+tools/jetson_environment_report.py --output /tmp/osracer_jetson_environment.json
+```
+
+串口延迟：
+
+```bash
 cd /home/osrbot/Desktop/osracer/osracer_lab
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-SERIAL_LATENCY_FILE=/tmp/osracer_serial_latency.json \
-  scripts/validate_osracer_lab.sh import-serial-latency
+python3 scripts/import_serial_latency_measurement.py \
+  --measurements docs/real_car_measurements.json \
+  --serial-latency /tmp/osracer_serial_latency.json
 ```
 
-`measurement-seed` writes only repo-confirmed facts and collection metadata. It
-does not invent mass, steering, speed, IMU range, latency, or extrinsic values.
-The seeded baud rate is intentionally not enough to pass the serial latency
-measurement gate.
-
-The readiness gate only counts an item as complete when `value` and `source` are
-non-empty and `value` matches the template `expected_format`. Keep
-`docs/real_car_measurements.json` local if it contains lab notes, serials, or
-other non-public details.
-
-Generate a review pack before writing measured values back into source files:
+相机标定：
 
 ```bash
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-  scripts/validate_osracer_lab.sh calibration-review-pack
-CALIBRATION_REVIEW_PACK=/tmp/osracer_calibration_review_pack \
-  scripts/validate_osracer_lab.sh calibration-review-pack-verify
+python3 scripts/import_camera_info_calibration.py \
+  --measurements docs/real_car_measurements.json \
+  --camera-info /tmp/osracer_camera_info.json
 ```
 
-The review pack contains validation results, the calibration plan, a measured
-overlay for offline sim/replay, sim2real readiness gates, and copied text evidence
-from the combined measurement session when those files are referenced in the
-measurement JSON. Run `calibration-review-pack-verify` after copying the pack.
-Treat it as the handoff artifact for deciding whether any source write-back is approved.
-
-## Must Measure Before Calibrated Sim2Real
-
-| Area | Parameter | Unit / Format | Suggested method | Current status |
-|---|---|---|---|---|
-| Mass | Full vehicle mass with battery, Jetson, camera, lidar, wiring | kg | Scale, ready-to-run state | missing |
-| Mass | Front/rear weight distribution | kg or percent | Two-scale axle measurement | missing |
-| Geometry | Front track | m | Measure tire center to tire center | missing |
-| Geometry | Tire width and loaded radius | m | Caliper/tape, car on ground | missing |
-| Steering | Servo command min / center / max | firmware units or PWM us | Query firmware or sweep with wheels lifted | missing |
-| Steering | True left/right wheel angle at limits | deg or rad | Angle gauge on wheel, compare left/right | missing |
-| Steering | Steering zero offset and deadband | deg or rad | Sweep small commands around zero | missing |
-| Steering | Step response delay and settling time | s | Record command timestamp plus video/encoder/IMU response | missing |
-| Motor / ESC | Motor KV or rated rpm | KV or rpm | Motor datasheet or tachometer | missing |
-| Motor / ESC | Battery voltage range and S count | V | Battery label and measured charged/nominal/cutoff voltage | missing |
-| Motor / ESC | True max speed | m/s | Straight low-risk run, logged odom/video | missing |
-| Motor / ESC | Minimum stable speed | m/s | Increment speed commands on lifted and ground tests | missing |
-| Motor / ESC | Throttle deadband and acceleration/brake delay | command units, s | Step command logs with wheel tachometer/odom | missing |
-| Encoder / odom | Encoder ticks per revolution and mount location | ticks/rev, frame | Firmware/config/datasheet check | missing |
-| IMU | Model | part number | Board BOM or firmware driver source | missing |
-| IMU | Sample rate | Hz | Firmware config or measured ROS topic rate | missing |
-| IMU | Accel/gyro ranges | g, deg/s or rad/s | Firmware config or datasheet | missing |
-| IMU | Magnetometer availability and calibration state | yes/no, notes | ROS topic and firmware command check | missing |
-| Camera | Intrinsics and distortion at deployed resolution | fx/fy/cx/cy, model, coeffs | Checkerboard or AprilTag calibration with AR0234 camera | missing |
-| Timing | Serial command latency | s | Timestamp ROS publish to firmware echo/effect | missing |
-| Timing | Sensor timestamp source and clock sync | description | Driver/firmware inspection | missing |
-| Extrinsics | `base_link -> camera_link` | xyz rpy, meters/radians | Measure mount or calibrate; resolve URDF vs static TF | conflicting |
-| Extrinsics | `base_link -> laser` | xyz rpy, meters/radians | Measure mount or calibrate; resolve URDF vs static TF | conflicting |
-| Extrinsics | `base_link -> imu_link` | xyz rpy, meters/radians | Measure mount or calibrate; resolve URDF vs static TF | conflicting |
-
-## Minimum First-Pass Commands
-
-Record real topic rates:
+传感器预检查：
 
 ```bash
-ros2 topic hz /odometry/filtered
-ros2 topic hz /imu_filter
-ros2 topic hz /rgb/image_raw
+python3 scripts/import_sensor_preflight_measurements.py \
+  --measurements docs/real_car_measurements.json \
+  --sensor-summary /tmp/osracer_sensor_summary.json
 ```
 
-Calibrate AR0234 intrinsics before visual sim2real:
+## 更新规则
 
-```bash
-# Record checkerboard/AprilTag images at the deployed camera resolution.
-# If the combined measurement session was not used, export the resulting ROS
-# CameraInfo message as JSON/YAML.
-ros2 topic echo --once /camera_info > /tmp/osracer_camera_info.yaml
-
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-  CAMERA_INFO_FILE=/tmp/osracer_camera_info.yaml \
-  scripts/validate_osracer_lab.sh import-camera-info
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-  MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json \
-  scripts/validate_osracer_lab.sh measured-overlay
-MEASURED_OVERLAY_FILE=/tmp/osracer_measured_overlay.json \
-  scripts/validate_osracer_lab.sh camera-calibration-overlay
-```
-
-The overlay gate defaults to the ROS camera runtime resolution in
-`hardware_params.py` (`640x480`). Do not use the advertised `130 deg` FOV as a
-substitute for measured `fx`, `fy`, `cx`, `cy`, and distortion coefficients.
-
-Record passive policy observations:
-
-```bash
-ros2 launch osracer_bringup policy_observation_recorder.launch.py \
-  output_path:=/tmp/osracer_policy_observations.csv \
-  rate_hz:=10.0
-```
-
-Export the shared hardware parameter JSON after each update:
-
-```bash
-python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json
-```
-
-## Update Rule
-
-Only move a value from `missing` or `conflicting` into the simulation control
-path after it has a measurement note and a matching repo parameter update.
+- 不要把未测量的猜测值写成已确认参数。
+- 每个实测值都要记录单位、来源、时间和采集方式。
+- 对视觉策略，必须先有 CameraInfo 标定再谈 sim2real。
+- 对闭环实车，必须先通过 measurement、overlay、replay 和首车 gate。

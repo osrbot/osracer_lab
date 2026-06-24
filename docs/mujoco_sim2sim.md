@@ -1,116 +1,75 @@
-# MuJoCo Sim2Sim Plan
+# MuJoCo Sim2Sim 验证
 
-This repository keeps IsaacLab as the high-throughput training simulator. MuJoCo is used as a second simulator to catch action-interface, geometry, and dynamics mistakes before real-car tests.
+`osracer_lab` 仍以 Isaac Lab 作为高并发训练仿真器。MuJoCo 在这里作为第二仿真器，用来尽早发现动作接口、几何参数和动力学假设中的明显错误。
 
-## Current Scope
+## 当前范围
 
-The current MuJoCo support is a kinematic interface smoke test:
+当前 MuJoCo 支持是运动学 smoke test，不是高保真实车仿真：
 
-- It reuses `osracer_lab_assets.hardware_params`.
-- It generates a minimal MJCF model with the same wheelbase, rear track, wheel radius, steering clamp, and speed envelope.
-- It keeps the action interface as `[target_speed_mps, target_steering_rad]`.
-- It compiles the MJCF and can run a short planar Ackermann rollout when the `mujoco` Python package is installed.
+- 生成一个最小 OSRacer MuJoCo XML。
+- 保持动作接口为 `[target_speed_mps, target_steering_rad]`。
+- 可读取 measured overlay，覆盖部分实测参数。
+- 可从 CSV replay 中读取策略输出，检查速度和转向是否合理。
 
-It is not yet a calibrated contact dynamics model. Mass, steering response, motor/ESC response, tire friction, and sensor extrinsics still need real measurements before wheel-ground contact dynamics should be enabled.
+## 基本命令
 
-## Commands
-
-Export the shared hardware parameter source:
-
-```bash
-python3 scripts/export_hardware_params.py --output /tmp/osracer_hardware_params.json
-```
-
-After real measurements are collected, export a separate measured overlay for offline sim/replay experiments without mutating source files:
-
-```bash
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-MEASURED_OVERLAY_OUTPUT=/tmp/osracer_measured_overlay.json \
-  scripts/validate_osracer_lab.sh measured-overlay
-```
-
-Generate the MuJoCo smoke-test model:
+生成 XML：
 
 ```bash
 python3 scripts/mujoco_sim2sim_smoke.py --xml-out /tmp/osracer_minimal.xml
 ```
 
-Generate the same model with measured overlay values applied only for offline testing:
+带 measured overlay：
 
 ```bash
 python3 scripts/mujoco_sim2sim_smoke.py \
-  --xml-out /tmp/osracer_measured_overlay.xml \
+  --xml-out /tmp/osracer_overlay.xml \
   --measured-overlay /tmp/osracer_measured_overlay.json
 ```
 
-If MuJoCo is installed in the active Python environment:
+如果本机装了 MuJoCo Python 包，可加 `--compile` 做 XML 编译检查：
 
 ```bash
 python3 scripts/mujoco_sim2sim_smoke.py --xml-out /tmp/osracer_minimal.xml --compile
 ```
 
-Run a one-second kinematic smoke rollout:
+## Replay 流程
+
+策略 replay CSV 需要包含：
+
+| 列 | 含义 |
+|---|---|
+| `speed_cmd` | 策略输出速度 |
+| `steering_cmd` | 策略输出转向 |
+
+这些列来自 `osracer feat-demo` 中的 `tools/policy_replay_csv.py`。
+
+执行 replay pipeline：
 
 ```bash
-python3 scripts/mujoco_sim2sim_smoke.py \
-  --xml-out /tmp/osracer_rollout.xml \
-  --rollout-steps 100 \
-  --speed-mps 0.3 \
-  --steering-rad 0.1
-```
-
-Expected output includes compile dimensions and rollout metrics:
-
-```text
-compiled nq=3 nv=3 nu=3
-rollout steps=100 time_s=1 speed_mps=0.3 steering_rad=0.1 distance_m=...
-```
-
-Replay actions produced by the sibling ROS workspace tool `tools/policy_replay_csv.py`:
-
-```bash
-python3 scripts/mujoco_sim2sim_smoke.py \
-  --xml-out /tmp/osracer_action_replay.xml \
-  --actions-csv /tmp/osracer_policy_replay.csv \
-  --steps-per-action 1
-```
-
-The action CSV must contain `speed_cmd` and `steering_cmd`. These are exactly the command columns appended by `tools/policy_replay_csv.py` in `/home/osrbot/Desktop/osracer/osracer`.
-
-Expected output:
-
-```text
-compiled nq=3 nv=3 nu=3
-actions_csv_rollout rows=... steps=... time_s=... distance_m=...
-```
-
-Run the full offline pipeline from recorded observations:
-
-```bash
-OSRACER_MUJOCO_PYTHON=/tmp/osracer_mujoco_venv/bin/python \
 python3 scripts/run_sim2real_replay_pipeline.py \
-  --observations /tmp/osracer_policy_observations.csv \
-  --policy /path/to/policy.pt \
-  --output-dir /tmp/osracer_sim2real_replay \
-  --min-rows 100 \
-  --max-clamped-ratio 0.5 \
-  --measured-overlay /tmp/osracer_measured_overlay.json
+  --policy-replay-csv /tmp/policy_replay.csv \
+  --output-dir /tmp/osracer_sim2real_replay
 ```
 
-The pipeline writes:
+输出通常包括：
 
 ```text
 /tmp/osracer_sim2real_replay/policy_replay.csv
 /tmp/osracer_sim2real_replay/mujoco_replay.xml
 ```
 
-The pipeline runs `tools/policy_replay_summary.py` before MuJoCo replay. It fails before simulation when action statistics exceed the configured gates.
+## 重点检查
 
-## Next Work
+- 策略输出是否超出仿真动作范围。
+- 转向符号是否和 ROS bridge / 固件一致。
+- 速度单位是否始终是 `m/s`。
+- 转向单位是否在策略侧为弧度，固件侧为角度。
+- overlay 后的轮径、轴距、轮距是否和实测值一致。
 
-1. Replace placeholder mass with measured full-vehicle mass.
-2. Add measured steering servo latency and motor/ESC speed response.
-3. Add camera, lidar, and IMU extrinsics from the real car.
-4. Replay exported `policy.pt` through `tools/policy_replay_csv.py`, then feed its `speed_cmd` / `steering_cmd` output into the MuJoCo kinematic model.
-5. Add calibrated wheel-ground contact dynamics after tire and mass data are measured.
-6. Compare speed, yaw rate, turn radius, steering saturation, and termination behavior before real-car replay.
+## 下一步
+
+1. 用真实 observation replay 驱动 MuJoCo。
+2. 加入更真实的轮胎和转向响应模型。
+3. 把 MuJoCo 检查接入 sim2real readiness gate。
+4. 与实车低速日志做对比，确认误差范围。

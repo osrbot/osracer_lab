@@ -1,113 +1,66 @@
-# OSRacer Sensor Extrinsics Alignment
+# OSRacer 传感器外参对齐
 
-This runbook resolves the current `base_link -> camera/lidar/imu` source-of-truth
-conflict before calibrated sim2real.
+当前 `osracer feat-demo` 中，URDF 和 static TF 对相机、雷达、IMU 的安装位置描述不一致。这个问题必须先解决，否则视觉、雷达、IMU 的 sim2real 标定没有统一坐标基准。
 
-## Current Conflict
+## 当前冲突
 
-The upper-computer repo currently exposes two different transform sets:
-
-| Frame | URDF `xyz rpy` | Static TF launch `xyz rpy` |
+| 变换 | URDF `xyz rpy` | Static TF `xyz rpy` |
 |---|---|---|
-| `camera_link` | `0.12323 -0.017229 -0.053395 -1.5708 0 -1.5708` | `0.30 0 0.075 0 0 0` |
-| `laser` | `-0.082558 -0.017229 0.034095 0 0 0` | `0.10 0 0.13 0 0 0` |
-| `imu_link` | `0.0417958953212156 -0.0177578126845364 -0.063598843109235 0 0 0` | `0.22 0 0.03 0 0 0` |
+| `base_link -> camera_link` | `0.12323 -0.017229 -0.053395 -1.5708 0 -1.5708` | `0.30 0 0.075 0 0 0` |
+| `base_link -> laser` | `-0.082558 -0.017229 0.034095 0 0 0` | `0.10 0 0.13 0 0 0` |
+| `base_link -> imu_link` | `0.0417958953212156 -0.0177578126845364 -0.063598843109235 0 0 0` | `0.22 0 0.03 0 0 0` |
 
-Do not tune visual, lidar, or IMU sim2real against both sets. Pick one measured
-source and propagate it everywhere.
+不要同时按两套外参做训练、replay 或实车标定。否则离线验证和实车 TF 会互相矛盾。
 
-## Recommended Source Of Truth
+## 推荐唯一来源
 
-Use measured physical mounting as the source of truth, then update generated or
-handwritten robot description files from that measurement.
+推荐顺序：
 
-Recommended order:
+1. 以实车物理测量值为准，记录每个传感器相对 `base_link` 的 `x y z roll pitch yaw`。
+2. 把实测值写入 `docs/real_car_measurements.json`。
+3. 用 `scripts/apply_sensor_extrinsics.py` 生成 measured overlay 或 review pack。
+4. 评审通过后，再决定是更新 URDF、static TF，还是统一由一个 robot description 生成两者。
 
-1. Measure sensor positions on the assembled car relative to `base_link`.
-2. Decide the sign convention and axes using ROS REP-103 frames.
-3. Update the OSRacer ROS description and static TF path so they agree.
-4. Update `osracer_lab_assets.hardware_params.OSRACER_SENSOR_EXTRINSICS`.
-5. Run the strict runtime interface check.
+## 测量记录
 
-## Measurement Notes
+每个传感器至少记录：
 
-Use meters and radians in repo parameters.
-
-For each sensor, record:
-
-| Field | Meaning |
+| 项 | 要求 |
 |---|---|
-| `x` | forward from `base_link` |
-| `y` | left from `base_link` |
-| `z` | up from `base_link` |
-| `roll` | rotation around x |
-| `pitch` | rotation around y |
-| `yaw` | rotation around z |
+| 坐标系 | 明确 `base_link` 原点和朝向 |
+| 平移 | `x y z`，单位米 |
+| 姿态 | `roll pitch yaw`，单位弧度或角度，但文档中要写清 |
+| 证据 | 照片、测量工具、原始记录、测量人和日期 |
+| 误差 | 说明估计误差，尤其是相机和雷达安装角 |
 
-For the camera, also record whether `camera_link` follows optical frame
-convention directly or whether a separate optical frame transform is required.
-The AR0234 image pipeline should not be tuned until this is settled.
+## ROS 在线检查
 
-For the lidar, confirm whether the first scan angle and increasing angle
-direction match the ROS driver output.
-
-For the IMU, confirm that the frame used by firmware quaternion output matches
-the ROS `imu_link` frame. A visually plausible pose can still have inverted yaw
-or swapped axes.
-
-## Live ROS Checks
-
-On the Jetson or dev machine with the ROS workspace sourced:
+在实车或 Jetson 上检查当前 TF：
 
 ```bash
-ros2 launch osracer_description robot_description_tf.launch.py
 ros2 run tf2_ros tf2_echo base_link camera_link
 ros2 run tf2_ros tf2_echo base_link laser
 ros2 run tf2_ros tf2_echo base_link imu_link
 ```
 
-If the robot state publisher is active from URDF at the same time, check for
-duplicate publishers:
+同时确认传感器 topic 的 `frame_id`：
 
 ```bash
-ros2 topic echo /tf_static --once
+ros2 topic echo --once /rgb/image_raw/header
+ros2 topic echo --once /scan/header
+ros2 topic echo --once /imu/data/header
 ```
 
-There should be one intended static transform for each sensor frame.
+## 仓库更新闸门
 
-## Repo Update Gate
+在没有完成实测和评审前，`strict_extrinsics` 失败是预期结果。只有满足这些条件后才允许开启严格检查：
 
-After recording measured `camera_extrinsic_xyz_rpy_in_base_link`,
-`lidar_extrinsic_xyz_rpy_in_base_link`, and
-`imu_extrinsic_xyz_rpy_in_base_link` in the measurement JSON, use this value
-format for each item:
+1. `docs/real_car_measurements.json` 中有相机、雷达、IMU 外参。
+2. review pack 里包含照片或文本证据。
+3. URDF 和 static TF 的来源已经统一。
+4. `scripts/check_runtime_contract.py --strict-extrinsics` 通过。
 
-```json
-{"value": [x, y, z, roll, pitch, yaw], "source": "measurement note or log"}
-```
-
-Review the planned alignment first:
-
-```bash
-cd /home/osrbot/Desktop/osracer/osracer_lab
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-  scripts/validate_osracer_lab.sh calibration-plan
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-  scripts/validate_osracer_lab.sh sensor-extrinsics-check
-```
-
-The calibration review pack also writes `sensor_extrinsics_review.json`, which
-records measured, URDF, and static TF values for each sensor frame.
-
-If the measured values are correct, apply them to the URDF, static TF launch,
-and IsaacLab hardware parameter source:
-
-```bash
-MEASUREMENTS_FILE=docs/real_car_measurements.json \
-  scripts/validate_osracer_lab.sh sensor-extrinsics-write
-```
-
-After updating transforms, run:
+检查命令：
 
 ```bash
 scripts/validate_osracer_lab.sh runtime-contract
@@ -115,17 +68,3 @@ python3 scripts/check_runtime_contract.py \
   --osracer-root /home/osrbot/Desktop/osracer/osracer \
   --strict-extrinsics
 ```
-
-Pass condition:
-
-- Normal runtime interface check passes.
-- Strict extrinsics check passes.
-- `docs/hardware_parameters.md` no longer lists conflicting values for the
-  active source of truth.
-- The first passive real-car log uses the same frame names as simulation.
-
-Stop if:
-
-- URDF and static TF still disagree.
-- `camera_link`, `laser`, or `imu_link` has more than one static publisher.
-- IMU yaw sign or lidar angle direction disagrees with manual motion.

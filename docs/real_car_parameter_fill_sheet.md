@@ -1,325 +1,163 @@
-# OSRacer Real-Car Parameter Fill Sheet
+# OSRacer 实车参数填写表
 
-Date: 2026-06-24
+这份表把当前已经填入的参数和仍需你补充的参数放在一起。后续 calibrated sim2sim / sim2real 以这里和 `docs/real_car_measurements.json` 为依据。
 
-This document is the single fill-in sheet for aligning `osracer_lab`, `osracer`
-`feat-demo`, and `osrcore` before calibrated sim2sim and sim2real work.
+## 来源
 
-## Source Authority
-
-| Area | Current value |
+| 项 | 来源 |
 |---|---|
-| Firmware | `osrbot/osrcore` `main` |
-| Firmware local source read | `/Users/winter/Documents/osracer/osrcore` |
-| Firmware HEAD read | `729a6c2` |
-| ROS upper computer | `osrbot/osracer` `feat-demo` |
-| `feat-demo` HEAD checked | `a901398` |
-| IsaacLab repo | `https://github.com/osrbot/osracer_lab` |
+| 固件 | `osrbot/osrcore` `main` |
+| ROS 上位机 | `osrbot/osracer` `feat-demo` |
+| Isaac Lab | `https://github.com/osrbot/osracer_lab` |
+| 参数模板 | `docs/real_car_measurements.template.json` |
 
-## Already Filled Parameters
+## 已填参数
 
-### Chassis And Simulation
+### 底盘与仿真
 
-| Parameter | Value | Source / note |
+| 参数 | 当前值 | 备注 |
 |---|---:|---|
-| Wheelbase | `0.285 m` | `feat-demo` chassis launch / lab |
-| Rear track | `0.235 m` | current lab parameter |
-| IsaacLab wheel radius | `0.050 m` | current lab/URDF model |
-| Firmware encoder wheel radius | `0.0425 m` | `osrcore` config |
-| Simulation max speed | `3.0 m/s` | current lab training envelope |
-| Simulation max steering | `0.488 rad` | current lab training envelope |
-| Initial real-car speed clamp | `0.3 m/s` | conservative deployment limit |
+| 轴距 | `0.285 m` | 与 ROS bridge 对齐 |
+| 后轮距 | `0.235 m` | 当前 Isaac / URDF 模型 |
+| Isaac Lab 轮半径 | `0.050 m` | 当前仿真值 |
+| 固件编码器轮半径 | `0.0425 m` | 来自 `osrcore` |
+| 仿真最大速度 | `3.0 m/s` | 训练动作范围 |
+| 仿真最大转向 | `0.488 rad` | 约 `27.96 deg` |
+| ROS 转向限幅 | `30 deg` | bridge 限幅 |
+| 初始实车限速 | `0.3 m/s` | 首车保守值 |
 
-Wheel radius is not resolved yet. `osrcore` encoder odometry and `osracer_sim`
-use `0.0425 m`; IsaacLab currently uses `0.050 m`. Measure the loaded tire
-radius before changing either value.
+### 运行接口
 
-### Runtime Interface
-
-| Parameter | Value |
+| 参数 | 当前值 |
 |---|---|
-| Jetson target OS | `JetPack 6.x / Ubuntu 22.04` |
-| ROS runtime | `ROS 2 Humble` |
-| Chassis launch | `osracer_bringup chassis_ackermann.launch.py` |
-| Serial device | `/dev/osrbot_base` |
-| Serial baud | `460800` |
-| Command protocol | `v <speed_mps> <steering_deg>` |
-| Command watchdog | `0.5 s` |
-| Firmware version query timeout | `0.8 s` |
-| Firmware version query | `fw version`, logs `OSRCORE ProjectVer` on ROS startup |
-| Ackermann command topic | `/ackermann_cmd` |
-| Twist command topic | `/cmd_vel` |
-| Runtime odom topic | `/odometry/filtered` |
-| Runtime IMU topic | `/imu_filter` |
-| Raw magnetometer topic | `/magnetometer_data` |
-| RC topic | `/rc_data` |
-| IMU serial frame | `i qx qy qz qw ax ay az gx gy gz` |
-| Odom serial frame | `o px py pz vx vy vz yaw` |
+| ROS | `ROS 2 Humble` |
+| Jetson 系统 | `JetPack 6.x / Ubuntu 22.04` |
+| 串口设备 | `/dev/osrbot_base` |
+| 串口波特率 | `460800` |
+| 控制命令 | `v <speed_mps> <steering_deg>` |
+| 默认遥测 | `stream sync` |
+| Ackermann topic | `/ackermann_cmd` |
+| Twist topic | `/cmd_vel` |
+| Odom topic | `/odometry/filtered` |
+| IMU topic | `/imu_filter` |
+| 指令看门狗 | `0.5 s` |
 
-### Firmware Control
+### 固件控制
 
-| Area | Parameter | Value |
-|---|---|---:|
-| Encoder | A/B GPIO | `3 / 9` |
-| Encoder | PPR | `1024` |
-| Encoder | Gear ratio | `10.55` |
-| Encoder | Firmware wheel radius | `0.0425 m` |
-| Encoder | Speed calculation interval | `20 ms` |
-| Encoder | Odom scale default / range | `1.0`, `0.5..1.5` |
-| Speed PID | Control interval | `20 ms` |
-| Speed PID | `kp / ki / kd` | `425.0 / 8.4 / 20.6` |
-| Speed PID | Max integral | `1000.0` |
-| Speed PID | Deadband | `0.05 m/s` |
-| Speed filter | Speed LPF / odom speed LPF | `0.15 / 0.95` |
-| Speed limit | Forward / reverse firmware clamp | `+6.0 / -6.0 m/s` |
-| Throttle | Feed-forward deadband default | `90 us` |
-| Throttle | Feed-forward deadband range | `0..300 us` |
-| Throttle | Feed-forward max | `500 us` |
-| PWM | Frequency / resolution | `50 Hz / 14 bit` |
-| Throttle PWM | `min / neutral / max` | `1000 / 1500 / 2000 us` |
-| Steering PWM | `min / center / max` | `1000 / 1500 / 2000 us` |
-| Steering | Max steering | `30 deg` |
-| Steering | Trim default / range | `0 deg`, `-5..5 deg` |
-| Steering | Reverse | `true` |
-| Throttle | Reverse | `false` |
-| Safety | Serial timeout | `500 ms` |
+| 参数 | 当前值 |
+|---|---:|
+| 编码器 PPR | `1024` |
+| 编码器减速比 | `10.55` |
+| 速度计算周期 | `20 ms` |
+| 速度 PID | `425.0 / 8.4 / 20.6` |
+| 油门 PWM | `1000 / 1500 / 2000 us` |
+| 转向 PWM | `1000 / 1500 / 2000 us` |
+| 固件最大转向 | `30 deg` |
+| 串口指令超时 | `500 ms` |
 
-### SBUS / RC
+### 相机
 
-| Parameter | Value |
+| 参数 | 当前值 |
 |---|---|
-| Protocol | Futaba SBUS |
-| Baud / format | `100000`, `8E2 inverted` |
-| Frame length | `25` |
-| Channel range | `240..1810` |
-| CH0 | Steering |
-| CH2 | Throttle |
-| CH6 | Control mode, `<1500` remote priority, `>=1500` serial control |
-| CH7 | Speed mode, `<1500` reduced speed, `>=1500` full speed |
-| Reduced speed scale | `15%` |
+| 型号 | `DCXG200` |
+| 传感器 | `AR0234` |
+| 快门 | Global shutter |
+| 镜头 | `2.7 mm` |
+| 标称视场角 | `130 deg` |
+| 最高分辨率 | `1920 x 1200` |
+| 当前 ROS 配置 | `640 x 480 @ 120 fps` |
+| 接口 | USB2.0 UVC |
+| 输出格式 | MJPG / YUY2 |
 
-### IMU / Battery / Telemetry
+### 激光雷达
 
-| Area | Parameter | Value |
-|---|---|---|
-| IMU | Model / address | `QMI8658`, `0x6B` |
-| IMU | Accel range | `+-4 g` |
-| IMU | Gyro range | `+-1024 dps` |
-| IMU | ODR | `1000 Hz` |
-| IMU | Average samples | `5` |
-| IMU | Gyro bias samples | `100` |
-| IMU heater | Target / warm / stable | `56 C / 38 C / 54 C` |
-| IMU heater | Ready timeout | `300000 ms` |
-| Battery | Low voltage / recover | `10.8 V / 11.1 V` |
-| Battery | Confirm / recover time | `3000 ms / 3000 ms` |
-| Telemetry | Sync | `5 ms` |
-| Telemetry | Legacy IMU | `5 ms` |
-| Telemetry | Legacy odom | `20 ms` |
-| Telemetry | Magnetometer | `50 ms` |
-| Telemetry | RC | `100 ms` |
-| Telemetry | Battery | `2000 ms` |
-
-### Camera
-
-| Parameter | Value |
+| 参数 | 当前值 |
 |---|---|
-| Model | `DCXG200` |
-| Sensor | `AR0234` |
-| Shutter | Global shutter |
-| Lens | `2.7 mm`, advertised low/no distortion |
-| Advertised FOV | `130 deg` |
-| Native resolution | `1920 x 1200` |
-| Pixel size | `3 um x 3 um` |
-| Frame rate | `90 / 120 fps` |
-| Interface | USB2.0 UVC |
-| Format | MJPG / YUY2 |
-| Power / supply | about `2 W`, `5 V` |
-| Module size | `36 mm x 36 mm` |
-| Net weight | `59.9-67.5 g` |
-| ROS driver | `usb_cam` |
-| ROS device | `/dev/video0` |
-| ROS frame | `camera_link` |
-| ROS topic | `/rgb/image_raw` |
-| Runtime resolution | `640 x 480` |
-| Runtime fps | `120` |
-| Runtime pixel format | `mjpeg2rgb` |
+| 水平视场角 | `270 deg` |
+| 距离 | `25 m` 级别 |
+| 测量精度 | `+/-2 cm` |
+| 角分辨率 | `0.1 / 0.25 deg` 可选 |
+| 频率 | `10 / 20 / 25 / 30 Hz` 可选 |
+| 输出 | 距离、角度、强度、时间戳 |
+| 传输 | UDP/IP 和 USB |
 
-Camera calibration still needs to be measured at the deployed runtime
-resolution. Do not use the advertised `130 deg` as calibrated intrinsics.
+### 需要解决的外参
 
-### Lidar
-
-| Parameter | Value |
+| 变换 | 当前问题 |
 |---|---|
-| Scan principle | Mechanical rotation |
-| Ranging principle | Pulse TOF |
-| Horizontal FOV | `270 deg` |
-| Range | `>=25 m @ 70% reflectivity`, `>=15 m @ 10% reflectivity` |
-| Accuracy | `+-2 cm` |
-| Angular resolution | `0.1 deg / 0.25 deg` |
-| Scan rate | `10 / 20 / 25 / 30 Hz` |
-| Sample rate | `28.8 / 36 / 43.2 kHz` |
-| Output | Range, angle, intensity, timestamp |
-| Transport | UDP/IP and USB |
-| Wavelength | `940 nm` |
-| Safety | Class 1 |
-| Size | `60 mm x 60 mm x 80 mm` |
-| Weight | `160 g` |
-| Power | `<=2 W` |
-| Supply | `9-36 V` |
-| Protection | IP65 |
-| ROS frame | `laser` |
-| Conservative lab scan model | `270 deg`, `0.25 deg`, `10 Hz`, `25 m`, `1081` rays |
+| `base_link -> camera_link` | URDF 和 static TF 不一致 |
+| `base_link -> laser` | URDF 和 static TF 不一致 |
+| `base_link -> imu_link` | URDF 和 static TF 不一致 |
 
-### Current Sensor Extrinsics To Resolve
+## 需要你补充的参数
 
-These values currently disagree between URDF and static TF. Fill the measured
-values below and then choose one source of truth.
+### 整车质量 / 几何
 
-| Transform | URDF value `xyz rpy` | Static TF value `xyz rpy` |
-|---|---|---|
-| `base_link -> camera_link` | `0.12323 -0.017229 -0.053395 -1.5708 0 -1.5708` | `0.30 0 0.075 0 0 0` |
-| `base_link -> laser` | `-0.082558 -0.017229 0.034095 0 0 0` | `0.10 0 0.13 0 0 0` |
-| `base_link -> imu_link` | `0.0417958953212156 -0.0177578126845364 -0.063598843109235 0 0 0` | `0.22 0 0.03 0 0 0` |
+| 参数 | 需要填写 |
+|---|---|
+| 整车质量 | 带电池、Jetson、相机、雷达、线束 |
+| 前轮距 | 实测值 |
+| 带负载轮半径 | 用于解决 `0.050 m` 与 `0.0425 m` 冲突 |
+| 轮胎宽度 | 实测值 |
+| 重心或前后重量分布 | 粗略值也可，但要标注方法 |
 
-## Parameters To Fill
+### 转向
 
-Fill values in SI units where possible. Add evidence paths or notes whenever a
-value comes from a measurement session, datasheet, photo, video, or ROS bag.
+| 参数 | 需要填写 |
+|---|---|
+| 左最大转向角 | 度或弧度 |
+| 右最大转向角 | 度或弧度 |
+| 舵机零点 | PWM 或角度 |
+| 转向死区 | 度或 PWM |
+| 转向响应时间 | 阶跃输入到稳定时间 |
 
-### Vehicle Mass / Geometry
+### 电机 / ESC / 电池
 
-| Parameter | Fill value | Method / evidence |
-|---|---|---|
-| Full vehicle mass with battery, Jetson, sensors, wiring |  |  |
-| Front axle weight |  |  |
-| Rear axle weight |  |  |
-| Front/rear weight distribution |  |  |
-| Front track, tire center to tire center |  |  |
-| Rear track, tire center to tire center |  |  |
-| Tire width |  |  |
-| Loaded tire radius |  |  |
-| Loaded tire diameter |  |  |
-| Tire material / compound |  |  |
-| Typical test ground surface |  |  |
+| 参数 | 需要填写 |
+|---|---|
+| 电机 KV 或额定转速 | 型号或实测 |
+| 电池电压范围 | 满电、标称、低压 |
+| 最大速度 | 地面实测 |
+| 最小稳定速度 | 地面实测 |
+| 加速延迟 | 命令到速度变化 |
+| 刹车延迟 | 命令到停止趋势 |
 
-### Steering
+### IMU / 编码器 / 时序
 
-| Parameter | Fill value | Method / evidence |
-|---|---|---|
-| True max steering left |  |  |
-| True max steering right |  |  |
-| Steering zero point offset |  |  |
-| Servo command units confirmed |  |  |
-| Steering deadband |  |  |
-| Steering response time |  |  |
-| Steering settle time |  |  |
-| Steering asymmetry or mechanical limit note |  |  |
+| 参数 | 需要填写 |
+|---|---|
+| IMU 实际发布频率 | ROS topic 实测 |
+| IMU 坐标系方向 | 相对 `base_link` |
+| 编码器速度误差 | 与外部测量对比 |
+| 串口往返延迟 | 多次采样均值和 p95 |
+| 传感器时间戳来源 | 硬件时间 / ROS 接收时间 |
 
-### Motor / ESC / Battery
+### 相机标定
 
-| Parameter | Fill value | Method / evidence |
-|---|---|---|
-| Motor KV or rated RPM |  |  |
-| Motor model |  |  |
-| ESC model |  |  |
-| ESC mode, brake, reverse behavior |  |  |
-| Battery S count |  |  |
-| Battery full voltage |  |  |
-| Battery nominal voltage |  |  |
-| Battery cutoff / safe minimum voltage |  |  |
-| True max speed on ground |  |  |
-| Minimum stable speed on ground |  |  |
-| Throttle deadband |  |  |
-| Throttle response delay |  |  |
-| Brake / deceleration response delay |  |  |
+| 参数 | 需要填写 |
+|---|---|
+| `fx fy cx cy` | CameraInfo |
+| 畸变模型 | CameraInfo |
+| 畸变系数 | CameraInfo |
+| 标定分辨率 | 必须和部署分辨率对应 |
+| 标定误差 | RMS / reprojection error |
 
-### Encoder / Odometry
+### 传感器外参
 
-| Parameter | Fill value | Method / evidence |
-|---|---|---|
-| Encoder ticks per revolution confirmed |  |  |
-| Encoder physical mount location |  |  |
-| Encoder before/after gearbox |  |  |
-| Effective ticks per wheel revolution |  |  |
-| Measured odom scale correction |  |  |
-| Odom drift over straight-line test |  |  |
-| Odom drift over turn test |  |  |
+| 参数 | 需要填写 |
+|---|---|
+| 相机 `xyz + rpy` | 相对 `base_link` |
+| 雷达 `xyz + rpy` | 相对 `base_link` |
+| IMU `xyz + rpy` | 相对 `base_link` |
+| 测量证据 | 照片、记录、测量方法 |
 
-### IMU
+## 最小优先级
 
-| Parameter | Fill value | Method / evidence |
-|---|---|---|
-| IMU model confirmed | `QMI8658` |  |
-| ROS publish rate observed |  |  |
-| Accel range confirmed | `+-4 g` |  |
-| Gyro range confirmed | `+-1024 dps` |  |
-| Magnetometer available / used |  |  |
-| IMU physical frame alignment to `base_link` |  |  |
-| IMU temperature at steady state |  |  |
-| Bias convergence time |  |  |
-| Static yaw drift over 5 min |  |  |
+如果只能先补一批，优先补：
 
-### Camera Calibration
-
-| Parameter | Fill value | Method / evidence |
-|---|---|---|
-| Calibration resolution |  |  |
-| Calibration fps |  |  |
-| `fx` |  |  |
-| `fy` |  |  |
-| `cx` |  |  |
-| `cy` |  |  |
-| Distortion model |  |  |
-| Distortion coefficients |  |  |
-| Calibration reprojection error |  |  |
-| Calibration file path |  |  |
-
-### Sensor Extrinsics
-
-Use `base_link` as the parent frame. Units: meters and radians.
-
-| Transform | `x` | `y` | `z` | `roll` | `pitch` | `yaw` | Method / evidence |
-|---|---:|---:|---:|---:|---:|---:|---|
-| `base_link -> camera_link` |  |  |  |  |  |  |  |
-| `base_link -> laser` |  |  |  |  |  |  |  |
-| `base_link -> imu_link` |  |  |  |  |  |  |  |
-
-Chosen source of truth after measurement:
-
-```text
-URDF / static TF / generated robot description:
-Reason:
-Files to update:
-```
-
-### Timing / Latency / Sync
-
-| Parameter | Fill value | Method / evidence |
-|---|---|---|
-| Serial command latency |  |  |
-| Serial round-trip latency |  |  |
-| Camera timestamp source |  |  |
-| Lidar timestamp source |  |  |
-| IMU timestamp source |  |  |
-| Clock sync method |  |  |
-| ROS bag / measurement session path |  |  |
-
-## Minimum Fill Set Before Next Calibration Step
-
-Fill these first:
-
-| Priority | Parameter |
-|---:|---|
-| 1 | Full vehicle mass |
-| 2 | Front/rear weight distribution |
-| 3 | Front track |
-| 4 | Loaded tire radius |
-| 5 | True left/right max steering angle |
-| 6 | Steering response time |
-| 7 | Battery S count and voltage limits |
-| 8 | True max speed and minimum stable speed |
-| 9 | Camera intrinsics at runtime resolution |
-| 10 | Camera/lidar/IMU measured extrinsics |
-| 11 | Serial command latency |
-| 12 | Sensor timestamp sync method |
+1. 带负载轮半径。
+2. 左右最大转向角和舵机零点。
+3. CameraInfo 内参和畸变。
+4. 相机、雷达、IMU 外参。
+5. 串口延迟和传感器时间戳来源。
+6. 整车质量和前后重量分布。

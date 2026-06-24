@@ -1,79 +1,59 @@
-# OSRacer feat-demo Parameter Audit
+# OSRacer feat-demo 参数核对
 
-Date: 2026-06-24
+本文记录 `osracer_lab` 与 ROS 上位机 `osracer feat-demo`、固件 `osrcore` 之间已经核对的参数，以及仍需实测确认的差异。
 
-Authority checked:
+## 当前来源
 
-- `feat-demo`: `osrbot/osracer` at `a901398`
-- Firmware authority snapshot source: local read-only `osrcore` at `729a6c2`
-- Isaac/tooling repo: `/home/osrbot/Desktop/osracer/osracer_lab`
+- `feat-demo`：`osrbot/osracer`，快照 `a901398`
+- 固件：`osrbot/osrcore`，快照 `729a6c2`
+- Isaac / 工具仓库：`osracer_lab`
 
-## Matched Runtime Parameters
+## 已匹配的运行参数
 
-| Item | `osracer feat-demo` | `osracer_lab` |
+| 参数 | `osracer_lab` | `feat-demo` / 固件 |
 |---|---|---|
-| ROS runtime | Humble | `real_runtime.ros_distro=humble` |
-| Jetson OS target | JetPack 6.x / Ubuntu 22.04 | `real_runtime.jetson_os=JetPack 6.x / Ubuntu 22.04` |
-| Serial device | `/dev/osrbot_base` | `/dev/osrbot_base` |
-| Serial baud | `460800` | `460800` |
-| Command protocol | `v <speed_mps> <steering_deg>` | same |
-| Command watchdog | `0.5 s` | `0.5 s` |
-| Firmware version startup query | `fw version`, logs `OSRCORE ProjectVer` | same |
-| Wheelbase | `0.285 m` | `0.285 m` |
-| Bridge steering clamp | `30 deg` | `30 deg` |
-| Policy steering envelope | `0.488 rad` | `0.488 rad` |
-| Initial real speed cap | `0.3 m/s` | `0.3 m/s` |
-| Ackermann topic | `/ackermann_cmd` | `/ackermann_cmd` |
-| CmdVel topic | `/cmd_vel` | `/cmd_vel` |
-| Odom topic | `/odometry/filtered` | `/odometry/filtered` |
-| IMU topic | `/imu_filter` | `/imu_filter` |
-| Camera runtime | `/dev/video0`, `640x480`, `120 fps`, `mjpeg2rgb`, `camera_link` | same |
-| Lidar runtime frame/topic | `laser`, `/scan` | same |
+| 串口设备 | `/dev/osrbot_base` | `/dev/osrbot_base` |
+| 波特率 | `460800` | `460800` |
+| 控制命令 | `v <speed_mps> <steering_deg>` | `v <speed_mps> <steering_deg>` |
+| 默认遥测 | `stream sync` | `stream sync` |
+| Ackermann 输入 | 速度 + 转向角 | `/ackermann_cmd` |
+| 转向单位 | 策略输出弧度，固件发送角度 | ROS bridge 内部转换 |
+| 固件版本 | `fw version` / `ProjectVer` | ROS 启动时查询并打印 |
 
-## Sensor Spec Coverage
+## 传感器覆盖情况
 
-| Sensor | Covered in lab | Notes |
+| 传感器 | 当前状态 |
+|---|---|
+| 相机 | 已记录 AR0234、2.7mm、USB UVC、`640 x 480 @ 120 fps` 运行配置；仍需 CameraInfo 标定 |
+| 激光雷达 | 已记录 25m、270 度、TOF、UDP/USB；仍需确认真实运行频率和时间戳 |
+| IMU | 固件侧记录 QMI8658、量程和频率；仍需确认 ROS frame 对齐 |
+| 编码器 | 固件侧有 PPR、减速比、轮半径；仍需确认加载轮径和仿真几何含义 |
+
+## 已知不一致
+
+| 项 | 当前差异 | 处理方式 |
 |---|---|---|
-| AR0234 camera | model `DCXG200`, global shutter, `1920x1200`, `2.7 mm`, advertised `130 deg`, UVC, MJPG/YUY2, runtime `640x480@120` | Calibration still required at deployed resolution. |
-| 25m lidar | `270 deg`, `0.1/0.25 deg`, `10/20/25/30 Hz`, `25 m @ 70%`, `15 m @ 10%`, Class 1, IP65 | Lab conservative scan model uses `0.25 deg`, `10 Hz`, `25 m`, `1081` rays. |
-| Chassis/firmware | `SERIAL_TIMEOUT=500 ms`, steering PWM `1000/1500/2000`, trim `0 deg`, encoder `1024 PPR`, gear ratio `10.55`, firmware wheel radius `0.0425 m`, PID `425.0/8.4/20.6`, QMI8658 IMU, `fw version` / `ProjectVer` | Snapshot derived from `osrcore`. |
+| 轮半径 | 固件 / `osracer_sim` 使用 `0.0425 m`，Isaac Lab 当前使用 `0.050 m` | 实测带负载轮半径后决定编码器和碰撞几何是否分开 |
+| 传感器外参 | URDF 与 static TF 不一致 | 按 [外参对齐](extrinsics_alignment.md) 统一 |
+| 相机视场角 | 标称 `130 deg` 与 `2.7 mm` 针孔估算不直接一致 | 使用 CameraInfo 标定结果作为视觉 sim2real 依据 |
 
-## Known Mismatches
+## 仍需补充
 
-- `osracer_sim` kinematic simulator and `osrcore` encoder odometry use `wheel_radius=0.0425 m`; `osracer_sim` also uses `track_width=0.215 m`.
-- `osracer_lab` chassis parameters use `rear_track_m=0.235 m` and `wheel_radius_m=0.050 m` for the current Isaac/URDF model.
-- This is not a source-code conflict yet because the kinematic simulator is a lightweight ROS sim, but it should not be treated as calibrated sim2real until real measurements choose the authoritative values.
-- Sensor extrinsics still conflict between URDF and static TF:
-  - `base_link -> camera_link`
-  - `base_link -> laser`
-  - `base_link -> imu_link`
+进入标定闭环 sim2real 前，还需要：
 
-## Information Still Needed
+1. 整车质量和重量分布。
+2. 前轮距、轮胎宽度、加载轮径。
+3. 左右最大转向角、舵机零点、响应时间和死区。
+4. 电机/ESC 参数、最大速度、最小稳定速度、加减速延迟。
+5. 相机内参和畸变。
+6. 相机、雷达、IMU 相对 `base_link` 的外参。
+7. 串口延迟、传感器时间戳来源和同步方式。
 
-These items are still required before calibrated closed-loop sim2real:
-
-1. Full vehicle mass with battery, Jetson, camera, lidar, and wiring.
-2. Front/rear weight distribution.
-3. Front track and tire width.
-4. Confirmed loaded wheel radius or tire diameter.
-5. True left/right max steering angles.
-6. Steering zero point, command units, deadband, and response time.
-7. Motor KV or rated RPM.
-8. Battery S count, charged/nominal/cutoff voltage.
-9. True max speed and minimum stable speed on ground.
-10. Throttle deadband and response delay.
-11. Encoder ticks per revolution and mount location.
-12. IMU physical frame alignment and measured timing. Firmware reports QMI8658, 1000 Hz ODR, +-4 g accel, +-1024 dps gyro.
-13. Camera calibration at runtime resolution: `fx`, `fy`, `cx`, `cy`, distortion model, coefficients.
-14. Measured camera/lidar/IMU extrinsics in `base_link`.
-15. Serial command latency report from the actual firmware.
-16. Sensor timestamp source and clock sync method.
-
-## Verification Commands
+## 验证命令
 
 ```bash
-scripts/validate_osracer_lab.sh source-authority-snapshot
 scripts/validate_osracer_lab.sh runtime-contract
-scripts/validate_osracer_lab.sh measurement-consistency
-MEASUREMENTS_FILE=docs/real_car_measurements.template.json scripts/validate_osracer_lab.sh measurement-gap
+python3 scripts/verify_source_authority_snapshot.py \
+  docs/source_authority_snapshot.json \
+  --osracer-root /home/osrbot/Desktop/osracer/osracer
 ```
