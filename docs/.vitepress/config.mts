@@ -36,6 +36,7 @@ const zhSidebar = [
     text: "实车部署",
     items: [
       { text: "Sim2Real / Jetson", link: "/sim2real" },
+      { text: "可行性与传感器闭环", link: "/feasibility_sensor_plan" },
       { text: "实车参数", link: "/real-car" },
       { text: "标定流程", link: "/calibration" },
       { text: "外参对齐", link: "/extrinsics_alignment" }
@@ -82,6 +83,7 @@ const enSidebar = [
     text: "Real-Car Deployment",
     items: [
       { text: "Sim2Real / Jetson", link: "/en/sim2real" },
+      { text: "Feasibility and Sensors", link: "/en/feasibility_sensor_plan" },
       { text: "Real-Car Parameters", link: "/en/real-car" },
       { text: "Calibration", link: "/en/calibration" },
       { text: "Extrinsics Alignment", link: "/en/extrinsics_alignment" }
