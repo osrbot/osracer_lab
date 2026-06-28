@@ -23,7 +23,7 @@ def parse_args():
     parser.add_argument("--policy", required=True, help="Exported policy file, for example policy.pt")
     parser.add_argument("--output-dir", required=True, help="Deployment package output directory")
     parser.add_argument("--name", default="osracer_jetson_deployment", help="Package name written to manifest")
-    parser.add_argument("--task", default="Isaac-OSRacerDriftRL-v0")
+    parser.add_argument("--task", default="Isaac-OSRacerVisualRL-v0")
     parser.add_argument("--format", default="torchscript", choices=("torchscript", "onnx", "tensorrt"))
     parser.add_argument("--measured-overlay", default=None, help="Optional measured overlay JSON to include")
     parser.add_argument(
@@ -32,6 +32,11 @@ def parse_args():
         help="Optional source authority snapshot JSON to include when present",
     )
     parser.add_argument("--notes", default="", help="Short operator note for the manifest")
+    parser.add_argument(
+        "--allow-sim-only-observations",
+        action="store_true",
+        help="Allow packaging sim-only tasks for research artifacts. Do not use for real-car closed loop.",
+    )
     return parser.parse_args()
 
 
@@ -116,8 +121,17 @@ If this is a structure-only smoke package, add `--skip-policy-load`.
 """
 
 
+SIM_ONLY_PACKAGE_TASKS = {"Isaac-OSRacerDriftRL-v0"}
+
+
 def main():
     args = parse_args()
+    if args.task in SIM_ONLY_PACKAGE_TASKS and not args.allow_sim_only_observations:
+        raise ValueError(
+            f"{args.task} uses simulator-only observations and is blocked from default Jetson packaging. "
+            "Use --task Isaac-OSRacerVisualRL-v0 for deployment candidates, or add "
+            "--allow-sim-only-observations for a sim-only research package."
+        )
     policy_path = Path(args.policy).resolve()
     if not policy_path.is_file():
         raise FileNotFoundError(policy_path)
@@ -232,4 +246,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except FileNotFoundError as exc:
+        print(f"[ERROR] missing file: {exc}", file=sys.stderr)
+        raise SystemExit(2)
+    except ValueError as exc:
+        print(f"[BLOCKED] {exc}", file=sys.stderr)
+        raise SystemExit(2)

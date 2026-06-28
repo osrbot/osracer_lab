@@ -9,6 +9,7 @@ This page defines the interface between training, export, offline replay, and re
 - Drift baseline: `logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt`
   - Command: `scripts/train_osracer_drift.py --headless --num_envs 2048 --max_iterations 2000`
   - Result: completed successfully on the RTX 4080 SUPER host.
+  - Scope: sim-only research baseline; not a default real-car deployment policy.
 - Visual stability check: `logs/rsl_rl/osracer_visual/2026-06-23_17-54-56/model_49.pt`
   - Command: `scripts/train_osracer_drift.py --task Isaac-OSRacerVisualRL-v0 --headless --num_envs 256 --max_iterations 50`
 - Visual throughput probe: `logs/rsl_rl/osracer_visual/2026-06-23_18-08-58/model_9.pt`
@@ -52,19 +53,21 @@ v <speed_mps> <steering_deg>
 
 ## Export And Package
 
-Export TorchScript:
+Export a deployment-candidate TorchScript policy:
 
 ```bash
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
   --headless \
-  --checkpoint logs/rsl_rl/osracer_drift/<run>/model_1999.pt
+  --task Isaac-OSRacerVisualRL-v0 \
+  --checkpoint logs/rsl_rl/osracer_visual/<run>/model_1999.pt
 ```
 
 Package for Jetson:
 
 ```bash
 python3 scripts/package_jetson_deployment.py \
-  --policy logs/rsl_rl/osracer_drift/<run>/exported/policy.pt \
+  --task Isaac-OSRacerVisualRL-v0 \
+  --policy logs/rsl_rl/osracer_visual/<run>/exported/policy.pt \
   --measured-overlay /tmp/osracer_measured_overlay.json \
   --output-dir /tmp/osracer_jetson_deployment
 ```

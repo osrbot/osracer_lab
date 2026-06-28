@@ -12,12 +12,28 @@ from osracer_lab_tasks.mdp.observations import base_ang_vel, base_lin_vel, root_
 
 @configclass
 class BlindObsCfg:
-    """Default observation configuration (no sensors; no corruption)."""
+    """Simulator-only observation configuration (no sensors; no corruption)."""
 
     @configclass
     class PolicyCfg(ObsGroup):
         root_pos_w_term = ObsTerm(func=root_pos_w, noise=Gnoise(mean=0.0, std=0.1))
         root_euler_xyz_term = ObsTerm(func=root_euler_xyz, noise=Gnoise(mean=0.0, std=0.1))
+        base_lin_vel_term = ObsTerm(func=base_lin_vel, noise=Gnoise(mean=0.0, std=0.5))
+        base_ang_vel_term = ObsTerm(func=base_ang_vel, noise=Gnoise(std=0.4))
+        last_action_term = ObsTerm(func=mdp.last_action, clip=(-1.0, 1.0))
+
+        def __post_init__(self):
+            self.concatenate_terms = True
+            self.enable_corruption = False
+
+    policy: PolicyCfg = PolicyCfg()
+
+@configclass
+class DeployableObsCfg:
+    """Real-car-deployable low-dimensional observation configuration."""
+
+    @configclass
+    class PolicyCfg(ObsGroup):
         base_lin_vel_term = ObsTerm(func=base_lin_vel, noise=Gnoise(mean=0.0, std=0.5))
         base_ang_vel_term = ObsTerm(func=base_ang_vel, noise=Gnoise(std=0.4))
         last_action_term = ObsTerm(func=mdp.last_action, clip=(-1.0, 1.0))

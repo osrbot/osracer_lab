@@ -1,2 +1,2 @@
 from .actions import OSRacerAckermannActionCfg
-from .observations import BlindObsCfg
+from .observations import BlindObsCfg, DeployableObsCfg

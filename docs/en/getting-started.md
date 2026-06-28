@@ -62,18 +62,28 @@ Isaac-OSRacerVisualRL-v0
 
 ## 5. Run Minimal Static Checks
 
+These checks only depend on the `osracer_lab` repository:
+
 ```bash
 cd ~/osracer_ws/osracer_lab
 scripts/validate_osracer_lab.sh static
-scripts/validate_osracer_lab.sh source-authority-snapshot
-scripts/validate_osracer_lab.sh runtime-contract
+scripts/validate_osracer_lab.sh sim-sensor-contract
+scripts/validate_osracer_lab.sh policy-observation-contract --task Isaac-OSRacerVisualRL-v0
 ```
 
-These checks confirm:
+They confirm:
 
 - Python files and package layout are valid.
-- `osrcore` and `osracer feat-demo` still match the expected protocol.
-- ROS real-car interfaces still match lab parameters.
+- Simulated camera / LiDAR parameters still come from the hardware parameter source.
+- The deployment-candidate observation does not directly use simulator truth.
+
+When a local `osracer feat-demo` checkout is available, run:
+
+```bash
+OSRACER_ROOT=/path/to/osracer scripts/validate_osracer_lab.sh runtime-contract
+```
+
+If `OSRACER_ROOT` is not set, the check reports the missing upper-computer path instead of printing a Python traceback.
 
 ## 6. Run A Drift Smoke Test
 

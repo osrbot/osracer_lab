@@ -25,6 +25,8 @@ Targets:
                   Check shared hardware/runtime parameters against osracer.
   sim-sensor-contract
                   Check Isaac/MuJoCo sensor configs against hardware_params.py.
+  policy-observation-contract
+                  Check policy observations for real-car deployability.
   real-measurements
                   Validate real-car measurement JSON values and sources.
   measurement-consistency
@@ -164,6 +166,10 @@ case "$target" in
         ;;
     sim-sensor-contract)
         python3 "$ROOT_DIR/scripts/check_sim_sensor_contract.py"
+        ;;
+    policy-observation-contract)
+        shift
+        python3 "$ROOT_DIR/scripts/check_policy_observation_contract.py" "$@"
         ;;
     real-measurements)
         if [[ -z "${MEASUREMENTS_FILE:-}" ]]; then

@@ -47,6 +47,7 @@ const zhSidebar = [
     items: [
       { text: "硬件参数", link: "/hardware_parameters" },
       { text: "运行时接口约定", link: "/deployment" },
+      { text: "传感器与 Observation 合同", link: "/sensor_contract" },
       { text: "feat-demo 参数核对", link: "/feat_demo_parameter_audit" },
       { text: "实车测量清单", link: "/real_car_measurement_checklist" },
       { text: "参数填写表", link: "/real_car_parameter_fill_sheet" }
@@ -94,6 +95,7 @@ const enSidebar = [
     items: [
       { text: "Hardware Parameters", link: "/en/hardware_parameters" },
       { text: "Runtime Interface", link: "/en/deployment" },
+      { text: "Sensor Contract", link: "/en/sensor_contract" },
       { text: "feat-demo Parameter Audit", link: "/en/feat_demo_parameter_audit" },
       { text: "Measurement Checklist", link: "/en/real_car_measurement_checklist" },
       { text: "Parameter Fill Sheet", link: "/en/real_car_parameter_fill_sheet" }

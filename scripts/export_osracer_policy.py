@@ -3,7 +3,8 @@
 Example:
     ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
         --headless \
-        --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
+        --task Isaac-OSRacerVisualRL-v0 \
+        --checkpoint logs/rsl_rl/osracer_visual/<run>/model_1999.pt
 """
 
 from osracer_lab_rl.startup import startup
@@ -24,6 +25,11 @@ parser.add_argument(
 parser.add_argument("--jit_filename", type=str, default="policy.pt")
 parser.add_argument("--onnx_filename", type=str, default="policy.onnx")
 parser.add_argument("--log_dir", type=str, default="logs/rsl_rl")
+parser.add_argument(
+    "--allow-sim-only-observations",
+    action="store_true",
+    help="Allow exporting tasks that use simulator-only observations. Use only for sim/research artifacts.",
+)
 simulation_app, args_cli = startup(parser=parser)
 
 import importlib.metadata as metadata
@@ -34,6 +40,8 @@ import torch
 
 from isaaclab_tasks.utils import parse_env_cfg
 from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, handle_deprecated_rsl_rl_cfg
+
+SIM_ONLY_EXPORT_TASKS = {"Isaac-OSRacerDriftRL-v0"}
 
 
 def _export_jit(runner, path: str, obs: torch.Tensor) -> tuple[int, ...]:

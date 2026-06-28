@@ -49,12 +49,13 @@ Use the same task and checkpoint path:
 
 ## Export A Policy
 
-TorchScript export:
+Deployment-candidate policies should be exported from a task that does not use simulator-only truth. TorchScript export:
 
 ```bash
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
   --headless \
-  --checkpoint logs/rsl_rl/osracer_drift/<run>/model_1999.pt
+  --task Isaac-OSRacerVisualRL-v0 \
+  --checkpoint logs/rsl_rl/osracer_visual/<run>/model_1999.pt
 ```
 
 ONNX export:
@@ -62,14 +63,18 @@ ONNX export:
 ```bash
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
   --headless --format onnx \
-  --checkpoint logs/rsl_rl/osracer_drift/<run>/model_1999.pt
+  --task Isaac-OSRacerVisualRL-v0 \
+  --checkpoint logs/rsl_rl/osracer_visual/<run>/model_1999.pt
 ```
+
+For drift simulation research artifacts, add `--allow-sim-only-observations` explicitly. That export is not a real-car closed-loop policy.
 
 ## Do Not Put It On The Car Immediately
 
 Before real-car closed loop:
 
 ```bash
+scripts/validate_osracer_lab.sh policy-observation-contract --task Isaac-OSRacerVisualRL-v0
 scripts/validate_osracer_lab.sh runtime-contract
 scripts/validate_osracer_lab.sh measurement-gap
 scripts/validate_osracer_lab.sh sim2real-readiness

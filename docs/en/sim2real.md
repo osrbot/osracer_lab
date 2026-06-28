@@ -14,7 +14,8 @@ OSRacer sim2real has three stages: export the policy, validate offline, then run
 
 ```bash
 python3 scripts/package_jetson_deployment.py \
-  --policy logs/rsl_rl/osracer_drift/<run>/exported/policy.pt \
+  --task Isaac-OSRacerVisualRL-v0 \
+  --policy logs/rsl_rl/osracer_visual/<run>/exported/policy.pt \
   --measured-overlay /tmp/osracer_measured_overlay.json \
   --output-dir /tmp/osracer_jetson_deployment
 ```

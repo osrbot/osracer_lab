@@ -9,6 +9,7 @@ ROS 2 上位机工作区 `/home/osrbot/Desktop/osracer/osracer` 负责运行时�
 - Drift baseline: `logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt`
   - Command: `scripts/train_osracer_drift.py --headless --num_envs 2048 --max_iterations 2000`
   - Result: completed successfully on the RTX 4080 SUPER host.
+  - Scope: sim-only research baseline; not a default real-car deployment policy.
 - Visual stability check: `logs/rsl_rl/osracer_visual/2026-06-23_17-54-56/model_49.pt`
   - Command: `scripts/train_osracer_drift.py --task Isaac-OSRacerVisualRL-v0 --headless --num_envs 256 --max_iterations 50`
   - Result: completed successfully after finite-observation and non-finite-state guards.
@@ -66,12 +67,13 @@ cmd_watchdog_timeout_s: 0.5
 
 ## 推荐 ROS 2 接入方式
 
-Export a checkpoint before integrating with ROS 2:
+Export a deployment-candidate checkpoint before integrating with ROS 2:
 
 ```bash
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
   --headless \
-  --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
+  --task Isaac-OSRacerVisualRL-v0 \
+  --checkpoint logs/rsl_rl/osracer_visual/<run>/model_1999.pt
 ```
 
 The default output directory is `<checkpoint_dir>/exported/` and contains:
@@ -85,14 +87,16 @@ ONNX export is available when explicitly requested:
 ```bash
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
   --headless --format onnx \
-  --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
+  --task Isaac-OSRacerVisualRL-v0 \
+  --checkpoint logs/rsl_rl/osracer_visual/<run>/model_1999.pt
 ```
 
 拷贝到 Jetson 前，先把导出的策略和硬件参数、manifest、checksum 打包：
 
 ```bash
 python3 scripts/package_jetson_deployment.py \
-  --policy logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/exported/policy.pt \
+  --task Isaac-OSRacerVisualRL-v0 \
+  --policy logs/rsl_rl/osracer_visual/<run>/exported/policy.pt \
   --measured-overlay /tmp/osracer_measured_overlay.json \
   --output-dir /tmp/osracer_jetson_deployment
 ```

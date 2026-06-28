@@ -33,6 +33,33 @@ def read_text(path):
     return path.read_text(errors="replace")
 
 
+REQUIRED_OSRACER_FILES = (
+    "osracer_bringup/launch/chassis_ackermann.launch.py",
+    "osracer_bringup/script/chassis_ackermann.py",
+    "osracer_bringup/launch/usb_cam.launch.py",
+    "osracer_description/launch/robot_description_tf.launch.py",
+    "osracer_description/urdf/osracer.urdf",
+    "tools/jetson_preflight.sh",
+    "tools/jetson_sensor_preflight.sh",
+    "tools/jetson_measurement_session.sh",
+    "tools/real_car_readiness_check.sh",
+)
+
+
+def validate_osracer_root(osracer_root):
+    missing = [path for path in REQUIRED_OSRACER_FILES if not (osracer_root / path).is_file()]
+    if not missing:
+        return True
+    print("[BLOCKED] runtime contract check cannot run")
+    print(f"  osracer_root: {osracer_root}")
+    print("  missing required file(s):")
+    for path in missing:
+        print(f"    - {path}")
+    print("  Set OSRACER_ROOT to the local osracer feat-demo checkout, for example:")
+    print("    OSRACER_ROOT=/path/to/osracer scripts/validate_osracer_lab.sh runtime-contract")
+    return False
+
+
 def find_default_launch_value(text, argument_name):
     pattern = re.compile(
         r"DeclareLaunchArgument\(\s*['\"]"
@@ -142,6 +169,8 @@ def check_float(name, actual, expected, failures, tol=1e-9):
 def main():
     args = parse_args()
     osracer_root = Path(args.osracer_root).resolve()
+    if not validate_osracer_root(osracer_root):
+        return 2
     params = hardware_summary()
     runtime = params["real_runtime"]
     chassis = params["chassis"]

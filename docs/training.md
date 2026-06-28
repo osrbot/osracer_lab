@@ -61,13 +61,14 @@ cd ~/osracer_ws/osracer_lab
 
 ## 导出策略
 
-TorchScript：
+部署候选策略应从不含仿真真值的 task 导出。TorchScript：
 
 ```bash
 cd ~/osracer_ws/osracer_lab
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
   --headless \
-  --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
+  --task Isaac-OSRacerVisualRL-v0 \
+  --checkpoint logs/rsl_rl/osracer_visual/<run>/model_1999.pt
 ```
 
 ONNX：
@@ -76,14 +77,18 @@ ONNX：
 cd ~/osracer_ws/osracer_lab
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
   --headless --format onnx \
-  --checkpoint logs/rsl_rl/osracer_drift/2026-06-23_17-05-26/model_1999.pt
+  --task Isaac-OSRacerVisualRL-v0 \
+  --checkpoint logs/rsl_rl/osracer_visual/<run>/model_1999.pt
 ```
+
+如果只是导出 drift 仿真研究 artifact，必须显式加 `--allow-sim-only-observations`。该导出不能直接用于实车闭环。
 
 ## 导出后不要直接上车
 
 导出后至少跑：
 
 ```bash
+scripts/validate_osracer_lab.sh policy-observation-contract --task Isaac-OSRacerVisualRL-v0
 scripts/validate_osracer_lab.sh runtime-contract
 scripts/validate_osracer_lab.sh measurement-gap
 ```

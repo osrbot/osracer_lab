@@ -70,12 +70,16 @@ scripts/validate_osracer_lab.sh runtime-contract
   --task Isaac-OSRacerVisualRL-v0 --headless --num_envs 256
 ```
 
-导出 checkpoint：
+导出部署候选 checkpoint：
 
 ```bash
 ~/rlgpu_ws/IsaacLab/isaaclab.sh -p scripts/export_osracer_policy.py \
-  --headless --checkpoint logs/rsl_rl/osracer_drift/<run>/model_1999.pt
+  --headless \
+  --task Isaac-OSRacerVisualRL-v0 \
+  --checkpoint logs/rsl_rl/osracer_visual/<run>/model_1999.pt
 ```
+
+`Isaac-OSRacerDriftRL-v0` 仍是 sim-only 基线；如需导出仿真研究 artifact，必须额外加 `--allow-sim-only-observations`。
 
 ## 实车运行接口
 

@@ -62,18 +62,28 @@ Isaac-OSRacerVisualRL-v0
 
 ## 5. 跑最小静态检查
 
+这些检查只依赖 `osracer_lab` 本仓库：
+
 ```bash
 cd ~/osracer_ws/osracer_lab
 scripts/validate_osracer_lab.sh static
-scripts/validate_osracer_lab.sh source-authority-snapshot
-scripts/validate_osracer_lab.sh runtime-contract
+scripts/validate_osracer_lab.sh sim-sensor-contract
+scripts/validate_osracer_lab.sh policy-observation-contract --task Isaac-OSRacerVisualRL-v0
 ```
 
-这三步用于确认：
+它们用于确认：
 
 - Python 文件和包结构基本正确
-- `osrcore` / `osracer feat-demo` 的协议接口约定还一致
-- ROS 实车接口约定与 lab 参数还一致
+- 仿真相机 / 雷达参数仍来自硬件参数源
+- 部署候选 observation 没有直接使用仿真真值
+
+需要本地 `osracer feat-demo` 仓库时，再运行：
+
+```bash
+OSRACER_ROOT=/path/to/osracer scripts/validate_osracer_lab.sh runtime-contract
+```
+
+如果没有设置 `OSRACER_ROOT`，这个检查会提示缺少哪个上位机路径，不会再抛 Python traceback。
 
 ## 6. 跑 drift smoke
 
