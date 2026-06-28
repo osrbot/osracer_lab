@@ -275,4 +275,8 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except (FileNotFoundError, ValueError, ET.ParseError) as exc:
+        print(f"[FAIL] runtime contract check failed: {exc}")
+        raise SystemExit(1)

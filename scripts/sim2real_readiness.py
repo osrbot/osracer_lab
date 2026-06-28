@@ -56,7 +56,11 @@ def run_runtime_contract(osracer_root, strict_extrinsics=False):
     try:
         sys.argv = argv
         with contextlib.redirect_stdout(output):
-            code = runtime_contract_main()
+            try:
+                code = runtime_contract_main()
+            except Exception as exc:
+                print(f"[FAIL] runtime contract check raised: {exc}")
+                code = 1
     finally:
         sys.argv = old_argv
 
